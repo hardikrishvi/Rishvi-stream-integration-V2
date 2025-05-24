@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sync Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            padding-top: 20px;
+            position: fixed;
+            width: 220px;
+            color: white;
+        }
+
+            .sidebar a {
+                color: white;
+                text-decoration: none;
+                padding: 12px 20px;
+                display: block;
+            }
+
+                .sidebar a:hover {
+                    background-color: #495057;
+                }
+
+            .sidebar i {
+                margin-right: 10px;
+            }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        header, footer {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .card {
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h4 class="text-center mb-4">Rishvi</h4>
+        <a href="profile.html"><i class="fas fa-user-cog"></i> Profile</a>
+        <a href="report.html"><i class="fas fa-chart-line"></i> Reports</a>
+        <a href="sync.html"><i class="fas fa-sync-alt"></i> Sync</a>
+        <a href="main.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header><h3>Profile</h3></header>
+
+        <!-- Profile Edit Section -->
+        <div class="card p-4 mt-4">
+            <form id="profileForm">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Name</label>
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Email</label>
+                        <input type="text" class="form-control" id="email" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Password</label>
+                        <input type="password" class="form-control" id="password">
+                    </div>
+                </div>
+              
+                <div class="row mb-3">
+
+                    <div class="col-md-4">
+                        <label>Authorization Token</label>
+                        <input type="password" class="form-control" id="authToken">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Linnworks Sync Token</label>
+                        <input type="password" class="form-control" id="syncToken">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Last Auto Sync (UTC)</label>
+                        <input type="text" class="form-control" id="lastSync" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+
+
+                    <div class="col-md-4">
+                        <label>Linnworks Order Sync From Last (Hour)</label>
+                        <input type="text" class="form-control" id="linnhour">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Linnworks Order Sync Limit Per Page</label>
+                        <input type="text" class="form-control" id="linnpage">
+                    </div>
+                </div>
+
+                <!-- LINNWORKS Section -->
+                <div class="section-title">Linnworks</div>
+                <div class="row" id="linnworksSection"></div>
+
+                <!-- STREAM Section -->
+                <div class="section-title">Stream</div>
+                <div class="row" id="streamSection"></div>
+
+
+                <!-- Sync Section -->
+                <div class="section-title">Sync</div>
+                <div class="row" id="syncSection"></div>
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+            <div id="successMsg" class="alert alert-success mt-3 d-none">Profile updated successfully!</div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-4">&copy; 2025 My Dashboard. All rights reserved.</footer>
+    </div>
+
+    <script>
+        if (localStorage.getItem('email') == '') {
+            window.location.href = 'main.html';
+        }
+        const apiUrl = 'api/Config/Get/' + localStorage.getItem('email');
+        const saveUrl = 'api/Config/Save';
+        let profileData;
+
+        // Load data
+        fetch(apiUrl)
+            .then(res => res.json())
+            .then(data => {
+                profileData = data;
+                document.getElementById('name').value = data.name;
+                document.getElementById('email').value = data.email;
+                document.getElementById('password').value = data.password;
+                document.getElementById('authToken').value = data.authorizationToken;
+                document.getElementById('syncToken').value = data.linnworksSyncToken;
+                document.getElementById('lastSync').value = data.lastSyncOn;
+                //document.getElementById('ClientId').value = data.ClientId;
+                //document.getElementById('ClientSecret').value = data.ClientSecret;
+                document.getElementById('linnpage').value = data.linnpage;
+                document.getElementById('linnhour').value = data.linnhour;
+                renderCheckboxes('linnworksSection', data.linnworks);
+                renderCheckboxes('streamSection', data.stream);
+              
+                renderCheckboxes('syncSection', data.sync);
+            });
+
+        function renderCheckboxes(sectionId, obj) {
+            const section = document.getElementById(sectionId);
+            Object.entries(obj).forEach(([key, value]) => {
+                const label = key.replace(/([A-Z])/g, ' $1');
+                section.innerHTML += `
+                    <div class="col-md-4 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="${sectionId}-${key}" ${value ? 'checked' : ''}>
+                            <label class="form-check-label" for="${sectionId}-${key}">${label}</label>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Save data
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const updatedData = {
+                Name: document.getElementById('name').value,
+                Email: profileData.email, // can't change
+                Password: document.getElementById('password').value,
+                AuthorizationToken: document.getElementById('authToken').value,
+                LinnworksSyncToken: document.getElementById('syncToken').value,
+                LastSyncOn : document.getElementById('lastSync').value,
+                Linnworks: getCheckboxValues('linnworksSection', profileData.linnworks),
+                Stream: getCheckboxValues('streamSection', profileData.stream),
+                //ClientSecret: document.getElementById('ClientSecret').value,
+                //ClientId: document.getElementById('ClientId').value,
+                Sync: getCheckboxValues('syncSection', profileData.sync),
+                linnpage: document.getElementById('linnpage').value,
+                linnhour: document.getElementById('linnhour').value,
+            };
+
+            fetch(saveUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+            })
+                .then(response => response.text()) // Read response as text (if it's a string)
+                .then(responseText => {
+                    if (responseText == 'ok') {
+                        document.getElementById('successMsg').classList.remove('d-none');
+                        setTimeout(() => {
+                            document.getElementById('successMsg').classList.add('d-none');
+                        }, 3000);
+                    }
+                    else {
+                        alert(responseText);
+                    }
+                
+            })
+            .catch(() => alert("Failed to save profile."));
+        });
+
+        function getCheckboxValues(sectionId, original) {
+            const obj = {};
+            for (const key in original) {
+                const checkbox = document.getElementById(`${sectionId}-${key}`);
+                obj[key] = checkbox.checked;
+            }
+            return obj;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linnworks-Stream Intigration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            transition: all 1s ease;
+        }
+
+        header,
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        header h1,
+        footer p {
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 80px);
+            padding: 20px;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 80%;
+            max-width: 1200px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            gap: 2%;
+        }
+
+        .signup-container,
+        .login-container {
+            width: 48%;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            border-color: #ff7e5f;
+            outline: none;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background-color: #ff7e5f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #feb47b;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group input:checked {
+            background-color: #ff7e5f;
+            border-color: #ff7e5f;
+        }
+
+        .checkbox-group input:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 126, 95, 0.5);
+        }
+
+        .checkbox-group input:hover {
+            background-color: #feb47b;
+        }
+
+        .animated-input {
+            opacity: 0;
+            animation: fadeIn 0.6s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .success-message {
+            font-size: 18px;
+            color: green;
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #343a40;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .error-message {
+            font-size: 14px;
+            color: #d9534f;
+        }
+
+        .signup-container,
+        .login-container {
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Linnworks-Stream Integration</h1>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+
+            <!-- Signup Form -->
+            <div class="signup-container">
+                <h2>Sign Up</h2>
+                <form id="signup-form">
+                    <!-- Step 1 -->
+                    <div id="step1">
+                        <input type="text" id="name" class="form-control animated-input" placeholder="Name" required>
+                        <input type="email" id="email" class="form-control animated-input" placeholder="Email" required>
+                        <input type="password" id="password" class="form-control animated-input" placeholder="Password" required>
+                        <input type="password" id="confirm-password" class="form-control animated-input" placeholder="Confirm Password" required>
+                        <label><input type="checkbox" id="terms" required> I agree to the terms and conditions</label>
+                        <div id="terms-error" class="error-message"></div>
+                        <button type="button" class="btn" id="next-step">Next</button>
+                    </div>
+
+                    <!-- Step 2: Linnworks Preferences -->
+                    <div id="step2" style="display:none;">
+                        <label>Select Linnworks Preferences:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="linnworks1"> Download Order from Stream</label>
+                            <label><input type="checkbox" id="linnworks3"> Print Label from Stream</label>
+                            <label><input type="checkbox" id="linnworks4"> Print Label from Linnworks</label>
+                            <label><input type="checkbox" id="linnworks5"> Dispatch Order from Stream</label>
+                            <label><input type="checkbox" id="linnworks8"> Send Change to Stream</label>
+                        </div>
+                        <button type="button" class="btn" id="next-step2">Next</button>
+                    </div>
+
+                    <!-- Step 3: Stream Preferences -->
+                    <div id="step3" style="display:none;">
+                        <label>Select Stream Preferences:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="stream1"> Get Tracking Details</label>
+                            <label><input type="checkbox" id="stream2"> Enable/Disable Webhook</label>
+                            <label><input type="checkbox" id="stream3"> Send Change from Linnworks to Stream</label>
+                            <label><input type="checkbox" id="stream5"> Create Product to Stream</label>
+                            <label><input type="checkbox" id="stream6"> Download Product from Stream to Linnworks</label>
+                            <label><input type="checkbox" id="stream7"> Get Route Plan from Stream</label>
+                            <label><input type="checkbox" id="stream8"> Get Depot List from Stream</label>
+                        </div>
+                        <button type="button" class="btn" id="next-step3">Next</button>
+                    </div>
+
+
+                    <!-- Step 5: Success Message -->
+                    <div id="step4" style="display:none;">
+                        <div class="success-message">Registration Successful! Now proceed to login.</div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-container">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <input type="email" id="login-email" class="form-control animated-input" placeholder="Email" required>
+                    <input type="password" id="login-password" class="form-control animated-input" placeholder="Password" required>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Company Name. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Random background color and pattern
+        function getRandomColor() {
+            const colors = [
+                'linear-gradient(to right, #ff7e5f, #feb47b)',
+                'linear-gradient(to right, #6a11cb, #2575fc)',
+                'linear-gradient(to right, #ff7e5f, #feb47b, #2575fc, #6a11cb)',
+                'linear-gradient(to right, #00c6ff, #0072ff)',
+                'linear-gradient(to right, #ffafbd, #ffc3a0)'
+            ];
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            return colors[randomIndex];
+        }
+
+        // Apply random background color on page load
+        document.body.style.background = getRandomColor();
+        localStorage.setItem('email', '');
+        // Step 1 to Step 2 Transition
+        $('#next-step').on('click', function () {
+            var isValid = true;
+            var email = $('#email').val();
+            var password = $('#password').val();
+            var confirmPassword = $('#confirm-password').val();
+
+            // Email Validation
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!email.match(emailPattern)) {
+                isValid = false;
+                alert("Please enter a valid email address.");
+            }
+
+            // Password Validation
+            if (password !== confirmPassword) {
+                isValid = false;
+                alert("Passwords do not match.");
+            }
+
+            if ($('#terms').is(':checked') === false) {
+                isValid = false;
+                alert("Please agree to the terms and conditions.");
+            }
+
+            if (isValid) {
+                $('#step1').hide();
+                $('#step2').show();
+            }
+        });
+
+        // Step 2 to Step 3 Transition
+        $('#next-step2').on('click', function () {
+            $('#step2').hide();
+            $('#step3').show();
+        });
+
+       
+
+        // Step 4 to Step 5 Transition and API Call
+        $('#next-step3').on('click', function () {
+            var registrationData = {
+                name: $('#name').val(),
+                email: $('#email').val(),
+                password: $('#password').val(),
+                linnworks: {
+                    downloadOrderFromStream: $('#linnworks1').prop('checked'),
+                    printLabelFromStream: $('#linnworks3').prop('checked'),
+                    printLabelFromLinnworks: $('#linnworks4').prop('checked'),
+                    dispatchOrderFromStream: $('#linnworks5').prop('checked'),
+                    sendChangeToStream: $('#linnworks8').prop('checked')
+                },
+                stream: {
+                    getTrackingDetails: $('#stream1').prop('checked'),
+                    enableWebhook: $('#stream2').prop('checked'),
+                    sendChangeFromLinnworksToStream: $('#stream3').prop('checked'),
+                    createProductToStream: $('#stream5').prop('checked'),
+                    downloadProductFromStreamToLinnworks: $('#stream6').prop('checked'),
+                    getRoutePlanFromStream: $('#stream7').prop('checked'),
+                    getDepotListFromStream: $('#stream8').prop('checked')
+                }
+            };
+
+            const apiUrl = '/api/Config/Register';
+          
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Set content type to JSON
+                },
+                body: JSON.stringify(registrationData) // Send data as JSON string
+            })
+                .then(response => response.text()) // Read response as text (if it's a string)
+                .then(responseText => {
+                    if (responseText == 'ok') {
+                        $('#step3').hide();
+                        $('#step4').show();
+                    }
+                    else {
+                        alert(responseText);
+                    }
+                })
+                .catch(error => {
+
+                });
+            // Show success message
+            
+        });
+
+        // Login Form Submission
+        $('#login-form').on('submit', function (e) {
+            e.preventDefault();
+
+            var email = $('#login-email').val();
+            var password = $('#login-password').val();
+
+            // Check if email and password are correct (for example purposes, we assume they are valid)
+            if (email && password) {
+                const apiUrl = '/api/Config/Login';
+                var loginData = {
+                    
+                    email: email,
+                    password: password,
+                    
+                };
+                debugger;
+                localStorage.setItem('email', loginData.email);
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Set content type to JSON
+                    },
+                    body: JSON.stringify(loginData) // Send data as JSON string
+                })
+                    .then(response => response.text()) // Read response as text (if it's a string)
+                    .then(responseText => {
+                        if (responseText == 'ok') {
+                            
+                            window.location.href = 'report.html' // Redirect to the new URL
+                        }
+                        else {
+                            alert(responseText);
+                            localStorage.setItem('email', '');
+                        }
+                    })
+                    .catch(error => {
+                    });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+﻿<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+
+	<title>Code Generator</title>
+</head>
+<body>
+	<div class="container" ng-controller="CodeGeneratorController">
+		<div class="row">
+			<div class="col">
+				<div class="form-group">
+					<label for="modules">Modules</label>
+					<select class="form-control" id="modules" ng-model="dto.module">
+						<option value="">[Select Module]</option>
+						<option ng-repeat="module in modules" ng-value="module" ng-bind="module"></option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="models">Models</label>
+					<select class="form-control" id="models" ng-model="dto.model">
+						<option value="">[Select Model]</option>
+						<option ng-repeat="model in models" ng-value="model" ng-bind="model"></option>
+					</select>
+				</div>
+
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generateModelFiles()">Generate Model Files</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('data-configuration')">Generate Data Configuration</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('dto')">Generate DTOs</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('mapper')">Generate Mapper</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('validations')">Generate Validations</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('list-orders')">Generate List Order</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('filters')">Generate Filter</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('admin-service')">Generate Admin Service</a>
+				<a href="javascript:;" class="btn btn-link"
+				   ng-show="dto.model"
+				   ng-click="generate('admin-api')">Generate Admin Api</a>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			crossorigin="anonymous">
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+	</script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.js"></script>
+
+	<script>
+		(function (angular) {
+			"use strict";
+
+			var app = angular.module("myApp", []);
+
+			app.controller('CodeGeneratorController', function($scope, $http) {
+
+				$scope.dto = {};
+
+				$scope.modules = null;
+				$http.get('api/code-generator/modules')
+					.then(function(resp) {
+						$scope.modules = resp.data;
+					});
+
+				$scope.models = null;
+				$scope.$watch('dto.module',
+					function(newValue, oldValue, scope) {
+
+						if (newValue == '' || newValue == undefined) {
+							$scope.dto.model = '';
+							$scope.models = null;
+							return;
+						}
+
+						$http.get('api/code-generator/modules/' + newValue)
+							.then(function(resp) {
+								$scope.models = resp.data;
+							});
+					});
+
+				//$scope.generateFolderStructure = function() {
+				//	$http.get('api/code-generator/modules/' + $scope.dto.module + '/generate-folders');
+				//};
+
+				$scope.generateModelFiles = function () {
+					$http.get('api/code-generator/modules/' + $scope.dto.module + '/generate-folders');
+					$scope.generate('code');
+				};
+
+				$scope.generate = function (type) {
+					$http.get('api/code-generator/modules/' + $scope.dto.module + '/properties/' + $scope.dto.model + '/generate-' + type);
+				};
+			});
+
+
+		}(window.angular));
+	</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+﻿SiteSetting:
+  SiteTitle:            Rishvi .NET 6 with lambda
+  WebsiteUrl:           http://localhost:5268/
+
+MailSettings:
+  Enabled:              true
+  FromName:             Rishvi .NET Core with Angular Framework
+  FromEmail:            donotreply@rishvi.co.uk
+  ContactEmail:         contact@rishvi.co.uk
+  Host:                 smtp.mailtrap.io
+  Port:                 587
+  EnableSsl:            true
+  IsAuthentication:     true
+  Username:             b5832ae7678ef0
+  Password:             b701e1a9bdf732

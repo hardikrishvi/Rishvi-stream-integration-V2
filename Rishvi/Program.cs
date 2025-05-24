@@ -1,0 +1,106 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.Core.Helpers;
+using Rishvi;
+using SyncApiController.Services;
+using Rishvi.Modules.ShippingIntegrations.Models.Classes;
+using Rishvi_Vault;
+using Microsoft.EntityFrameworkCore;
+using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.ShippingIntegrations.Core.Helper;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.ShippingIntegrations.Api;
+using Hangfire;
+using Rishvi.Modules.ShippingIntegrations.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Store configuration reference early
+var config = builder.Configuration;
+
+// Register services
+builder.Services.AddTransient<ServiceHelper>();
+builder.Services.AddScoped<AwsS3>();
+builder.Services.AddTransient<ConfigController>();
+
+builder.Services.AddDbContext<SqlContext>(options =>
+{
+    options.UseSqlServer(config.GetConnectionString("Connection")); // Use your DB provider
+});
+builder.Services.Configure<ApplicationSettings>(
+    builder.Configuration.GetSection("ApplicationSettings"));
+
+builder.Services.Configure<MessinaSettings>(builder.Configuration.GetSection("MessinaSettings"));
+builder.Services.Configure<ServiceHelperSettings>(builder.Configuration.GetSection("ServiceHelperSettings"));
+//builder.Services.Configure<StreamApiSettings>(builder.Configuration.GetSection("StreamApiSettings"));
+//builder.Services.Configure<CourierSettings>(builder.Configuration.GetSection("CourierSettings"));
+
+
+// AWS Lambda hosting
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
+// Custom services
+builder.Services.ConfigureServices(config);
+
+// Register Autofac
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+// Hosted background service
+builder.Services.AddHostedService<SyncBackgroundService>();
+
+// Autofac container modules
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+{
+    containerBuilder.RegisterModule(new RepositoryHandlerModule());
+    containerBuilder.RegisterType<TradingApiOAuthHelper>().AsSelf();
+    containerBuilder.RegisterType<ReportsController>().PropertiesAutowired();
+    containerBuilder.RegisterType<SetupController>().AsSelf();
+    containerBuilder.RegisterType<ServiceHelper>().AsSelf();
+    containerBuilder.RegisterType<ServiceHelper>().As<IServiceHelper>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<AuthorizationConfig>().As<IAuthorizationToken>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ConfigController>().AsSelf().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<LinnworksController>().AsSelf().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<StreamController>().AsSelf().InstancePerLifetimeScope();
+});
+
+// Safely register Hangfire
+var hangfireConnectionString = config.GetConnectionString("Connection");
+builder.Services.AddHangfire(configuration =>
+{
+    configuration.UseSqlServerStorage(hangfireConnectionString);
+});
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = Environment.ProcessorCount * 5;
+});
+
+// HttpClient registration
+builder.Services.AddHttpClient();
+
+// Build and configure app
+var app = builder.Build();
+
+// Setup AppSettings
+AppSettings.AppSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
+
+// Configure middleware
+app.Configure(builder.Environment);
+
+app.UseHangfireDashboard("/hangfire");
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
+
+// Run the app
+app.Run();
