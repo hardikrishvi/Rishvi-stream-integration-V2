@@ -10,24 +10,33 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
     public class ServiceHelper : IServiceHelper
     {
         private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
-        private readonly ServiceHelperSettings _settings;
+        private readonly string _StoragePath;
+        private readonly string _OrderStoreLocation;
+        private readonly string _ProductStoreLocation;
+        private readonly string _StockStoreLocation;
+        private readonly string _PriceStoreLocation;
+        private readonly string _ProcessStoreLocation;
 
-        public ServiceHelper(TradingApiOAuthHelper tradingApiOAuthHelper, IOptions<ServiceHelperSettings> options)
+        private readonly string _ApiBasePath;
+        private readonly string _OAuthUrl;
+        private readonly string _SyncPath;
+        private readonly string _ImageURL;
+
+        public ServiceHelper(TradingApiOAuthHelper tradingApiOAuthHelper, IConfiguration config)
         {
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
-            _settings = options.Value;
+            _StoragePath = config["ServiceHelperSettings:StoragePath"] ?? GetSetting("StoragePath");
+            _OrderStoreLocation = config["ServiceHelperSettings:OrderStoreLocation"];
+            _ProductStoreLocation = config["ServiceHelperSettings:ProductStoreLocation"];
+            _StockStoreLocation = config["ServiceHelperSettings:StockStoreLocation"];
+            _PriceStoreLocation = config["ServiceHelperSettings:PriceStoreLocation"];
+            _ProcessStoreLocation = config["ServiceHelperSettings:ProcessStoreLocation"] ?? GetSetting("ProcessStoreLocation");
+            _ApiBasePath = config["ServiceHelperSettings:ApiBasePath"] ?? GetSetting("ApiBasePath");
+            _OAuthUrl = config["ServiceHelperSettings:OAuthUrl"] ?? GetSetting("OAuthUrl");
+            _SyncPath = config["ServiceHelperSettings:SyncPath"] ?? GetSetting("SyncPath");
+            _ImageURL = config["ServiceHelperSettings:ImageURL"] ?? GetSetting("ImageURL");
         }
-        public string StoragePath => _settings.StoragePath;
-        public string OrderStoreLocation => _settings.OrderStoreLocation;
-        public string ProductStoreLocation => _settings.ProductStoreLocation;
-        public string StockStoreLocation => _settings.StockStoreLocation;
-        public string PriceStoreLocation => _settings.PriceStoreLocation;
-        public string ProcessStoreLocation => _settings.ProcessStoreLocation;
-
-        public string ApiBasePath => _settings.ApiBasePath;
-        public string OAuthUrl => _settings.OAuthUrl;
-        public string SyncPath => _settings.SyncPath;
-
+        
         private static string GetSetting([CallerMemberName] string name = null)
         {
             return System.Configuration.ConfigurationManager.AppSettings.Get(name) ?? string.Empty;
@@ -114,7 +123,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
                         Tag = identifierTag,
                         IsCustom = true,
                         ImageId = Guid.NewGuid(),
-                        ImageUrl = $"https://stream-api-stg.rishvi.app/{identifierTag}.png"
+                        ImageUrl = _ImageURL + identifierTag + ".png"
                     }
                 });
             });

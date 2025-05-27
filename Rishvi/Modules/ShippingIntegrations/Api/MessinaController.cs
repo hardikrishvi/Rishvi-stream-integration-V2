@@ -41,11 +41,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         //internal static string webApiURL = "https://api.ebay.com/ws/api.dll";
 
         private readonly IAuthorizationToken _authorizationToken;
-        private readonly MessinaSettings _settings;
-        public MessinaController(IAuthorizationToken authorizationToken, IOptions<MessinaSettings> settings)
+        public MessinaController(IAuthorizationToken authorizationToken)
         {
             _authorizationToken = authorizationToken;
-            _settings = settings.Value;
         }
 
         [HttpGet(), Route("Landing")]
@@ -55,7 +53,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 string path = "<script  nonce=\"avsm220214\">document.location=\"{0}\"</script>";
                 email = HttpUtility.UrlEncode(email);
-                var helper = new MessianApiOAuthHelper(_settings);
+                var helper = new MessianApiOAuthHelper();
                 string newToken = Guid.NewGuid().ToString();
                 var SessionID = helper.GetSessionID(newToken);
                 AuthorizationConfigClass newConfig = _authorizationToken.CreateNew(email, SessionID, newToken, accountname, "", "", token);
@@ -65,7 +63,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     ContentType = "text/html",
                     StatusCode = (int)HttpStatusCode.Redirect,
                     Content = String.Format(path, AuthorizeUrl.Replace("{SESSION_ID}", SessionID)
-                    .Replace("{RU_NAME}", _settings.ProdRedirectURL))
+                    .Replace("{RU_NAME}", MessinaSettings.ProdRedirectURL))
                 };
             }
             catch (Exception ex)
@@ -81,13 +79,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             var user = _authorizationToken.Load(token);
             if (!string.IsNullOrEmpty(user.SessionID))
             {
-                await new MessianApiOAuthHelper(_settings).GenerateToken(user, user.SessionID);
+                await new MessianApiOAuthHelper().GenerateToken(user, user.SessionID);
             }
             return new ContentResult
             {
                 ContentType = "text/html",
                 StatusCode = (int)HttpStatusCode.Redirect,
-                Content = String.Format(path, _settings.HostName + "/messinacomplete.html")
+                Content = String.Format(path, MessinaSettings.HostName + "/messinacomplete.html")
             };
         }
 
@@ -97,17 +95,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             var user = _authorizationToken.Load(token);
             if (!string.IsNullOrEmpty(user.access_token))
             {
-                user.FtpPassword = String.IsNullOrEmpty(user.FtpPassword) ? _settings.FtpPassword : user.FtpPassword;
-                user.FtpUsername = String.IsNullOrEmpty(user.FtpUsername) ? _settings.FtpUsername : user.FtpUsername;
-                user.FtpHost = String.IsNullOrEmpty(user.FtpHost) ? _settings.FtpHost : user.FtpHost;
+                user.FtpPassword = String.IsNullOrEmpty(user.FtpPassword) ? MessinaSettings.FtpPassword : user.FtpPassword;
+                user.FtpUsername = String.IsNullOrEmpty(user.FtpUsername) ? MessinaSettings.FtpUsername : user.FtpUsername;
+                user.FtpHost = String.IsNullOrEmpty(user.FtpHost) ? MessinaSettings.FtpHost : user.FtpHost;
                 var ftpConfig = new FtpClient(user.FtpHost)
                 {
                     Credentials = new System.Net.NetworkCredential(user.FtpUsername,user.FtpPassword)
                 };
                 string remoteFilePath = "/Messina/" + filename + ".csv"; // Replace with your FTP file path
                 string localFilePath = "local-file.csv"; // Local path to save the file
-                new MessianApiOAuthHelper(_settings).DownloadFileFromFtpAsync(ftpConfig, remoteFilePath, localFilePath, user);
-                new MessianApiOAuthHelper(_settings).ReadCsvAndBatchProcessAsync(localFilePath, 3, user);
+                new MessianApiOAuthHelper().ReadCsvAndBatchProcessAsync(localFilePath, 3, user);
             }
         }
     }   

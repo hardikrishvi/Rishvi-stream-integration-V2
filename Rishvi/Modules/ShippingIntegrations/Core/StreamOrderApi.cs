@@ -42,7 +42,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId)
         {
             string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-            var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
+            //var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
+            var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
             var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
             var request = new RestRequest("/orders/orders/" + orderNo, Method.Get);
             request.AddHeader("Accept", "application/json");
@@ -69,7 +70,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
+                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.CreateOrderUrl), Method.Post);
                 request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service,type));
@@ -120,7 +121,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
+                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest("/orders/orders/" + orderid, Method.Patch);
                 string finalreq = JsonConvert.SerializeObject(new StreamOrderUpdateReq.Root()
@@ -227,7 +228,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
+                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.DeleteOrderUrl) + orderNo, Method.Delete);
                 //request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service));
@@ -282,7 +283,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     http_method = http_method
                 };
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
+                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest("/webhooks/webhooks", Method.Post);
                 request.AddJsonBody(JsonConvert.SerializeObject(req));

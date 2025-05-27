@@ -19,8 +19,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
     {
         private readonly ReportsController _reportsController;
         private readonly SetupController _setupController;
-        private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
-        public TradingApiOAuthHelper(ReportsController reportsController, SetupController setupController, IOptions<CourierSettings> courierSettings)
+       // private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
+        public TradingApiOAuthHelper(ReportsController reportsController, SetupController setupController)
         {
             _reportsController = reportsController;
             _setupController = setupController;
@@ -585,7 +585,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             List<CourierService> services = Services.GetServices;
             var streamAuth = ManageToken.GetToken(auth);
             //CourierService selectedService = services.Find(s => s.ServiceUniqueId == new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9"));
-            CourierService selectedService = services.Find(s => s.ServiceUniqueId == _selectedServiceGuid);
+            CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
                 var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
@@ -602,7 +602,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         CompanyName = jsopndata.CustomerInfo.Address.Company,
                         CountryCode = "GB",
                         DeliveryNote = "",
-                        ServiceId = _selectedServiceGuid,
+                        ServiceId = CourierSettings.SelectedServiceId,
                         Email = auth.Email,
                         Name = jsopndata.CustomerInfo.Address.FullName,
                         OrderReference = jsopndata.NumOrderId.ToString(),
@@ -644,7 +644,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         {
             List<CourierService> services = Services.GetServices;
             var streamAuth = ManageToken.GetToken(auth);
-            CourierService selectedService = services.Find(s => s.ServiceUniqueId == _selectedServiceGuid);
+            CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
                 var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
@@ -664,7 +664,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             CompanyName = jsopndata.CustomerInfo.Address.Company,
                             CountryCode = "GB",
                             DeliveryNote = "",
-                            ServiceId = _selectedServiceGuid,
+                            ServiceId = CourierSettings.SelectedServiceId,
                             Email = auth.Email,
                             Name = jsopndata.CustomerInfo.Address.FullName,
                             OrderReference = jsopndata.NumOrderId.ToString(),
