@@ -7,6 +7,7 @@ using Rishvi.Modules.Core.Authorization;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.DTOs;
 using Rishvi.Modules.CronJob;
+using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi_Vault;
 
 namespace Rishvi
@@ -30,6 +31,11 @@ namespace Rishvi
             _ = services.Configure<FtpSetting>(Configuration.GetSection("FtpSetting"));
             _ = services.Configure<LinnworkAppCredential>(Configuration.GetSection("LinnworkAppCredential"));
             _ = services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));
+            _ = services.Configure<CourierSettings>(Configuration.GetSection("CourierSettings"));   
+            _ = services.Configure<ServiceHelperSettings>(Configuration.GetSection("ServiceHelperSettings"));
+            _ = services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
+            _ = services.Configure<MessinaSettings>(Configuration.GetSection("MessinaSettings"));
+            _ = services.Configure<StreamApiSettings>(Configuration.GetSection("StreamApiSettings"));
 
             _ = services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
             {

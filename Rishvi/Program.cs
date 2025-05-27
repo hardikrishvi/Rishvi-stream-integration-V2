@@ -25,18 +25,10 @@ builder.Services.AddTransient<ServiceHelper>();
 builder.Services.AddScoped<AwsS3>();
 builder.Services.AddTransient<ConfigController>();
 
-builder.Services.AddDbContext<SqlContext>(options =>
-{
-    options.UseSqlServer(config.GetConnectionString("Connection")); // Use your DB provider
-});
-builder.Services.Configure<ApplicationSettings>(
-    builder.Configuration.GetSection("ApplicationSettings"));
-
-builder.Services.Configure<MessinaSettings>(builder.Configuration.GetSection("MessinaSettings"));
-builder.Services.Configure<ServiceHelperSettings>(builder.Configuration.GetSection("ServiceHelperSettings"));
-//builder.Services.Configure<StreamApiSettings>(builder.Configuration.GetSection("StreamApiSettings"));
-//builder.Services.Configure<CourierSettings>(builder.Configuration.GetSection("CourierSettings"));
-
+//builder.Services.AddDbContext<SqlContext>(options =>
+//{
+//    options.UseSqlServer(config.GetConnectionString("Connection")); // Use your DB provider
+//});
 
 // AWS Lambda hosting
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);

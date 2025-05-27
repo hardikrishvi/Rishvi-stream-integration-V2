@@ -135,7 +135,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     res.LastSyncOnDate = DateTime.Now;
                     await _configController.Save(res);
 
-                    new MessianApiOAuthHelper(_settings).SyncLogs(
+                    new MessianApiOAuthHelper().SyncLogs(
                         DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"),
                         res.AuthorizationToken,
                         DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")
