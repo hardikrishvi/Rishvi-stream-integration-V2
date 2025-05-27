@@ -16,19 +16,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
 
         public LinnworksAPI.BaseSession authorized = new LinnworksAPI.BaseSession();
         public LinnworksAPI.ApiContext context = null;
-        private readonly ApplicationSettings _appSettings;
-        public LinnworksBaseStream(ApplicationSettings appSettings)
-        {
-            _appSettings = appSettings;
-        }
 
         public LinnworksBaseStream(string token)
         {
             //Fetch the application settings from the config file
             authorized = controller.AuthorizeByApplication(new LinnworksAPI.AuthorizeByApplicationRequest
             {
-                ApplicationId = Guid.Parse("060f6bc8-cb09-4682-b280-de37f8892f4c"),
-                ApplicationSecret = Guid.Parse("7166a843-a1e3-450b-88a9-626feb3229a6"),
+                ApplicationId = ApplicationSettings.ApplicationId,
+                ApplicationSecret = ApplicationSettings.ApplicationSecret,
                 Token = Guid.Parse(token)
             });
 

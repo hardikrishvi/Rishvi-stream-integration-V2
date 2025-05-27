@@ -19,8 +19,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         ServiceGroup="Generic",
                         ServiceName="Stream Generic Service",
                         ServiceTag = "STREAM",
-                        //ServiceUniqueId = _serviceUniqueId,
-                        ServiceUniqueId = Guid.Parse("6A476315-04DB-4D25-A25C-E6917A1BCAD9"),
+                        ServiceUniqueId = CourierSettings.SelectedServiceId,
+                        //ServiceUniqueId = Guid.Parse("6A476315-04DB-4D25-A25C-E6917A1BCAD9"),
                         ServiceProperty = new List<Classes.ServiceProperty>(),
                         ConfigItems = new List<Classes.ConfigItem>()
                     }

@@ -51,7 +51,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 if (!isAuthorized)
                 {
                     string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                    var client = new RestClient(ClientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath);
+                    //var client = new RestClient(ClientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath);
+                    var client = new RestClient(ClientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath);
                     var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.StreamOAuthUrl), Method.Post);
                     request.AddJsonBody(new { grant_type = AWSParameter.GetConnectionString(AppSettings.GrantType), client_id = ClientId, client_secret= ClientSecret });
                     request.AddHeader("Accept", "application/json");

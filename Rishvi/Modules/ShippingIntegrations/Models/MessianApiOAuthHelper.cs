@@ -16,11 +16,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
     public class MessianApiOAuthHelper
     {
         int SiteID = 2;
-        private readonly MessinaSettings _settings;
-        public MessianApiOAuthHelper(MessinaSettings settings)
-        {
-            _settings = settings;
-        }
 
         public string GetSessionID(string AuthToken)
         {
@@ -28,7 +23,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             string error = "";
             string strReq = @"<?xml version=""1.0"" encoding=""utf-8""?>
                         <GetSessionIDRequest xmlns=""urn:ebay:apis:eBLBaseComponents"">
-                          <RuName>" + _settings.ProdRedirectURL + @"</RuName>
+                          <RuName>" + MessinaSettings.ProdRedirectURL + @"</RuName>
                         </GetSessionIDRequest>";
 
             xmlDoc = MakeAPICall(strReq, "GetSessionID", error, AuthToken);
@@ -157,10 +152,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             xmlQuery.AppendJoin("\n", new string[] {
                                 "</ReviseInventoryStatusRequest>"
                                 });
-            var ProductResp = await HttpPostXMLAsync(xmlQuery.ToString(), _settings.WebApiURL,
+            var ProductResp = await HttpPostXMLAsync(xmlQuery.ToString(), MessinaSettings.WebApiURL,
                         new Dictionary<string, string>() {
                                 {"X-EBAY-API-SITEID","2" },
-                                {"X-EBAY-API-COMPATIBILITY-LEVEL",_settings.TradingAPI_Version },
+                                {"X-EBAY-API-COMPATIBILITY-LEVEL", MessinaSettings.TradingAPI_Version },
                                 {"X-EBAY-API-CALL-NAME","ReviseInventoryStatus"}
                            }, true);
 
@@ -206,12 +201,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         {
             XmlDocument xmlDoc = new XmlDocument();
 
-            string APIServerURL = _settings.TradingAPI_ServerURL;
+            string APIServerURL = MessinaSettings.TradingAPI_ServerURL;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(APIServerURL);
-            request.Headers.Add("X-EBAY-API-DEV-NAME", _settings.DeveloperId);
-            request.Headers.Add("X-EBAY-API-APP-NAME", _settings.ProdClientId);
-            request.Headers.Add("X-EBAY-API-CERT-NAME", _settings.ProdClientSecret);
-            request.Headers.Add("X-EBAY-API-COMPATIBILITY-LEVEL", _settings.TradingAPI_Version);
+            request.Headers.Add("X-EBAY-API-DEV-NAME", MessinaSettings.DeveloperId);
+            request.Headers.Add("X-EBAY-API-APP-NAME", MessinaSettings.ProdClientId);
+            request.Headers.Add("X-EBAY-API-CERT-NAME", MessinaSettings.ProdClientSecret);
+            request.Headers.Add("X-EBAY-API-COMPATIBILITY-LEVEL", MessinaSettings.TradingAPI_Version);
             request.Headers.Add("X-EBAY-API-SITEID", SiteID.ToString());
             request.Headers.Add("X-EBAY-API-CALL-NAME", callname);
             request.Method = "POST";
@@ -294,8 +289,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                     });
                     t.Wait();
 
-                    // Pass the required '_settings' parameter to the constructor
-                    new MessianApiOAuthHelper(_settings).ProcessBatchAsync(batch, user);
+                    new MessianApiOAuthHelper().ProcessBatchAsync(batch, user);
                     batch.Clear();
                 }
             }
@@ -303,7 +297,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         public async Task ProcessBatchAsync(List<CsvRecord> batch, AuthorizationConfigClass user)
         {
 
-            await new MessianApiOAuthHelper(_settings).PriceUpdate(user, batch.Select(d => d.ItemId).ToList(), batch.Select(d => d.StartPrice).ToList());
+            await new MessianApiOAuthHelper().PriceUpdate(user, batch.Select(d => d.ItemId).ToList(), batch.Select(d => d.StartPrice).ToList());
 
         }
 
