@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Rishvi.Core.Data;
-
-public interface IEntityTypeConfiguration<TEntityType> where TEntityType : class
+namespace Rishvi.Core.Data
 {
-    void Map(EntityTypeBuilder<TEntityType> builder);
+    public interface IEntityTypeConfiguration<TEntityType> where TEntityType : class
+    {
+        void Map(EntityTypeBuilder<TEntityType> builder);
+    }
 }

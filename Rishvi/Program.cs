@@ -13,6 +13,7 @@ using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Api;
 using Hangfire;
 using Rishvi.Modules.ShippingIntegrations.Models;
+using Rishvi.Dependencies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,8 @@ builder.Services.AddHangfireServer(options =>
 {
     options.WorkerCount = Environment.ProcessorCount * 5;
 });
+
+AutoMapperConfiguration.ConfigureAutoMapper(builder.Services);
 
 // HttpClient registration
 builder.Services.AddHttpClient();

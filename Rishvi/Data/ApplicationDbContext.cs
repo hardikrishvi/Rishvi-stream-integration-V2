@@ -1,3 +1,7 @@
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Task = sib_api_v3_sdk.Model.Task;
+
+
 using Microsoft.EntityFrameworkCore;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
@@ -12,9 +16,26 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
+    public DbSet<WebhookResp.Event> Events { get; set; }
+    public DbSet<WebhookOrder> Orders { get; set; }
+    public DbSet<WebhookResponse.Run> Runs { get; set; }
+    public DbSet<WebhookResp.Subscription> Subscriptions { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Event>()
+            .HasKey(e => e.id).HasName("PK_Event");
+        // Defines primary key using fluent API
+
+        builder.Entity<WebhookOrder>()
+            .HasKey(o => o.id).HasName("PK_WebhookOrder");
+
+
+        builder.Entity<Subscription>()
+            .HasKey(s => s.id).HasName("PK_Subscription");
+
+        builder.Entity<Run>()
+            .HasKey(r => r.id).HasName("PK_Run");
         
         builder.ShadowProperties();
         base.OnModelCreating(builder);
@@ -61,18 +82,18 @@ public class ApplicationDbContext : DbContext
         }
     }
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellation = default)
-    {
-        await Task.Run(() => TimestampUpdate(), cancellation);
-        try
-        {
-            return await base.SaveChangesAsync(cancellation);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException(ex.Message);
-        }
-    }
+    // public override async Task<int> SaveChangesAsync(CancellationToken cancellation = default)
+    // {
+    //     await Task.Run(() => TimestampUpdate(), cancellation);
+    //     try
+    //     {
+    //         return await base.SaveChangesAsync(cancellation);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         throw new InvalidOperationException(ex.Message);
+    //     }
+    // }
 
     private void TimestampUpdate()
     {
