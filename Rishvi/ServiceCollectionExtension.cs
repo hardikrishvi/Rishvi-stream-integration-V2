@@ -61,7 +61,9 @@ namespace Rishvi
                                                              .AllowAnyMethod()
                                                               .AllowAnyHeader()));
 
-            _ = services.AddAutoMapper(typeof(ServiceCollectionExtension));
+           // _ = services.AddAutoMapper(typeof(ServiceCollectionExtension));
+
+            _ = services.AddAutoMapper(typeof(ServiceCollectionExtension).Assembly);
 
             _ = services.AddSwaggerGen(options =>
             {
