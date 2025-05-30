@@ -580,12 +580,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
         }
 
+        // Fix for CS0120: An object reference is required for the non-static field, method, or property 'CourierSettings.SelectedServiceId'
+
+        // Assuming that `CourierSettings` is intended to be instantiated and used as an object, 
+        // we need to create an instance of `CourierSettings` and access its `SelectedServiceId` property.
+
         public async Task UpdateLinnworksOrdersToStream(AuthorizationConfigClass auth, string OrderId, string StreamOrderId)
         {
             List<CourierService> services = Services.GetServices;
             var streamAuth = ManageToken.GetToken(auth);
-            //CourierService selectedService = services.Find(s => s.ServiceUniqueId == new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9"));
-            CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
+
+            // Create an instance of CourierSettings
+            CourierSettings courierSettings = new CourierSettings();
+
+            // Access the SelectedServiceId property through the instance
+            CourierService selectedService = services.Find(s => s.ServiceUniqueId == courierSettings.SelectedServiceId);
+
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
                 var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
@@ -602,21 +612,21 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         CompanyName = jsopndata.CustomerInfo.Address.Company,
                         CountryCode = "GB",
                         DeliveryNote = "",
-                        ServiceId = CourierSettings.SelectedServiceId,
+                        ServiceId = courierSettings.SelectedServiceId,
                         Email = auth.Email,
                         Name = jsopndata.CustomerInfo.Address.FullName,
                         OrderReference = jsopndata.NumOrderId.ToString(),
                         OrderId = 0,
                         Packages = new List<Package>() { new Package() {
-                                        PackageDepth = 0,
-                                        PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
-                                     Items = jsopndata.Items.Select(f=> new Item()
-                                     {
-                                           ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
-                                           ItemName =f.Title,
-                                           Quantity = f.Quantity
-                                       }).ToList()
-                                  }},
+                                       PackageDepth = 0,
+                                       PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
+                                    Items = jsopndata.Items.Select(f=> new Item()
+                                    {
+                                          ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
+                                          ItemName =f.Title,
+                                          Quantity = f.Quantity
+                                      }).ToList()
+                                 }},
                         ServiceConfigItems = new List<ServiceConfigItem>(),
                         OrderExtendedProperties = new List<Models.ExtendedProperty>(),
                         Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
@@ -640,11 +650,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
+        // Fix for CS0120: An object reference is required for the non-static field, method, or property 'CourierSettings.SelectedServiceId'
+
+        // Assuming that `CourierSettings` is intended to be instantiated and used as an object, 
+        // we need to create an instance of `CourierSettings` and access its `SelectedServiceId` property.
+
         public async Task CreateLinnworksOrdersToStream(AuthorizationConfigClass auth, string OrderId)
         {
             List<CourierService> services = Services.GetServices;
             var streamAuth = ManageToken.GetToken(auth);
-            CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
+
+            // Create an instance of CourierSettings
+            CourierSettings courierSettings = new CourierSettings();
+
+            // Access the SelectedServiceId property through the instance
+            CourierService selectedService = services.Find(s => s.ServiceUniqueId == courierSettings.SelectedServiceId);
+
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
                 var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
@@ -664,7 +685,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             CompanyName = jsopndata.CustomerInfo.Address.Company,
                             CountryCode = "GB",
                             DeliveryNote = "",
-                            ServiceId = CourierSettings.SelectedServiceId,
+                            ServiceId = courierSettings.SelectedServiceId,
                             Email = auth.Email,
                             Name = jsopndata.CustomerInfo.Address.FullName,
                             OrderReference = jsopndata.NumOrderId.ToString(),
