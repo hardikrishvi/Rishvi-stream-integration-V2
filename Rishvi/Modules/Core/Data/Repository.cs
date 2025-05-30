@@ -11,6 +11,8 @@ namespace Rishvi.Modules.Core.Data
     {
         void Add(TEntity entity);
 
+        void AddRange(IList<TEntity> entity);
+
         void Delete(object Id);
 
         void Delete(TEntity entity);
@@ -50,6 +52,11 @@ namespace Rishvi.Modules.Core.Data
         public void Add(TEntity entity)
         {
             _dbSet.Add(entity);
+        }
+
+        public void AddRange(IList<TEntity> entity)
+        {
+            _dbSet.AddRange(entity);
         }
 
         public void Delete(object id)
@@ -147,5 +154,7 @@ namespace Rishvi.Modules.Core.Data
             });
 
         }
+
+        
     }
 }

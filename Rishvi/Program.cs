@@ -25,10 +25,15 @@ builder.Services.AddTransient<ServiceHelper>();
 builder.Services.AddScoped<AwsS3>();
 builder.Services.AddTransient<ConfigController>();
 
-//builder.Services.AddDbContext<SqlContext>(options =>
-//{
-//    options.UseSqlServer(config.GetConnectionString("Connection")); // Use your DB provider
-//});
+builder.Services.AddDbContext<SqlContext>(options =>
+{
+    options.UseSqlServer(config.GetConnectionString("Connection")); // Use your DB provider
+});
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(config.GetConnectionString("Connection")); // Use your DB provider
+});
 
 // AWS Lambda hosting
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);

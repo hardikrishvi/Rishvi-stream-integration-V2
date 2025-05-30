@@ -16,26 +16,26 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
-    public DbSet<WebhookResp.Event> Events { get; set; }
-    public DbSet<WebhookOrder> Orders { get; set; }
-    public DbSet<WebhookResponse.Run> Runs { get; set; }
-    public DbSet<WebhookResp.Subscription> Subscriptions { get; set; }
+    //public DbSet<Event> Events { get; set; }
+    //public DbSet<WebhookOrder> Orders { get; set; }
+    //public DbSet<Run> Runs { get; set; }
+    //public DbSet<Subscription> Subscriptions { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<Event>()
-            .HasKey(e => e.id).HasName("PK_Event");
-        // Defines primary key using fluent API
+        //builder.Entity<Event>()
+        //    .HasKey(e => e.id).HasName("PK_Event");
+        //// Defines primary key using fluent API
 
-        builder.Entity<WebhookOrder>()
-            .HasKey(o => o.id).HasName("PK_WebhookOrder");
+        //builder.Entity<WebhookOrder>()
+        //    .HasKey(o => o.id).HasName("PK_WebhookOrder");
 
 
-        builder.Entity<Subscription>()
-            .HasKey(s => s.id).HasName("PK_Subscription");
+        //builder.Entity<Subscription>()
+        //    .HasKey(s => s.id).HasName("PK_Subscription");
 
-        builder.Entity<Run>()
-            .HasKey(r => r.id).HasName("PK_Run");
+        //builder.Entity<Run>()
+        //    .HasKey(r => r.id).HasName("PK_Run");
         
         builder.ShadowProperties();
         base.OnModelCreating(builder);

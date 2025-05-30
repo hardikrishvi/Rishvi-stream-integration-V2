@@ -590,11 +590,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             List<CourierService> services = Services.GetServices;
             var streamAuth = ManageToken.GetToken(auth);
 
-            // Create an instance of CourierSettings
-            CourierSettings courierSettings = new CourierSettings();
-
-            // Access the SelectedServiceId property through the instance
-            CourierService selectedService = services.Find(s => s.ServiceUniqueId == courierSettings.SelectedServiceId);
+            CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
 
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
@@ -612,7 +608,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         CompanyName = jsopndata.CustomerInfo.Address.Company,
                         CountryCode = "GB",
                         DeliveryNote = "",
-                        ServiceId = courierSettings.SelectedServiceId,
+                        ServiceId = CourierSettings.SelectedServiceId,
                         Email = auth.Email,
                         Name = jsopndata.CustomerInfo.Address.FullName,
                         OrderReference = jsopndata.NumOrderId.ToString(),
@@ -650,7 +646,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
-        // Fix for CS0120: An object reference is required for the non-static field, method, or property 'CourierSettings.SelectedServiceId'
 
         // Assuming that `CourierSettings` is intended to be instantiated and used as an object, 
         // we need to create an instance of `CourierSettings` and access its `SelectedServiceId` property.
@@ -660,11 +655,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             List<CourierService> services = Services.GetServices;
             var streamAuth = ManageToken.GetToken(auth);
 
-            // Create an instance of CourierSettings
-            CourierSettings courierSettings = new CourierSettings();
-
-            // Access the SelectedServiceId property through the instance
-            CourierService selectedService = services.Find(s => s.ServiceUniqueId == courierSettings.SelectedServiceId);
+            CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
 
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
@@ -685,7 +676,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             CompanyName = jsopndata.CustomerInfo.Address.Company,
                             CountryCode = "GB",
                             DeliveryNote = "",
-                            ServiceId = courierSettings.SelectedServiceId,
+                            //ServiceId = courierSettings.SelectedServiceId,
+                            // Access the static property directly using the class name instead of an instance
+                            ServiceId = CourierSettings.SelectedServiceId,
                             Email = auth.Email,
                             Name = jsopndata.CustomerInfo.Address.FullName,
                             OrderReference = jsopndata.NumOrderId.ToString(),

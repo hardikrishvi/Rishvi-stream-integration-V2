@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Rishvi.Models;
 
 namespace Rishvi.Modules.Core.Data
 {
@@ -12,6 +13,11 @@ namespace Rishvi.Modules.Core.Data
         public SqlContext(DbContextOptions<SqlContext> context) : base(context)
         {
         }
+
+        public DbSet<Event> Events { get; set; }
+        public DbSet<WebhookOrder> Orders { get; set; }
+        public DbSet<Run> Runs { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
