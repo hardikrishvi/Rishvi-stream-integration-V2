@@ -15,7 +15,7 @@ namespace Rishvi.Modules.Core.Data
         }
 
         public DbSet<Event> Events { get; set; }
-        public DbSet<WebhookOrder> Orders { get; set; }
+        public DbSet<WebhookOrder> WebhookOrders { get; set; }
         public DbSet<Run> Runs { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
 

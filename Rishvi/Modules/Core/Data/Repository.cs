@@ -50,6 +50,7 @@ namespace Rishvi.Modules.Core.Data
         }
 
         public void Add(TEntity entity)
+        
         {
             _dbSet.Add(entity);
         }
