@@ -17,6 +17,8 @@ namespace Rishvi.Domain.Mapper
             CreateMap<DTOs.Subscription.SubscriptionDto, Models.Subscription>();
 
             CreateMap<DTOs.Event.EventDto, Models.Event>();
+
+            CreateMap<DTOs.Authorization.AuthorizationDto, Models.Authorization>();
         }
     }
 }

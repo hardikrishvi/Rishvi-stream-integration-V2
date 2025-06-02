@@ -18,6 +18,7 @@ namespace Rishvi.Modules.Core.Data
         public DbSet<WebhookOrder> WebhookOrders { get; set; }
         public DbSet<Run> Runs { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Models.Authorization> Authorizations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
