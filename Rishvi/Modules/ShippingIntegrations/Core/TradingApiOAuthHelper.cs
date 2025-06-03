@@ -26,7 +26,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         private readonly SetupController _setupController;
 
        // private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
-        public TradingApiOAuthHelper(ReportsController reportsController, SetupController setupController);
+        //public TradingApiOAuthHelper(ReportsController reportsController, SetupController setupController);
 
         private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
         private readonly ApplicationDbContext _dbContext;
