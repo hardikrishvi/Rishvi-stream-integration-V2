@@ -10,7 +10,9 @@ namespace Rishvi.Modules.Core.Data
     public interface IRepository<TEntity> where TEntity : class
     {
         void Add(TEntity entity);
-
+        
+        void AddRange(IList<TEntity> entity);
+ 
         void Delete(object Id);
 
         void Delete(TEntity entity);
@@ -51,7 +53,12 @@ namespace Rishvi.Modules.Core.Data
         {
             _dbSet.Add(entity);
         }
-
+ 
+        public void AddRange(IList<TEntity> entity)
+        {
+            _dbSet.AddRange(entity);
+        }
+ 
         public void Delete(object id)
         {
             TEntity existing = _dbSet.Find(id);

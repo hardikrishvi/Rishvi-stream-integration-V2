@@ -5,6 +5,7 @@ using Task = sib_api_v3_sdk.Model.Task;
 using Microsoft.EntityFrameworkCore;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
+using Item = Rishvi.Models.Item;
 
 public class ApplicationDbContext : DbContext
 {
@@ -13,13 +14,25 @@ public class ApplicationDbContext : DbContext
     {
             
     }
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
     }
+    public DbSet<OrderRoot> OrderRoot { get; set; }
+    
     public DbSet<WebhookResp.Event> Events { get; set; }
-    public DbSet<WebhookOrder> Orders { get; set; }
+    // public DbSet<WebhookOrder> Orders { get; set; }
     public DbSet<WebhookResponse.Run> Runs { get; set; }
     public DbSet<WebhookResp.Subscription> Subscriptions { get; set; }
+    public DbSet<GeneralInfo> GeneralInfo { get; set; }
+    public DbSet<ShippingInfo> ShippingInfo { get; set; }
+    public DbSet<TaxInfo> TaxInfo { get; set; }
+    
+    public DbSet<Item> Item { get; set; }
+    public DbSet<CustomerInfo> CustomerInfo { get; set; }
+    public DbSet<TotalsInfo> TotalsInfo { get; set; }
+    public DbSet<Fulfillment> Fulfillment { get; set; }
+    
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -37,6 +50,12 @@ public class ApplicationDbContext : DbContext
         builder.Entity<Run>()
             .HasKey(r => r.id).HasName("PK_Run");
         
+        builder.Entity<WebhookOrder>(entity =>
+        {
+            entity.ToTable("Orders");   // same table
+            entity.HasNoKey();          // treat as keyless entity
+        });
+        builder.Entity<OrderRoot>().ToTable("Orders");
         builder.ShadowProperties();
         base.OnModelCreating(builder);
 

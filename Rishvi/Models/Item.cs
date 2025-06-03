@@ -1,11 +1,14 @@
+using System.ComponentModel.DataAnnotations;
 using Rishvi.Core.Data;
-
+using System;
+using System.Collections.Generic;
 namespace Rishvi.Models;
 
 public class Item : IModificationHistory
 {
+    [Key]
     public Guid Id { get; set; }
-    public Guid? ItemId { get; set; }
+    public string ItemId { get; set; }
     public string ItemNumber { get; set; }
     public string SKU { get; set; }
     public string Title { get; set; }

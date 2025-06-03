@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Rishvi.Core.Data;
 
 namespace Rishvi.Models;
@@ -15,6 +16,7 @@ public class GeneralInfo : IModificationHistory
     public bool? PartShipped { get; set; }
     public int? Marker { get; set; }
     public bool? IsParked { get; set; }
+    [NotMapped]
     public object Identifiers { get; set; }
     public string ReferenceNum { get; set; }
     public string SecondaryReference { get; set; }
@@ -25,11 +27,14 @@ public class GeneralInfo : IModificationHistory
     public string SiteCode { get; set; }
     public bool? HoldOrCancel { get; set; }
     public DateTime? DespatchByDate { get; set; }
+    [NotMapped]
     public object ScheduledDelivery { get; set; }
     public bool? HasScheduledDelivery { get; set; }
     public Guid? Location { get; set; }
     public int? NumItems { get; set; }
+    [NotMapped]
     public object PickwaveIds { get; set; }
+    [NotMapped]
     public object StockAllocationType { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
