@@ -86,7 +86,7 @@ var app = builder.Build();
 AppSettings.AppSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
 CourierSettings.CourierSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
 StreamApiSettings.StreamApiSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
-
+ApplicationSettings.ApplicationSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
 
 // Configure middleware
 app.Configure(builder.Environment);

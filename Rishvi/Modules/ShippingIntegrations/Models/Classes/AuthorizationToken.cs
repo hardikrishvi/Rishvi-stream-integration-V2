@@ -51,7 +51,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                 AuthorizationConfigClass output = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
 
                 //Get authorization data from database
-                var get_auth = _authorization.GetByToken(Guid.Parse(AuthorizationToken));
+                //var get_auth = _authorization.GetByToken(Guid.Parse(AuthorizationToken));
 
                 if (output.PartyFileCreated == false)
                 {
