@@ -12,9 +12,9 @@ public class ItemConfiguration : Rishvi.Core.Data.IEntityTypeConfiguration<Item>
         // Primary Key
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+        builder.Property(x => x.ItemId).IsRequired();
 
         // Scalar properties
-        builder.Property(x => x.ItemId);
         builder.Property(x => x.ItemNumber).HasMaxLength(100);
         builder.Property(x => x.SKU).HasMaxLength(100);
         builder.Property(x => x.Title).HasMaxLength(255);

@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Rishvi.Core.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rishvi.Models;
 
+[Table("Orders")]
 public class OrderRoot : IModificationHistory
 {
     [Key]
@@ -20,6 +22,8 @@ public class OrderRoot : IModificationHistory
     public List<Item> Items { get; set; }
     public bool? HasItems { get; set; }
     public int? TotalItemsSum { get; set; }
+    
+    public string TempColumn { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

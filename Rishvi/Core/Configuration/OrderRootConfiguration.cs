@@ -26,30 +26,15 @@ public class OrderRootConfiguration : Rishvi.Core.Data.IEntityTypeConfiguration<
         // You can either ignore it or store it as a serialized string (e.g. JSON)
         builder.Ignore(x => x.FolderName); // Or map as a backing field if needed
 
-        // One-to-one owned or separate entity configurations
-        builder.OwnsOne(x => x.GeneralInfo, navigationBuilder =>
-        {
-            navigationBuilder.WithOwner();
-        });
-
-        builder.OwnsOne(x => x.ShippingInfo, navigationBuilder =>
-        {
-            navigationBuilder.WithOwner();
-        });
+        
 
         builder.HasOne(x => x.CustomerInfo)
             .WithMany()
             .HasForeignKey("CustomerInfoId");
 
-        builder.OwnsOne(x => x.TotalsInfo, navigationBuilder =>
-        {
-            navigationBuilder.WithOwner();
-        });
+        
 
-        builder.OwnsOne(x => x.TaxInfo, navigationBuilder =>
-        {
-            navigationBuilder.WithOwner();
-        });
+        
 
         builder.HasOne(x => x.Fulfillment)
             .WithMany()
