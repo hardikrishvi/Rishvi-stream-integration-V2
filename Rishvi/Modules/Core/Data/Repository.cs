@@ -23,8 +23,6 @@ namespace Rishvi.Modules.Core.Data
 
         TEntity GetById(object id);
 
-        TEntity GetByToken(Guid AuthorizationToken);
-
         void Update(TEntity entity);
 
         void UpdateList(IList<TEntity> entities);
@@ -158,31 +156,5 @@ namespace Rishvi.Modules.Core.Data
 
         }
 
-        public TEntity GetByToken(Guid AuthorizationToken)
-        {
-            // Ensure the token is not an empty Guid to avoid invalid input
-            if (AuthorizationToken == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(AuthorizationToken), "Token cannot be an empty Guid.");
-            }
-
-            // Use a strongly-typed approach to avoid null propagating operator issues
-            var propertyInfo = typeof(TEntity).GetProperty("Token");
-            if (propertyInfo == null)
-            {
-                throw new InvalidOperationException($"The entity type {typeof(TEntity).Name} does not contain a property named 'Token'.");
-            }
-
-            foreach (var entity in _dbSet)
-            {
-                var tokenValue = propertyInfo.GetValue(entity, null);
-                if (tokenValue is Guid tokenGuid && tokenGuid == AuthorizationToken)
-                {
-                    return entity;
-                }
-            }
-
-            return null!;
-        }
     }
 }

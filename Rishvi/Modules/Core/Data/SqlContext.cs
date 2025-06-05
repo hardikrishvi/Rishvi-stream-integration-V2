@@ -47,8 +47,8 @@ namespace Rishvi.Modules.Core.Data
             builder.Entity<LinnworksSettings>(); 
             builder.Entity<StreamSettings>(); 
             builder.Entity<SyncSettings>(); 
-            builder.Entity<Ebay>(); 
-            
+            builder.Entity<Ebay>();
+            builder.Entity<Models.Authorization>();
             
             builder.Entity<OrderRoot>(); 
             builder.Entity<Address>(); 

@@ -469,46 +469,46 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             var output = JsonConvert.DeserializeObject<WebhookResponse.Root>(data);
             await _tradingApiOAuthHelper.SaveWebhook(data, output.webhook.subscription.party_id, DateTime.Now.ToString("ddMMyyyyhhmmss"));
-            SqlHelper.SystemLogInsert("Webhook_riddhi", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook", "", false);
+            //SqlHelper.SystemLogInsert("Webhook_riddhi", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook", "", false);
 
-            var subscription = new Subscription()
-            {
-                party_id = output.webhook.subscription.party_id,
-                @event = output.webhook.subscription.@event,
-                event_type = output.webhook.subscription.event_type,
-                url_path = output.webhook.subscription.url_path,
-                http_method = output.webhook.subscription.http_method
-            };
-            var @event = new Event
-            {
-                event_code = output.webhook.@event.event_code,
-                event_code_desc = output.webhook.@event.event_code_desc,
-                event_desc = output.webhook.@event.event_desc,
-                event_date = output.webhook.@event.event_date,
-                event_time = output.webhook.@event.event_time,
-                event_text = output.webhook.@event.event_text,
-                event_link = output.webhook.@event.event_link
-            };
-            var run = new Run
-            {
-                loadId = output.webhook.run.loadId,
-                status = output.webhook.run.status,
-                description = output.webhook.run.description
-            };
-            _subscription.Add(subscription);
-            _event.Add(@event);
-            _run.Add(run);
-            foreach (var order in output.webhook.orders)
-            {
-                var webhookOrder = new WebhookOrder
-                {
-                    sequence = order.sequence,
-                    order = order.order
-                };
-                _webhookOrder.Add(webhookOrder);
-            }
+            //var subscription = new Subscription()
+            //{
+            //    party_id = output.webhook.subscription.party_id,
+            //    @event = output.webhook.subscription.@event,
+            //    event_type = output.webhook.subscription.event_type,
+            //    url_path = output.webhook.subscription.url_path,
+            //    http_method = output.webhook.subscription.http_method
+            //};
+            //var @event = new Event
+            //{
+            //    event_code = output.webhook.@event.event_code,
+            //    event_code_desc = output.webhook.@event.event_code_desc,
+            //    event_desc = output.webhook.@event.event_desc,
+            //    event_date = output.webhook.@event.event_date,
+            //    event_time = output.webhook.@event.event_time,
+            //    event_text = output.webhook.@event.event_text,
+            //    event_link = output.webhook.@event.event_link
+            //};
+            //var run = new Run
+            //{
+            //    loadId = output.webhook.run.loadId,
+            //    status = output.webhook.run.status,
+            //    description = output.webhook.run.description
+            //};
+            //_subscription.Add(subscription);
+            //_event.Add(@event);
+            //_run.Add(run);
+            //foreach (var order in output.webhook.orders)
+            //{
+            //    var webhookOrder = new WebhookOrder
+            //    {
+            //        sequence = order.sequence,
+            //        order = order.order
+            //    };
+            //    _webhookOrder.Add(webhookOrder);
+            //}
 
-            _unitOfWork.Context.SaveChanges();
+           // _unitOfWork.Context.SaveChanges();
 
             if (output.webhook.@event.event_code == "LOCKPLANNING" ||
                 output.webhook.@event.event_code == "PLANNEDDELIVERY" ||

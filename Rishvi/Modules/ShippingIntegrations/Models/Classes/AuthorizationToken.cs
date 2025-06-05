@@ -44,14 +44,76 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
             if (string.IsNullOrWhiteSpace(AuthorizationToken))
                 throw new ArgumentNullException("authorizationToken");
 
+            
             if (AwsS3.S3FileIsExists("Authorization", "Files/" + AuthorizationToken + ".json").Result)
             {
                 
                 string json = AwsS3.GetS3File("Authorization", "Files/" + AuthorizationToken + ".json");
                 AuthorizationConfigClass output = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
 
+                try
+                {
+                    var get_auth = _authorization.Get().Where(x => x.AuthorizationToken == AuthorizationToken);
+
+                    if (get_auth.Count() == 0)
+                    {
+                        //Add authorization to database
+                        var auth = new Authorization
+                        {
+                            IntegratedDateTime = output.IntegratedDateTime == null ? null : output.IntegratedDateTime,
+                            AuthorizationToken = output.AuthorizationToken == null ? "" : output.AuthorizationToken,
+                            Email = output.Email == null ? "" : output.Email,
+                            ClientId = output.ClientId  == null ? "" : output.ClientId,
+                            ClientSecret = output.ClientSecret == null ? "" : output.ClientSecret,
+                            SessionID = output.SessionID == null ? "" : output.SessionID,
+                            LinnworksUniqueIdentifier = output.LinnworksUniqueIdentifier == null ? "" : output.LinnworksUniqueIdentifier,
+                            AccountName = output.AccountName == null ? "" : output.AccountName,
+                            IsConfigActive = output.IsConfigActive,
+                            ConfigStatus = output.ConfigStatus == null ? "" : output.ConfigStatus,
+                            AddressLine1 = output.AddressLine1 == null ? "" : output.AddressLine1,
+                            CompanyName = output.CompanyName == null ? "" : output.CompanyName,
+                            AddressLine2 = output.AddressLine2 == null ? "" : output.AddressLine2,
+                            AddressLine3 = output.AddressLine3 == null ? "" : output.AddressLine3,
+                            City = output.City == null ? "" : output.City,
+                            ContactName = output.ContactName == null ? "" : output.ContactName,
+                            ContactPhoneNo = output.ContactPhoneNo == null ? "" : output.ContactPhoneNo,
+                            CountryCode = output.CountryCode == null ? "" : output.CountryCode,
+                            County = output.County == null ? "" : output.County,
+                            PostCode = output.PostCode == null ? "" : output.PostCode,
+                            LabelReference = output.LabelReference == null ? "" : output.LabelReference,
+                            access_token = output.access_token == null ? "" : output.access_token,
+                            ExpirationTime = output.ExpirationTime == null ? null : DateTime.Parse(output.ExpirationTime),
+                            expires_in = output.expires_in,
+                            refresh_token = output.refresh_token == null ? "" : output.refresh_token,
+                            refresh_token_expires_in = output.refresh_token_expires_in,
+                            token_type = output.token_type == null ? "" : output.token_type,
+                            FtpHost = output.FtpHost == null ? "" : output.FtpHost,
+                            FtpUsername = output.FtpUsername == null ? "" : output.FtpUsername,
+                            FtpPassword = output.FtpPassword == null ? "" : output.FtpPassword,
+                            FtpPort = output.FtpPort,
+                            LinnworksToken = output.LinnworksToken == null ? "" : output.LinnworksToken,
+                            LinnworksServer = output.LinnworksServer == null ? "" : output.LinnworksServer,
+                            LinnRefreshToken = output.LinnRefreshToken == null ? "" : output.LinnRefreshToken,
+                            fulfiilmentLocation = output.fulfiilmentLocation == null ? "" : output.fulfiilmentLocation,
+                            PartyFileCreated = output.PartyFileCreated,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        }; 
+                        _authorization.Add(auth);
+                        _unitOfWork.Commit();
+
+                    }
+                    else { }
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
                 //Get authorization data from database
-                //var get_auth = _authorization.GetByToken(Guid.Parse(AuthorizationToken));
+               
+
+
 
                 if (output.PartyFileCreated == false)
                 {
@@ -62,15 +124,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                     AwsS3.UploadFileToS3("Authorization", output.GenerateStreamFromString(updatedJson), $"Files/{output.AuthorizationToken}.json");
 
                     //Add authorization to database
-                    var auth = new Authorization
+                    var new_auth = new Authorization
                     {
                         IntegratedDateTime = output.IntegratedDateTime,
-                        AuthorizationToken = Guid.Parse(output.AuthorizationToken),
+                        AuthorizationToken = output.AuthorizationToken,
                         Email = output.Email,
                         ClientId = output.ClientId,
                         ClientSecret = output.ClientSecret,
                         SessionID = output.SessionID,
-                        LinnworksUniqueIdentifier = Guid.Parse(output.LinnworksUniqueIdentifier),
+                        LinnworksUniqueIdentifier = output.LinnworksUniqueIdentifier,
                         AccountName = output.AccountName,
                         IsConfigActive = output.IsConfigActive,
                         ConfigStatus = output.ConfigStatus,
@@ -85,25 +147,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                         County = output.County,
                         PostCode = output.PostCode,
                         LabelReference = output.LabelReference,
-                        access_token = Guid.Parse(output.access_token),
+                        access_token = output.access_token,
                         ExpirationTime = DateTime.Parse(output.ExpirationTime),
                         expires_in = output.expires_in,
-                        refresh_token = Guid.Parse(output.refresh_token),
+                        refresh_token = output.refresh_token,
                         refresh_token_expires_in = output.refresh_token_expires_in,
                         token_type = output.token_type,
                         FtpHost = output.FtpHost,
                         FtpUsername = output.FtpUsername,
                         FtpPassword = output.FtpPassword,
                         FtpPort = output.FtpPort,
-                        LinnworksToken = Guid.Parse(output.LinnworksToken),
+                        LinnworksToken = output.LinnworksToken,
                         LinnworksServer = output.LinnworksServer,
-                        LinnRefreshToken = Guid.Parse(output.LinnRefreshToken),
+                        LinnRefreshToken = output.LinnRefreshToken,
                         fulfiilmentLocation = output.fulfiilmentLocation,
                         PartyFileCreated = output.PartyFileCreated,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
-                    _authorization.Add(auth);
+                    _authorization.Add(new_auth);
                     _unitOfWork.Commit();
                 }
                 return output;
