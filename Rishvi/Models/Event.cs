@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Rishvi.Core.Data;
 
 namespace Rishvi.Models
 {
-    public class Event
+    public class Event : IModificationHistory
     {
         [Key]
         public int id { get; set; }
@@ -13,5 +14,8 @@ namespace Rishvi.Models
         public string event_time { get; set; }
         public string event_text { get; set; }
         public string event_link { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        
     }
 }
