@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rishvi.Modules.Core.Data;
 
@@ -11,9 +12,11 @@ using Rishvi.Modules.Core.Data;
 namespace Rishvi.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    partial class SqlContextModelSnapshot : ModelSnapshot
+    [Migration("20250604084926_addColumnsForCreateDateandUpdate")]
+    partial class addColumnsForCreateDateandUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
