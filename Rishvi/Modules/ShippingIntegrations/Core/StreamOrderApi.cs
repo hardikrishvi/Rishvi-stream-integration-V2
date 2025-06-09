@@ -84,11 +84,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return null;
         }
 
-        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid)
+        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, int orderId)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
             string errorMessage = string.Empty;
-            if (streamorderid == null)
+            if (orderId == 0)
             {
                 try
                 {
@@ -138,7 +138,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
             else
             {
-                StreamGetOrderResponse.Root streamOrder = GetOrder(streamAuthToken, streamorderid, clientId);
+                StreamGetOrderResponse.Root streamOrder = GetOrder(streamAuthToken,  orderId.ToString(), clientId);
                 var changes = new Dictionary<string, string>() { };
                 //streamOrder.re.Addresses ??= new StreamGetOrderResponse.Addresses();
                 //StreamGetOrderResponse.Address address = streamOrder.StreamGetOrderResponse.Addresses.Address1 ?? new StreamGetOrderResponse.Address();
@@ -193,7 +193,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                 if (changes.Count > 0)
                 {
-                    UpdateOrder(changes, clientId, streamAuthToken, streamorderid);
+                    UpdateOrder(changes, clientId, streamAuthToken, orderId.ToString());
                 }
             }
             return Tuple.Create(streamOrderResponse, errorMessage);

@@ -645,6 +645,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
             {
                 var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
+                int orderId = Convert.ToInt32(StreamOrderId);
                 try
                 {
                     var jsopndata = JsonConvert.DeserializeObject<OpenOrder>(json);
@@ -677,8 +678,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         OrderExtendedProperties = new List<Models.ExtendedProperty>(),
                         Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                         Region = jsopndata.CustomerInfo.Address.Region,
-                        Town = jsopndata.CustomerInfo.Address.Town
-                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY");
+                        Town = jsopndata.CustomerInfo.Address.Town,
+                        
+                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", orderId);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
                     if (streamOrderResponse.Item1.response == null)
@@ -716,6 +718,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     try
                     {
                         var jsopndata = JsonConvert.DeserializeObject<OpenOrder>(json);
+                        int orderId = jsopndata.NumOrderId;
                         var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
                         {
                             AuthorizationToken = auth.AuthorizationToken,
@@ -748,7 +751,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                             Region = jsopndata.CustomerInfo.Address.Region,
                             Town = jsopndata.CustomerInfo.Address.Town
-                        }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY");
+                        }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", orderId);
                         streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                         streamOrderResponse.Item1.ItemId = "";
                         if (streamOrderResponse.Item1.response == null)
