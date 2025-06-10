@@ -751,7 +751,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                             Region = jsopndata.CustomerInfo.Address.Region,
                             Town = jsopndata.CustomerInfo.Address.Town
-                        }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", orderId);
+                        }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", 0);
                         streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                         streamOrderResponse.Item1.ItemId = "";
                         if (streamOrderResponse.Item1.response == null)
