@@ -40,8 +40,8 @@ public class OrderRootConfiguration : Rishvi.Core.Data.IEntityTypeConfiguration<
             .WithMany()
             .HasForeignKey("FulfillmentId");
 
-        builder.HasMany(x => x.Items)
-            .WithOne()
-            .HasForeignKey(x => x.OrderId);
+        //builder.HasMany(x => x.Items)
+        //    .WithOne()
+        //    .HasForeignKey(x => x.OrderId);
     }
 }

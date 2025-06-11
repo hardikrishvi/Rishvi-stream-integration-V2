@@ -680,7 +680,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Region = jsopndata.CustomerInfo.Address.Region,
                         Town = jsopndata.CustomerInfo.Address.Town,
                         
-                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", orderId);
+                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
                     if (streamOrderResponse.Item1.response == null)
@@ -751,7 +751,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                             Region = jsopndata.CustomerInfo.Address.Region,
                             Town = jsopndata.CustomerInfo.Address.Town
-                        }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", 0);
+                        }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null);
                         streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                         streamOrderResponse.Item1.ItemId = "";
                         if (streamOrderResponse.Item1.response == null)
@@ -972,7 +972,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
             }
         }
-        public async Task InsertOrderFromJson(string json)
+        public void InsertOrderFromJson(string json)
         {
             try
             {
@@ -1187,7 +1187,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         UpdatedAt = null,
                         CompositeSubItems = new List<Rishvi.Models.Item>()
                     };
-        
+
                     // Process composite sub-items
                     foreach (var c in i.CompositeSubItems ?? new List<Rishvi.Models.Item>())
                     {
@@ -1224,11 +1224,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             UpdatedAt = null,
                             CompositeSubItems = new List<Rishvi.Models.Item>()
                         };
-        
+
                         item.CompositeSubItems.Add(subItem);
                         items.Add(subItem);
                     }
-        
+
                     items.Add(item);
                 }
 
@@ -1243,7 +1243,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 _OrderRoot.Add(order);
                 _Item.AddRange(items);
 
-                await _unitOfWork.Context.SaveChangesAsync();
+                _unitOfWork.Context.SaveChanges();
                 Console.WriteLine("✅ Order inserted successfully");
             }
             catch (Exception ex)

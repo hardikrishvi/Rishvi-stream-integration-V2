@@ -27,8 +27,8 @@ namespace Rishvi.Modules.Core.Data
         public DbSet<GeneralInfo> GeneralInfo { get; set; }
         public DbSet<ShippingInfo> ShippingInfo { get; set; }
         public DbSet<TaxInfo> TaxInfo { get; set; }
-    
         public DbSet<Item> Item { get; set; }
+    
         public DbSet<CustomerInfo> CustomerInfo { get; set; }
         public DbSet<TotalsInfo> TotalsInfo { get; set; }
         public DbSet<Fulfillment> Fulfillment { get; set; }

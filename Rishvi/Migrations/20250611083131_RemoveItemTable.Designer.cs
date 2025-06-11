@@ -12,8 +12,8 @@ using Rishvi.Modules.Core.Data;
 namespace Rishvi.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    [Migration("20250531110810_ChangePrimarykeyforitem")]
-    partial class ChangePrimarykeyforitem
+    [Migration("20250611083131_RemoveItemTable")]
+    partial class RemoveItemTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,6 +97,162 @@ namespace Rishvi.Migrations
                     b.ToTable("Address");
                 });
 
+            modelBuilder.Entity("Rishvi.Models.Authorization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressLine1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressLine2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressLine3")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AuthorizationToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientSecret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConfigStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhoneNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("County")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpirationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FtpHost")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FtpPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FtpPort")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FtpUsername")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IntegratedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsConfigActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LabelReference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinnRefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinnworksServer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinnworksToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinnworksUniqueIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("PartyFileCreated")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PostCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SessionID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("access_token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("expires_in")
+                        .HasColumnType("int");
+
+                    b.Property<string>("fulfiilmentLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("refresh_token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("refresh_token_expires_in")
+                        .HasColumnType("int");
+
+                    b.Property<string>("token_type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authorizations");
+                });
+
             modelBuilder.Entity("Rishvi.Models.CustomerInfo", b =>
                 {
                     b.Property<Guid>("CustomerInfoId")
@@ -126,6 +282,85 @@ namespace Rishvi.Migrations
                     b.HasIndex("BillingAddressId");
 
                     b.ToTable("CustomerInfo");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.Ebay", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("DispatchOrderFromEbay")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DownloadOrderFromEbay")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SendOrderToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("UpdateInformationFromEbayToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("UpdateTrackingDetailsFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ebay");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.Event", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("event_code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_code_desc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_date")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_desc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_time")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Rishvi.Models.Fulfillment", b =>
@@ -243,114 +478,121 @@ namespace Rishvi.Migrations
                     b.ToTable("GeneralInfo");
                 });
 
-            modelBuilder.Entity("Rishvi.Models.Item", b =>
+            modelBuilder.Entity("Rishvi.Models.IntegrationSettings", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("AvailableStock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BarcodeNumber")
+                    b.Property<string>("AuthorizationToken")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BinRack")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChannelSKU")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChannelTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("Cost")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("CostIncTax")
-                        .HasColumnType("float");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ImageId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("InOrderBook")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ItemId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-                    
-                    b.Property<string>("ItemNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MinimumLevel")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OnOrder")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("OrderId")
+                    b.Property<Guid>("EbayId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("OrderRootOrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double?>("PricePerUnit")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("RowId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SKU")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("StockItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("StockItemIntId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("StockLevelsSpecified")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("LastSyncOn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("UnitCost")
-                        .HasColumnType("float");
+                    b.Property<DateTime>("LastSyncOnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinnworksId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LinnworksSyncToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("StreamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SyncId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<double?>("Weight")
-                        .HasColumnType("float");
+                    b.Property<int>("ebayhour")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ebaypage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("linnhour")
+                        .HasColumnType("int");
+
+                    b.Property<int>("linnpage")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderRootOrderId");
+                    b.HasIndex("EbayId");
 
-                    b.ToTable("Item");
+                    b.HasIndex("LinnworksId");
+
+                    b.HasIndex("StreamId");
+
+                    b.HasIndex("SyncId");
+
+                    b.ToTable("IntegrationSettings");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.LinnworksSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("DispatchOrderFromEbay")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DispatchOrderFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DownloadOrderFromEbay")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DownloadOrderFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PrintLabelFromLinnworks")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PrintLabelFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SendChangeToEbay")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SendChangeToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LinnworksSettings");
                 });
 
             modelBuilder.Entity("Rishvi.Models.OrderRoot", b =>
@@ -423,6 +665,37 @@ namespace Rishvi.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("Rishvi.Models.Run", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("loadId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Runs");
+                });
+
             modelBuilder.Entity("Rishvi.Models.ShippingInfo", b =>
                 {
                     b.Property<Guid?>("ShippingId")
@@ -482,6 +755,121 @@ namespace Rishvi.Migrations
                     b.HasKey("ShippingId");
 
                     b.ToTable("ShippingInfo");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.StreamSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CreateProductToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("DownloadProductFromStreamToLinnworks")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableWebhook")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("GetDepotListFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("GetRoutePlanFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("GetTrackingDetails")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SendChangeFromLinnworksToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SendChangesFromEbayToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StreamSettings");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.Subscription", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("event")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("event_type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("http_method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("party_id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("url_path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.SyncSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CreateEbayOrderToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CreateLinnworksOrderToStream")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("DispatchEbayOrderFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DispatchLinnworksOrderFromStream")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SyncEbayOrder")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SyncLinnworksOrder")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SyncSettings");
                 });
 
             modelBuilder.Entity("Rishvi.Models.TaxInfo", b =>
@@ -558,6 +946,32 @@ namespace Rishvi.Migrations
                     b.HasKey("TotalsInfoId");
 
                     b.ToTable("TotalsInfo");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.WebhookOrder", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("order")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("sequence")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.ToTable("WebhookOrders");
                 });
 
             modelBuilder.Entity("Rishvi.Modules.ErrorLogs.Models.ErrorLog", b =>
@@ -661,11 +1075,39 @@ namespace Rishvi.Migrations
                     b.Navigation("BillingAddress");
                 });
 
-            modelBuilder.Entity("Rishvi.Models.Item", b =>
+            modelBuilder.Entity("Rishvi.Models.IntegrationSettings", b =>
                 {
-                     b.HasOne("Rishvi.Models.OrderRoot", null)
-                        .WithMany("Items")
-                        .HasForeignKey("OrderRootOrderId");
+                    b.HasOne("Rishvi.Models.Ebay", "Ebay")
+                        .WithMany()
+                        .HasForeignKey("EbayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rishvi.Models.LinnworksSettings", "Linnworks")
+                        .WithMany()
+                        .HasForeignKey("LinnworksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rishvi.Models.StreamSettings", "Stream")
+                        .WithMany()
+                        .HasForeignKey("StreamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rishvi.Models.SyncSettings", "Sync")
+                        .WithMany()
+                        .HasForeignKey("SyncId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ebay");
+
+                    b.Navigation("Linnworks");
+
+                    b.Navigation("Stream");
+
+                    b.Navigation("Sync");
                 });
 
             modelBuilder.Entity("Rishvi.Models.OrderRoot", b =>
@@ -718,8 +1160,6 @@ namespace Rishvi.Migrations
 
                     b.Navigation("TotalsInfo");
                 });
-
-          
 #pragma warning restore 612, 618
         }
     }

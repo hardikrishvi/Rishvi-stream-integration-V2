@@ -11,9 +11,6 @@ namespace Rishvi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Item_Item_ItemId1",
-                table: "Item");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Item",
@@ -39,22 +36,12 @@ namespace Rishvi.Migrations
                 table: "Item",
                 column: "Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Item_Item_ItemId1",
-                table: "Item",
-                column: "ItemId1",
-                principalTable: "Item",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Item_Item_ItemId1",
-                table: "Item");
-
-            migrationBuilder.DropPrimaryKey(
+             migrationBuilder.DropPrimaryKey(
                 name: "PK_Item",
                 table: "Item");
 
@@ -75,12 +62,6 @@ namespace Rishvi.Migrations
                 table: "Item",
                 column: "ItemId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Item_Item_ItemId1",
-                table: "Item",
-                column: "ItemId1",
-                principalTable: "Item",
-                principalColumn: "ItemId");
         }
     }
 }

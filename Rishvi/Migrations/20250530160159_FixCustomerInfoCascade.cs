@@ -358,17 +358,11 @@ namespace Rishvi.Migrations
                     StockItemIntId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ItemId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrderRootOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Item", x => x.ItemId);
-                    table.ForeignKey(
-                        name: "FK_Item_Item_ItemId1",
-                        column: x => x.ItemId1,
-                        principalTable: "Item",
-                        principalColumn: "ItemId");
                     table.ForeignKey(
                         name: "FK_Item_Orders_OrderRootOrderId",
                         column: x => x.OrderRootOrderId,
@@ -385,11 +379,6 @@ namespace Rishvi.Migrations
                 name: "IX_CustomerInfo_BillingAddressId",
                 table: "CustomerInfo",
                 column: "BillingAddressId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Item_ItemId1",
-                table: "Item",
-                column: "ItemId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Item_OrderRootOrderId",

@@ -19,7 +19,7 @@ public class ItemListDto
     public double? UnitCost { get; set; }
     public double? Cost { get; set; }
     public double? CostIncTax { get; set; }
-    public List<Models.Item> CompositeSubItems { get; set; }
+    public List<ItemDto> CompositeSubItems { get; set; }
     public double? Weight { get; set; }
     public string BarcodeNumber { get; set; }
     public string ChannelSKU { get; set; }

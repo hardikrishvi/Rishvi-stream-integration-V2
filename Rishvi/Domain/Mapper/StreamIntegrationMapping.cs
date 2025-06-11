@@ -40,7 +40,7 @@ namespace Rishvi.Domain.Mapper
             CreateMap<CustomerInfoDto, CustomerInfo>();
             CreateMap<FulfillmentDto, Fulfillment>();
             CreateMap<GeneralInfoDto, GeneralInfo>();
-            CreateMap<ItemDto, Item>();
+          //  CreateMap<ItemDto, Item>();
             CreateMap<OrderRootDto,OrderRoot>();
             CreateMap<ShippingInfoDto,ShippingInfo>();
             CreateMap<TaxInfoDto,TaxInfo>();

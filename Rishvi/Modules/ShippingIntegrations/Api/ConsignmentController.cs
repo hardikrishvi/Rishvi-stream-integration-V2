@@ -47,7 +47,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //create response class, we will be adding packages to it
                 GenerateLabelResponse response = new GenerateLabelResponse();
                 var streamAuth = ManageToken.GetToken(auth);
-                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId);
+                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString());
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
                  */
@@ -136,7 +136,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //create response class, we will be adding packages to it
                 GenerateLabelResponse response = new GenerateLabelResponse();
                 var streamAuth = ManageToken.GetToken(auth);
-                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId);
+                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString());
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
                  */

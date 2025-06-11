@@ -118,8 +118,9 @@ namespace Rishvi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("AuthorizationToken")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("AuthorizationToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
                         .IsRequired()
@@ -164,7 +165,7 @@ namespace Rishvi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ExpirationTime")
+                    b.Property<DateTime?>("ExpirationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FtpHost")
@@ -175,37 +176,40 @@ namespace Rishvi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FtpPort")
+                    b.Property<int?>("FtpPort")
                         .HasColumnType("int");
 
                     b.Property<string>("FtpUsername")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("IntegratedDateTime")
+                    b.Property<DateTime?>("IntegratedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsConfigActive")
+                    b.Property<bool?>("IsConfigActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("LabelReference")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("LinnRefreshToken")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LinnRefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LinnworksServer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("LinnworksToken")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LinnworksToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("LinnworksUniqueIdentifier")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LinnworksUniqueIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PartyFileCreated")
+                    b.Property<bool?>("PartyFileCreated")
                         .HasColumnType("bit");
 
                     b.Property<string>("PostCode")
@@ -219,8 +223,9 @@ namespace Rishvi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("access_token")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("access_token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("expires_in")
                         .HasColumnType("int");
@@ -229,10 +234,11 @@ namespace Rishvi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("refresh_token")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("refresh_token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("refresh_token_expires_in")
+                    b.Property<int?>("refresh_token_expires_in")
                         .HasColumnType("int");
 
                     b.Property<string>("token_type")
@@ -594,9 +600,6 @@ namespace Rishvi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ItemId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ItemNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -653,7 +656,6 @@ namespace Rishvi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId1");
 
                     b.HasIndex("OrderRootOrderId");
 
@@ -1220,7 +1222,7 @@ namespace Rishvi.Migrations
                 {
                     b.HasOne("Rishvi.Models.Item", null)
                         .WithMany("CompositeSubItems")
-                        .HasForeignKey("ItemId1");
+                        .HasForeignKey("Id");
 
                     b.HasOne("Rishvi.Models.OrderRoot", null)
                         .WithMany("Items")

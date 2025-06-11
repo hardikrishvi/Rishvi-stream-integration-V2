@@ -66,7 +66,7 @@ namespace Rishvi.Migrations.ApplicationDb
                     b.Property<int?>("InOrderBook")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("ItemId1")
+                    b.Property<Guid?>("ItemId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ItemNumber")
@@ -119,7 +119,7 @@ namespace Rishvi.Migrations.ApplicationDb
 
                     b.HasKey("ItemId");
 
-                    b.HasIndex("ItemId1");
+                    b.HasIndex("ItemId");
 
                     b.HasIndex("OrderId");
 
@@ -290,16 +290,7 @@ namespace Rishvi.Migrations.ApplicationDb
                     b.ToTable("Totals");
                 });
 
-            modelBuilder.Entity("Rishvi.Models.Item", b =>
-                {
-                    b.HasOne("Rishvi.Models.Item", null)
-                        .WithMany("CompositeSubItems")
-                        .HasForeignKey("ItemId1");
-
-                    b.HasOne("Rishvi.Models.OrderRoot", null)
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId");
-                });
+           
 
             modelBuilder.Entity("Rishvi.Models.OrderRoot", b =>
                 {
@@ -595,11 +586,7 @@ namespace Rishvi.Migrations.ApplicationDb
                     b.Navigation("TotalsInfo");
                 });
 
-            modelBuilder.Entity("Rishvi.Models.Item", b =>
-                {
-                    b.Navigation("CompositeSubItems");
-                });
-
+           
             modelBuilder.Entity("Rishvi.Models.OrderRoot", b =>
                 {
                     b.Navigation("Items");

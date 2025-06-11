@@ -1,3 +1,5 @@
+using Rishvi.DTOs.Item;
+
 namespace Rishvi.DTOs.OrderRoot;
 
 public class OrderRootListDto
@@ -13,7 +15,7 @@ public class OrderRootListDto
     public bool? IsPostFilteredOut { get; set; }
     public bool? CanFulfil { get; set; }
     public Models.Fulfillment Fulfillment { get; set; }
-    public List<Models.Item> Items { get; set; }
+    public List<ItemDto> Items { get; set; }
     public bool? HasItems { get; set; }
     public int? TotalItemsSum { get; set; }
 }

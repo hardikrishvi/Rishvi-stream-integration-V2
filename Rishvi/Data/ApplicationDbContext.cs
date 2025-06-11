@@ -5,7 +5,6 @@ using Task = sib_api_v3_sdk.Model.Task;
 using Microsoft.EntityFrameworkCore;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
-using Item = Rishvi.Models.Item;
 
 public class ApplicationDbContext : DbContext
 {
@@ -30,7 +29,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ShippingInfo> ShippingInfo { get; set; }
     public DbSet<TaxInfo> TaxInfo { get; set; }
     
-    public DbSet<Item> Item { get; set; }
+    public DbSet<Rishvi.Models.Item> Item { get; set; }
     public DbSet<CustomerInfo> CustomerInfo { get; set; }
     public DbSet<TotalsInfo> TotalsInfo { get; set; }
     public DbSet<Fulfillment> Fulfillment { get; set; }

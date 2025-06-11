@@ -205,15 +205,14 @@ namespace Rishvi.Migrations.ApplicationDb
                     RowId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StockItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StockItemIntId = table.Column<int>(type: "int", nullable: true),
-                    ItemId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    StockItemIntId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Items", x => x.ItemId);
                     table.ForeignKey(
-                        name: "FK_Items_Items_ItemId1",
-                        column: x => x.ItemId1,
+                        name: "FK_Items_Items_ItemId",
+                        column: x => x.ItemId,
                         principalTable: "Items",
                         principalColumn: "ItemId");
                     table.ForeignKey(
@@ -224,9 +223,9 @@ namespace Rishvi.Migrations.ApplicationDb
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Items_ItemId1",
+                name: "IX_Items_ItemId",
                 table: "Items",
-                column: "ItemId1");
+                column: "ItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Items_OrderId",

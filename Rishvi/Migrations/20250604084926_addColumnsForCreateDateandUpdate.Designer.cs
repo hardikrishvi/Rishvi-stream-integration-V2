@@ -597,9 +597,6 @@ namespace Rishvi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ItemId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ItemNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -655,8 +652,6 @@ namespace Rishvi.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ItemId1");
 
                     b.HasIndex("OrderRootOrderId");
 
@@ -1221,10 +1216,7 @@ namespace Rishvi.Migrations
 
             modelBuilder.Entity("Rishvi.Models.Item", b =>
                 {
-                    b.HasOne("Rishvi.Models.Item", null)
-                        .WithMany("CompositeSubItems")
-                        .HasForeignKey("ItemId1");
-
+                    
                     b.HasOne("Rishvi.Models.OrderRoot", null)
                         .WithMany("Items")
                         .HasForeignKey("OrderRootOrderId");
@@ -1281,15 +1273,6 @@ namespace Rishvi.Migrations
                     b.Navigation("TotalsInfo");
                 });
 
-            modelBuilder.Entity("Rishvi.Models.Item", b =>
-                {
-                    b.Navigation("CompositeSubItems");
-                });
-
-            modelBuilder.Entity("Rishvi.Models.OrderRoot", b =>
-                {
-                    b.Navigation("Items");
-                });
 #pragma warning restore 612, 618
         }
     }
