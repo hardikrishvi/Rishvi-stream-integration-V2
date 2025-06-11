@@ -477,7 +477,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 @event = output.webhook.subscription.@event,
                 event_type = output.webhook.subscription.event_type,
                 url_path = output.webhook.subscription.url_path,
-                http_method = output.webhook.subscription.http_method
+                http_method = output.webhook.subscription.http_method,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = null
             };
             var @event = new Event
             {
@@ -487,13 +489,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 event_date = output.webhook.@event.event_date,
                 event_time = output.webhook.@event.event_time,
                 event_text = output.webhook.@event.event_text,
-                event_link = output.webhook.@event.event_link
+                event_link = output.webhook.@event.event_link,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = null
             };
             var run = new Run
             {
                 loadId = output.webhook.run.loadId,
                 status = output.webhook.run.status,
-                description = output.webhook.run.description
+                description = output.webhook.run.description,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = null
             };
             _subscription.Add(subscription);
             _event.Add(@event);
@@ -503,7 +509,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var webhookOrder = new WebhookOrder
                 {
                     sequence = order.sequence,
-                    order = order.order
+                    order = order.order,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = null
                 };
                 _webhookOrder.Add(webhookOrder);
             }
