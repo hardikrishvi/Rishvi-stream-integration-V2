@@ -56,34 +56,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return null;
         }
 
-        /// <summary>
-        /// Get order with all details from Stream API.
-        /// </summary>
-        public static StreamGetOrderResponse GetOrderDetial(string streamAuthToken, string orderNo, string clientId)
-        {
-            string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-            //var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
-            var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
-            var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
-            var request = new RestRequest("/orders/orders/" + orderNo, Method.Get);
-            request.AddHeader("Accept", "application/json");
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("Stream-Nonce", uniqueCode);
-            request.AddHeader("Stream-Party", clientId);
-            request.AddHeader("Authorization", "bearer " + streamAuthToken);
-            RestResponse<StreamGetOrderResponse> response = client.Execute<StreamGetOrderResponse>(request); // Fix: Ensure client is properly instantiated
-            if (response.IsSuccessful)
-            {
-                return JsonConvert.DeserializeObject<StreamGetOrderResponse>(response.Content);
-            }
-            else
-            {
-                string errorMessage = response.Content;
-                SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true);
-            }
-            return null;
-        }
-
         public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
@@ -188,6 +160,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     generateLabelRequest.OrderReference)
                 {
                     changes.Add("customerOrderNo", generateLabelRequest.OrderReference);
+                }
+                if(streamOrder?.response?.order?.groups?.FirstOrDefault().items.Count > 0)
+                {
+                    generateLabelRequest.Packages.Add(new Package()
+                    {
+                        Items = streamOrder.response.order.groups.FirstOrDefault().items.Select(i => new Item()
+                        {
+                            ProductCode = i.code,
+                            ItemName = i.description,
+                            Quantity = i.quantity,
+                            UnitWeight = i.weight
+                        }).ToList()
+                    });
                 }
 
 
