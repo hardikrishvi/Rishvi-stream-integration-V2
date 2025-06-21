@@ -122,6 +122,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
                         await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
                     }
+                    if (res.Sync.UpdateLinnworksOrderToStream)
+                    {
+                        await _linnworksController.UpdateLinnworksOrdersToStream(res.AuthorizationToken, "");
+                    }
                     //if (res.Sync.DispatchEbayOrderFromStream)
                     //{
                     //    await _ebayController.DispatchOrderFromStream(res.AuthorizationToken, "");

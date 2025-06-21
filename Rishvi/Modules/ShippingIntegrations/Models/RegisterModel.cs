@@ -73,5 +73,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         public bool CreateLinnworksOrderToStream { get; set; }
         public bool DispatchLinnworksOrderFromStream { get; set; }
         public bool DispatchEbayOrderFromStream { get; set; }
+
+        public bool UpdateLinnworksOrderToStream { get; set; }
     }
 }
