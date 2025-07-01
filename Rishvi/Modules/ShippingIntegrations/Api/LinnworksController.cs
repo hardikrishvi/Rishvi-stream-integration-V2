@@ -526,7 +526,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
 
             _unitOfWork.Context.SaveChanges();
-            EmailHelper.SendEmail("Req Json", data);
+            //EmailHelper.SendEmail("Req Json", data);
             try
             {
 
@@ -766,7 +766,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             catch (Exception ex)
             {
 
-                EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
+              //  EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
             }
             return new Dictionary<string, string>();
         }
