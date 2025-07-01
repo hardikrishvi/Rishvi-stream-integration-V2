@@ -348,6 +348,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
+                var webhookOrder1 = new WebhookOrder
+                {
+                    sequence = 1,
+                    order = $"Token:{ex.ToString()}",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+                _webhookOrder.Add(webhookOrder1);
+                _unitOfWork.Context.SaveChanges();
                 // Log the error (replace with ILogger for production)
                 Console.WriteLine($"Error updating order identifier: {ex.Message}");
                 throw; // Re-throw the exception for further handling if needed
@@ -522,6 +531,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
                 output.webhook.@event.event_code == "PLANNEDGROUP")
             {
+                var webhookOrder = new WebhookOrder
+                {
+                    sequence =0,
+                    order = "Add Event Code",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+                _webhookOrder.Add(webhookOrder);
+                _unitOfWork.Context.SaveChanges();
                 if (output.webhook.orders != null)
                 {
                     foreach (var strorder in output.webhook.orders)
@@ -568,6 +586,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     LinnworksSyncToken = userData.LinnworksSyncToken;
                                     Email = userData.Email;
                                 }
+                                var webhookOrder1 = new WebhookOrder
+                                {
+                                    sequence =1,
+                                    order = $"Token:{LinnworksSyncToken}",
+                                    CreatedAt = DateTime.Now,
+                                    UpdatedAt = DateTime.Now
+                                };
+                                _webhookOrder.Add(webhookOrder1);
+                                _unitOfWork.Context.SaveChanges();
+
                                 // update on linnworks
                                 if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                 {
