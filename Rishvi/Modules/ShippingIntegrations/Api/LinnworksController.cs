@@ -527,6 +527,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
             _unitOfWork.Context.SaveChanges();
             EmailHelper.SendEmail("Req Json", data);
+            try
+            {
+
+
             if (output.webhook.@event.event_code == "LOCKPLANNING" ||
                 output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
                 output.webhook.@event.event_code == "PLANNEDGROUP")
@@ -741,6 +745,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     }
                 }
 
+            }
+
+
+            }
+            catch (Exception ex)
+            {
+
+                EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
             }
             return new Dictionary<string, string>();
         }
