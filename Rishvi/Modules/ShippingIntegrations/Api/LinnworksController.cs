@@ -526,7 +526,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
 
             _unitOfWork.Context.SaveChanges();
-
+            EmailHelper.SendEmail("Req Json", data);
             if (output.webhook.@event.event_code == "LOCKPLANNING" ||
                 output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
                 output.webhook.@event.event_code == "PLANNEDGROUP")
