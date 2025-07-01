@@ -556,8 +556,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         // call order api to get driver detail or driver detail
                         string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
                         var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
+                            if (user==null)
+                            {
+                                var webhookOrder2 = new WebhookOrder
+                                {
+                                    sequence = 0,
+                                    order = "User is null",
+                                    CreatedAt = DateTime.Now,
+                                    UpdatedAt = DateTime.Now
+                                };
+                                _webhookOrder.Add(webhookOrder2);
+                                _unitOfWork.Context.SaveChanges();
+                            }
+
                         var logindata = await _configController.Get(user.Email);
                         var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
+
                         if (strorderdaat.response.valid)
                         {
                             foreach (var gr in strorderdaat.response.order.groups)
