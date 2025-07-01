@@ -509,9 +509,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var webhookOrder = new WebhookOrder
                 {
                     sequence = order.sequence,
-                    order = order.order,
+                    order = order.order+"_H_"+ output.webhook.@event.event_code,
                     CreatedAt = DateTime.Now,
-                    UpdatedAt = null
+                    UpdatedAt = DateTime.Now
                 };
                 _webhookOrder.Add(webhookOrder);
             }
