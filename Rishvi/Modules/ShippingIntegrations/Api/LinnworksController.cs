@@ -518,7 +518,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var webhookOrder = new WebhookOrder
                 {
                     sequence = order.sequence,
-                    order = order.order+"_H_"+ output.webhook.@event.event_code,
+                    order = order.order + "_H_" + output.webhook.@event.event_code,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 };
@@ -531,32 +531,32 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
 
 
-            if (output.webhook.@event.event_code == "LOCKPLANNING" ||
-                output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
-                output.webhook.@event.event_code == "PLANNEDGROUP")
-            {
-                var webhookOrder = new WebhookOrder
+                if (output.webhook.@event.event_code == "LOCKPLANNING" ||
+                    output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
+                    output.webhook.@event.event_code == "PLANNEDGROUP")
                 {
-                    sequence =0,
-                    order = "Add Event Code",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
-                _webhookOrder.Add(webhookOrder);
-                _unitOfWork.Context.SaveChanges();
-                if (output.webhook.orders != null)
-                {
-                    foreach (var strorder in output.webhook.orders)
+                    var webhookOrder = new WebhookOrder
                     {
-                        // need to update on linn order
-                        string Stream_runloadid = output.webhook.run.loadId;
-                        string Stream_runstatus = output.webhook.run.status;
-                        string Stream_rundescription = output.webhook.run.description;
-                        string Stream_orderid = strorder.order;
-                        // call order api to get driver detail or driver detail
-                        string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
-                        var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
-                            if (user==null)
+                        sequence = 0,
+                        order = "Add Event Code",
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
+                    _webhookOrder.Add(webhookOrder);
+                    _unitOfWork.Context.SaveChanges();
+                    if (output.webhook.orders != null)
+                    {
+                        foreach (var strorder in output.webhook.orders)
+                        {
+                            // need to update on linn order
+                            string Stream_runloadid = output.webhook.run.loadId;
+                            string Stream_runstatus = output.webhook.run.status;
+                            string Stream_rundescription = output.webhook.run.description;
+                            string Stream_orderid = strorder.order;
+                            // call order api to get driver detail or driver detail
+                            string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
+                            var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
+                            if (user == null)
                             {
                                 var webhookOrder2 = new WebhookOrder
                                 {
@@ -569,9 +569,122 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 _unitOfWork.Context.SaveChanges();
                             }
 
+                            var logindata = await _configController.Get(user.Email);
+                            var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
+
+                            if (strorderdaat != null)
+                            {
+                                if (strorderdaat.response.valid)
+                                {
+                                    foreach (var gr in strorderdaat.response.order.groups)
+                                    {
+                                        string Stream_trackingURL = strorderdaat.response.order.trackingURL;
+                                        string Stream_trackingId = strorderdaat.response.order.trackingId;
+                                        string Stream_driverName = gr.runDetails.driverName;
+                                        string Stream_driver = gr.runDetails.driver;
+                                        string Stream_vehicle = gr.runDetails.vehicle;
+                                        string Stream_vehicleName = gr.runDetails.vehicleName;
+                                        string Stream_status = gr.status;
+                                        string Stream_driverNotes = gr.driverNotes;
+                                        string Stream_estimateArrivalDateTime = gr.estimateArrivalDateTime != "0" ? gr.estimateArrivalDateTime : gr.planned.fromDateTime.Replace("T00-01Z", "");
+                                        string Stream_vehicleType = gr.runDetails.vehicleType;
+                                        string Stream_dispatched = gr.runDetails.dispatched ? "Yes" : "No";
+                                        string Stream_departed = gr.runDetails.departed ? "Yes" : "No";
+                                        string Stream_completed = gr.runDetails.completed ? "Yes" : "No";
+                                        string Stream_startActualDateTime = gr.runDetails.start.actualDateTime;
+                                        string Stream_startPlannedDateTime = gr.runDetails.start.plannedDateTime;
+                                        string Stream_endActualDateTime = gr.runDetails.end.actualDateTime;
+                                        string Stream_endPlannedDateTime = gr.runDetails.end.plannedDateTime;
+                                        string linnworksorderid = strorderdaat.response.order.header.orderNo;
+
+                                        string LinnworksSyncToken = "";
+                                        string Email = "";
+
+                                        if (logindata is OkObjectResult okResult)
+                                        {
+                                            var userData = okResult.Value as RegistrationData;
+                                            LinnworksSyncToken = userData.LinnworksSyncToken;
+                                            Email = userData.Email;
+                                        }
+                                        var webhookOrder1 = new WebhookOrder
+                                        {
+                                            sequence = 1,
+                                            order = $"Token:{LinnworksSyncToken}",
+                                            CreatedAt = DateTime.Now,
+                                            UpdatedAt = DateTime.Now
+                                        };
+                                        _webhookOrder.Add(webhookOrder1);
+                                        _unitOfWork.Context.SaveChanges();
+
+                                        // update on linnworks
+                                        if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
+                                        {
+                                            await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
+                                    {"Stream_runloadid",Stream_runloadid },
+                                    {"Stream_runstatus",Stream_runstatus },
+                                    {"Stream_rundescription",Stream_rundescription },
+                                    {"Stream_orderid",Stream_orderid },
+                                    {"Stream_driverName",Stream_driverName },
+                                    {"Stream_driver",Stream_driver},
+                                    {"Stream_vehicle",Stream_vehicle },
+                                    {"Stream_vehicleName",Stream_vehicleName },
+                                    {"Stream_status",Stream_status },
+                                    {"Stream_driverNotes",Stream_driverNotes },
+                                    {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
+                                    {"Stream_vehicleType",Stream_vehicleType },
+                                    {"Stream_dispatched",Stream_dispatched },
+                                    {"Stream_departed",Stream_departed },
+                                    {"Stream_completed",Stream_completed},
+                                    {"Stream_startActualDateTime", Stream_startActualDateTime},
+                                    {"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
+                                    {"Stream_endActualDateTime",Stream_endActualDateTime },
+                                    { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
+                                });
+                                            if (gr.estimateArrivalDateTime != "0")
+                                            {
+                                                await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
+                                                DateTime.Parse(gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
+                                                //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
+
+                                            }
+                                            else
+                                            {
+                                                await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
+                                           DateTime.Parse(Regex.Split(gr.planned.fromDateTime, "T")[0], null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
+                                                //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, Regex.Split(gr.planned.fromDateTime, "T")[0]);
+
+                                            }
+                                            var alldata = _reportsController.GetReportData(new ReportModelReq() { email = Email }).Result;
+                                            if (alldata.Count(d => d.LinnNumOrderId == linnworksorderid && d.IsLinnOrderCreatedInStream == true && d.IsLinnOrderDispatchInStream == false) > 0)
+                                            {
+                                                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).IsLinnOrderDispatchInStream = true;
+                                                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).DispatchLinnOrderInStream = DateTime.Now;
+                                                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).updatedDate = DateTime.Now;
+                                                await _tradingApiOAuthHelper.SaveReportData(JsonConvert.SerializeObject(alldata), Email);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                EmailHelper.SendEmail("Error Webhook Update","User Authentication Issue - "+ user.AuthorizationToken+" Data:"+ data);
+                            }
+
+
+                        }
+                    }
+                    else
+                    {
+                        string Stream_runloadid = output.webhook.run.loadId;
+                        string Stream_runstatus = output.webhook.run.status;
+                        string Stream_rundescription = output.webhook.run.description;
+                        string Stream_orderid = output.webhook.order.id;
+                        // call order api to get driver detail or driver detail
+                        string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
+                        var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
                         var logindata = await _configController.Get(user.Email);
                         var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
-
                         if (strorderdaat.response.valid)
                         {
                             foreach (var gr in strorderdaat.response.order.groups)
@@ -604,114 +717,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     LinnworksSyncToken = userData.LinnworksSyncToken;
                                     Email = userData.Email;
                                 }
-                                var webhookOrder1 = new WebhookOrder
-                                {
-                                    sequence =1,
-                                    order = $"Token:{LinnworksSyncToken}",
-                                    CreatedAt = DateTime.Now,
-                                    UpdatedAt = DateTime.Now
-                                };
-                                _webhookOrder.Add(webhookOrder1);
-                                _unitOfWork.Context.SaveChanges();
-
                                 // update on linnworks
                                 if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                 {
                                     await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
-                                    {"Stream_runloadid",Stream_runloadid },
-                                    {"Stream_runstatus",Stream_runstatus },
-                                    {"Stream_rundescription",Stream_rundescription },
-                                    {"Stream_orderid",Stream_orderid },
-                                    {"Stream_driverName",Stream_driverName },
-                                    {"Stream_driver",Stream_driver},
-                                    {"Stream_vehicle",Stream_vehicle },
-                                    {"Stream_vehicleName",Stream_vehicleName },
-                                    {"Stream_status",Stream_status },
-                                    {"Stream_driverNotes",Stream_driverNotes },
-                                    {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
-                                    {"Stream_vehicleType",Stream_vehicleType },
-                                    {"Stream_dispatched",Stream_dispatched },
-                                    {"Stream_departed",Stream_departed },
-                                    {"Stream_completed",Stream_completed},
-                                    {"Stream_startActualDateTime", Stream_startActualDateTime},
-                                    {"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
-                                    {"Stream_endActualDateTime",Stream_endActualDateTime },
-                                    { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
-                                });
-                                    if (gr.estimateArrivalDateTime != "0")
-                                    {
-                                        await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                        DateTime.Parse(gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
-                                        //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
-
-                                    }
-                                    else
-                                    {
-                                        await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                   DateTime.Parse(Regex.Split(gr.planned.fromDateTime, "T")[0], null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
-                                        //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, Regex.Split(gr.planned.fromDateTime, "T")[0]);
-
-                                    }
-                                    var alldata = _reportsController.GetReportData(new ReportModelReq() { email = Email }).Result;
-                                    if (alldata.Count(d => d.LinnNumOrderId == linnworksorderid && d.IsLinnOrderCreatedInStream == true && d.IsLinnOrderDispatchInStream == false) > 0)
-                                    {
-                                        alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).IsLinnOrderDispatchInStream = true;
-                                        alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).DispatchLinnOrderInStream = DateTime.Now;
-                                        alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).updatedDate = DateTime.Now;
-                                        await _tradingApiOAuthHelper.SaveReportData(JsonConvert.SerializeObject(alldata), Email);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    string Stream_runloadid = output.webhook.run.loadId;
-                    string Stream_runstatus = output.webhook.run.status;
-                    string Stream_rundescription = output.webhook.run.description;
-                    string Stream_orderid = output.webhook.order.id;
-                    // call order api to get driver detail or driver detail
-                    string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
-                    var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
-                    var logindata = await _configController.Get(user.Email);
-                    var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
-                    if (strorderdaat.response.valid)
-                    {
-                        foreach (var gr in strorderdaat.response.order.groups)
-                        {
-                            string Stream_trackingURL = strorderdaat.response.order.trackingURL;
-                            string Stream_trackingId = strorderdaat.response.order.trackingId;
-                            string Stream_driverName = gr.runDetails.driverName;
-                            string Stream_driver = gr.runDetails.driver;
-                            string Stream_vehicle = gr.runDetails.vehicle;
-                            string Stream_vehicleName = gr.runDetails.vehicleName;
-                            string Stream_status = gr.status;
-                            string Stream_driverNotes = gr.driverNotes;
-                            string Stream_estimateArrivalDateTime = gr.estimateArrivalDateTime != "0" ? gr.estimateArrivalDateTime : gr.planned.fromDateTime.Replace("T00-01Z", "");
-                            string Stream_vehicleType = gr.runDetails.vehicleType;
-                            string Stream_dispatched = gr.runDetails.dispatched ? "Yes" : "No";
-                            string Stream_departed = gr.runDetails.departed ? "Yes" : "No";
-                            string Stream_completed = gr.runDetails.completed ? "Yes" : "No";
-                            string Stream_startActualDateTime = gr.runDetails.start.actualDateTime;
-                            string Stream_startPlannedDateTime = gr.runDetails.start.plannedDateTime;
-                            string Stream_endActualDateTime = gr.runDetails.end.actualDateTime;
-                            string Stream_endPlannedDateTime = gr.runDetails.end.plannedDateTime;
-                            string linnworksorderid = strorderdaat.response.order.header.orderNo;
-
-                            string LinnworksSyncToken = "";
-                            string Email = "";
-
-                            if (logindata is OkObjectResult okResult)
-                            {
-                                var userData = okResult.Value as RegistrationData;
-                                LinnworksSyncToken = userData.LinnworksSyncToken;
-                                Email = userData.Email;
-                            }
-                            // update on linnworks
-                            if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
-                            {
-                                await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
                                 {"Stream_runloadid",Stream_runloadid },
                                 {"Stream_runstatus",Stream_runstatus },
                                 {"Stream_rundescription",Stream_rundescription },
@@ -732,41 +741,41 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 {"Stream_endActualDateTime",Stream_endActualDateTime },
                                 { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
                             });
-                                if (gr.estimateArrivalDateTime != "0")
-                                {
-                                    await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                    DateTime.Parse(gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
-                                    //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
+                                    if (gr.estimateArrivalDateTime != "0")
+                                    {
+                                        await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
+                                        DateTime.Parse(gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
+                                        //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
 
-                                }
-                                else
-                                {
-                                    await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                    DateTime.Parse(Regex.Split(gr.planned.fromDateTime, "T")[0], null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
-                                    //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, Regex.Split(gr.planned.fromDateTime, "T")[0]);
+                                    }
+                                    else
+                                    {
+                                        await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
+                                        DateTime.Parse(Regex.Split(gr.planned.fromDateTime, "T")[0], null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
+                                        //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, Regex.Split(gr.planned.fromDateTime, "T")[0]);
 
-                                }
-                                var alldata = _reportsController.GetReportData(new ReportModelReq() { email = Email }).Result;
-                                if (alldata.Count(d => d.LinnNumOrderId == linnworksorderid && d.IsLinnOrderCreatedInStream == true && d.IsLinnOrderDispatchInStream == false) > 0)
-                                {
-                                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).IsLinnOrderDispatchInStream = true;
-                                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).DispatchLinnOrderInStream = DateTime.Now;
-                                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).updatedDate = DateTime.Now;
-                                    await _tradingApiOAuthHelper.SaveReportData(JsonConvert.SerializeObject(alldata), Email);
+                                    }
+                                    var alldata = _reportsController.GetReportData(new ReportModelReq() { email = Email }).Result;
+                                    if (alldata.Count(d => d.LinnNumOrderId == linnworksorderid && d.IsLinnOrderCreatedInStream == true && d.IsLinnOrderDispatchInStream == false) > 0)
+                                    {
+                                        alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).IsLinnOrderDispatchInStream = true;
+                                        alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).DispatchLinnOrderInStream = DateTime.Now;
+                                        alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).updatedDate = DateTime.Now;
+                                        await _tradingApiOAuthHelper.SaveReportData(JsonConvert.SerializeObject(alldata), Email);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-            }
+                }
 
 
             }
             catch (Exception ex)
             {
 
-              //  EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
+                //  EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
             }
             return new Dictionary<string, string>();
         }
