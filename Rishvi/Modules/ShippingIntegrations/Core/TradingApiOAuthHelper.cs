@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Rishvi.Modules.Core.Data;
 using Address = Rishvi.Models.Address;
 using static Rishvi.Modules.ShippingIntegrations.Models.WebhookResponse;
+using Rishvi.Modules.Core.Authorization;
 
 namespace Rishvi.Modules.ShippingIntegrations.Core
 {
@@ -39,6 +40,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         private readonly IRepository<ShippingInfo> _ShippingInfo;
         private readonly IRepository<TaxInfo> _TaxInfo;
         private readonly IRepository<TotalsInfo> _TotalsInfo;
+        private readonly IRepository<ClientAuth> _ClientAuth;
         private readonly IRepository<Rishvi.Models.Item> _Item;
         private readonly IUnitOfWork _unitOfWork;
         
@@ -47,6 +49,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         private readonly IRepository<Rishvi.Models.StreamSettings> _StreamSettings;
         private readonly IRepository<Rishvi.Models.SyncSettings> _SyncSettings;
         private readonly IRepository<Rishvi.Models.Ebay> _Ebay;
+        private readonly ManageToken _manageToken;
 
         public TradingApiOAuthHelper(ReportsController reportsController, SetupController setupController, IOptions<CourierSettings> courierSettings, ApplicationDbContext dbContext,
         IUnitOfWork unitOfWork,
@@ -54,7 +57,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             IRepository<GeneralInfo> generalInfo, IRepository<OrderRoot> orderRoot, IRepository<ShippingInfo> shippingInfo,
             IRepository<TaxInfo> taxInfo, IRepository<TotalsInfo> totalsInfo, IRepository<Rishvi.Models.Item> item,
             IRepository<IntegrationSettings> integrationSettings, IRepository<LinnworksSettings> linnworksSettings, IRepository<Rishvi.Models.StreamSettings> streamSettings,
-            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay)
+            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay, IRepository<ClientAuth> ClientAuth, ManageToken manageToken)
 
         {
             _reportsController = reportsController;
@@ -75,6 +78,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _StreamSettings    =  streamSettings;
             _SyncSettings      = syncSettings;
             _Ebay      = ebay;
+            _ClientAuth = ClientAuth;
+            _manageToken = manageToken;
         }
 
         #region Ebay Api Function
@@ -638,7 +643,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public async Task UpdateLinnworksOrdersToStream(AuthorizationConfigClass auth, string OrderId, string StreamOrderId)
         {
             List<CourierService> services = Services.GetServices;
-            var streamAuth = ManageToken.GetToken(auth);
+            var streamAuth = _manageToken.GetToken(auth);
+            //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
+            //var streamAuth = manageToken.GetToken(auth);
 
             CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
 
@@ -705,7 +712,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public async Task CreateLinnworksOrdersToStream(AuthorizationConfigClass auth, string OrderId)
         {
             List<CourierService> services = Services.GetServices;
-            var streamAuth = ManageToken.GetToken(auth);
+            var streamAuth = _manageToken.GetToken(auth);
+            //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
+            //var streamAuth = manageToken.GetToken(auth);
 
             CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
 
@@ -801,7 +810,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         // this function is for save report data for specific user
         public async Task<StreamGetOrderResponse.Root> GetStreamOrder(AuthorizationConfigClass _User, string OrderId)
         {
-            var streamAuth = ManageToken.GetToken(_User);
+            var streamAuth = _manageToken.GetToken(_User);
+            //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
+            //var streamAuth = manageToken.GetToken(_User);
             return StreamOrderApi.GetOrder(streamAuth.AccessToken, OrderId, _User.ClientId);
         }
         #endregion

@@ -36,7 +36,7 @@ namespace Rishvi.Core.Configuration
             builder.Property(x => x.ClientSecret).HasMaxLength(255);
             builder.Property(x => x.access_token).HasMaxLength(255);
             builder.Property(x => x.ExpirationTime).IsRequired();
-            builder.Property(x => x.expires_in).HasMaxLength(30);
+            builder.Property(x => x.expires_in).IsRequired(false);
             builder.Property(x => x.refresh_token).HasMaxLength(255);
             builder.Property(x => x.refresh_token_expires_in).HasMaxLength(30);
             builder.Property(x => x.token_type).HasMaxLength(50);

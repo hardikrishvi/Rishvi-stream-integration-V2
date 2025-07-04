@@ -1,5 +1,7 @@
 ﻿using LinnworksAPI;
 using Microsoft.AspNetCore.Mvc;
+using Rishvi.Models;
+using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
@@ -12,9 +14,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
     public class SetupController : ControllerBase
     {
         private readonly IAuthorizationToken _authorizationToken;
-        public SetupController(IAuthorizationToken authorizationToken)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ManageToken _manageToken;
+        public SetupController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ManageToken manageToken)
         {
             _authorizationToken = authorizationToken;
+            _unitOfWork = unitOfWork;
+            _manageToken = manageToken;
         }
 
         [HttpPost, Route("AddNewUser")]
@@ -291,7 +297,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
 
                 // Retrieve stream authorization token
-                var streamAuth = ManageToken.GetToken(auth);
+                var streamAuth = _manageToken.GetToken(auth);
+                //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
+                //var streamAuth = manageToken.GetToken(auth);
 
                 // Subscribe to the webhook using the StreamOrder API
                 StreamOrderApi.WebhookSubscribe(
