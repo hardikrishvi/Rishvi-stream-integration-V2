@@ -7,6 +7,7 @@ using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Api;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.Core.Data;
 
 public class RegisterControllerTests
 {
@@ -17,13 +18,14 @@ public class RegisterControllerTests
         var mockAwsS3 = new Mock<AwsS3>();
         var mockServiceHelper = new Mock<ServiceHelper>();
         var mockTrade = new Mock<TradingApiOAuthHelper>();
+        var mockDb = new Mock<SqlContext>();
 
         mockServiceHelper.Setup(static service => service.TransformEmail(It.IsAny<string>())).Returns("transformedEmail");
 
         mockAwsS3.Setup( s3 => AwsS3.S3FileIsExists("Authorization", It.IsAny<string>()))
                  .ReturnsAsync(false);
 
-        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object);
+        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object, mockDb.Object);
         var input = new RegistrationData { Email = "test@example.com" };
 
         // Act
@@ -42,6 +44,7 @@ public class RegisterControllerTests
         var mockAwsS3 = new Mock<AwsS3>();
         var mockServiceHelper = new Mock<ServiceHelper>();
         var mockTrade = new Mock<TradingApiOAuthHelper>();
+        var mockDb = new Mock<SqlContext>();
 
         var mockData = new RegistrationData
         {
@@ -60,7 +63,7 @@ public class RegisterControllerTests
         mockServiceHelper.Setup(helper => helper.HashPassword(It.IsAny<string>()))
                          .Returns("hashedPassword");
 
-        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object);
+        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object, mockDb.Object);
         var input = new RegistrationData
         {
             Email = "test@example.com",
@@ -83,6 +86,7 @@ public class RegisterControllerTests
         var mockAwsS3 = new Mock<AwsS3>();
         var mockServiceHelper = new Mock<ServiceHelper>();
         var mockTrade = new Mock<TradingApiOAuthHelper>();
+        var mockDb = new Mock<SqlContext>();
 
         var mockData = new RegistrationData
         {
@@ -101,7 +105,7 @@ public class RegisterControllerTests
         mockServiceHelper.Setup(helper => helper.HashPassword(It.IsAny<string>()))
                          .Returns("wrongHashedPassword");
 
-        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object);
+        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object, mockDb.Object);
         var input = new RegistrationData
         {
             Email = "test@example.com",
@@ -124,11 +128,12 @@ public class RegisterControllerTests
         var mockAwsS3 = new Mock<AwsS3>();
         var mockServiceHelper = new Mock<ServiceHelper>();
         var mockTrade = new Mock<TradingApiOAuthHelper>();
+        var mockDb = new Mock<SqlContext>();
 
         mockServiceHelper.Setup(helper => helper.TransformEmail(It.IsAny<string>()))
                          .Throws(new Exception("Test exception"));
 
-        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object);
+        var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object, mockDb.Object);
         var input = new RegistrationData { Email = "test@example.com" };
 
         // Act
