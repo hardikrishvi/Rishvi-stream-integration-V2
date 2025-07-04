@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Rishvi.Models;
+using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
@@ -11,9 +13,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
     public class ConsignmentController : ControllerBase
     {
         private readonly IAuthorizationToken _authorizationToken;
-        public ConsignmentController(IAuthorizationToken authorizationToken)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ApplicationDbContext _context;
+        private readonly ManageToken _manageToken;
+        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ApplicationDbContext context, ManageToken manageToken)
         {
             _authorizationToken = authorizationToken;
+            _unitOfWork = unitOfWork;
+            _context = context;
+            _manageToken = manageToken;
         }
 
         [HttpPost(), Route("CreateOrder")]
@@ -46,7 +54,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 //create response class, we will be adding packages to it
                 GenerateLabelResponse response = new GenerateLabelResponse();
-                var streamAuth = ManageToken.GetToken(auth);
+                //var streamAuth = ManageToken.GetToken(auth);
+                //var manageToken = new ManageToken(_unitOfWork, _au,  _context);
+                var streamAuth = _manageToken.GetToken(auth);
+
                 var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString());
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
@@ -135,7 +146,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 //create response class, we will be adding packages to it
                 GenerateLabelResponse response = new GenerateLabelResponse();
-                var streamAuth = ManageToken.GetToken(auth);
+                var streamAuth = _manageToken.GetToken(auth);
+
+                //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
+                //var streamAuth = manageToken.GetToken(auth);
+
                 var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString());
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
@@ -293,7 +308,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 // remember that request will 
 
                 //Call stream delete order api 
-                var streamAuth = ManageToken.GetToken(auth);
+                var streamAuth = _manageToken.GetToken(auth);
+                //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
+                //var streamAuth = manageToken.GetToken(auth);
+
                 var streamDeleteOrderResponse = StreamOrderApi.DeleteOrder(streamAuth.AccessToken, request.OrderReference, auth.ClientId);
                 if (streamDeleteOrderResponse.Item1.response == null && !string.IsNullOrEmpty(streamDeleteOrderResponse.Item2))
                 {

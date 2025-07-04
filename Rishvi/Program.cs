@@ -60,6 +60,15 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterType<ConfigController>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<LinnworksController>().AsSelf().InstancePerLifetimeScope();
     containerBuilder.RegisterType<StreamController>().AsSelf().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ManageToken>().AsSelf().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
+    containerBuilder.RegisterType<ApplicationDbContext>()
+       .AsSelf()
+       .InstancePerLifetimeScope();
+
+    containerBuilder.RegisterGeneric(typeof(Repository<>))
+           .As(typeof(IRepository<>))
+           .InstancePerLifetimeScope();
 });
 
 // Safely register Hangfire

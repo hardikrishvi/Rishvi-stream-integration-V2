@@ -34,29 +34,38 @@ public class ApplicationDbContext : DbContext
     public DbSet<TotalsInfo> TotalsInfo { get; set; }
     public DbSet<Fulfillment> Fulfillment { get; set; }
     
+    public DbSet<ClientAuth> ClientAuth { get; set; }
 
-    
+    public DbSet<Rishvi.Models.Authorization> Authorizations { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        //builder.Entity<Event>()
-        //    .HasKey(e => e.id).HasName("PK_Event");
-        //// Defines primary key using fluent API
+        builder.Entity<Event>()
+            .HasKey(e => e.id).HasName("PK_Event");
+        // Defines primary key using fluent API
 
-        //builder.Entity<WebhookOrder>()
-        //    .HasKey(o => o.id).HasName("PK_WebhookOrder");
+        builder.Entity<WebhookOrder>()
+            .HasKey(o => o.id).HasName("PK_WebhookOrder");
 
 
-        //builder.Entity<Subscription>()
-        //    .HasKey(s => s.id).HasName("PK_Subscription");
+        builder.Entity<Subscription>()
+            .HasKey(s => s.id).HasName("PK_Subscription");
 
-        //builder.Entity<Run>()
-        //    .HasKey(r => r.id).HasName("PK_Run");
-        
-        builder.Entity<WebhookOrder>(entity =>
-        {
-            entity.ToTable("Orders");   // same table
-            entity.HasNoKey();          // treat as keyless entity
-        });
+        builder.Entity<Run>()
+            .HasKey(r => r.id).HasName("PK_Run");
+
+        builder.Entity<WebhookResp.Event>()
+            .HasNoKey();
+
+        builder.Entity<WebhookResponse.Run>()
+            .HasNoKey();
+
+        builder.Entity<WebhookResp.Subscription>().HasNoKey();
+        //builder.Entity<WebhookOrder>(entity =>
+        //{
+        //    entity.ToTable("Orders");   // same table
+        //    entity.HasNoKey();          // treat as keyless entity
+        //});
         builder.Entity<OrderRoot>().ToTable("Orders");
         builder.ShadowProperties();
         base.OnModelCreating(builder);
