@@ -5,6 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Rishvi.Models;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Address = Rishvi.Models.Address;
+using Item = Rishvi.Models.Item;
 
 namespace Rishvi.Modules.Core.Data
 {
@@ -38,11 +41,14 @@ namespace Rishvi.Modules.Core.Data
         public DbSet<StreamSettings> StreamSettings { get; set; }
         public DbSet<SyncSettings> SyncSettings { get; set; }
         public DbSet<Ebay> Ebay { get; set; }
+        public DbSet<ReportModel> ReportModel { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<ReportModel>().HasKey(x => x._id);
             builder.ShadowProperties();
             base.OnModelCreating(builder);
+            builder.Entity<ReportModel>(); 
             builder.Entity<IntegrationSettings>(); 
             builder.Entity<LinnworksSettings>(); 
             builder.Entity<StreamSettings>(); 
@@ -123,9 +129,9 @@ namespace Rishvi.Modules.Core.Data
             {
                 return await base.SaveChangesAsync(cancellation);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw new InvalidOperationException(ex.Message);
             }
         }
 

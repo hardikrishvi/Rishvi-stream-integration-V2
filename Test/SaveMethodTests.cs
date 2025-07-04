@@ -7,6 +7,7 @@ using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.ShippingIntegrations.Api;
 
 namespace Test
@@ -32,11 +33,13 @@ namespace Test
 
             mockAwsS3.Setup(a => AwsS3.S3FileIsExists("Authorization", "Users/_register_test_example_com.json"))
                 .ReturnsAsync(true);
+            var mockDbContext = new Mock<SqlContext>();
 
             var controller = new ConfigController(
                 mockAwsS3.Object,
                 mockServiceHelper.Object,
-                mockTradingApiOAuthHelper.Object
+                mockTradingApiOAuthHelper.Object,
+                mockDbContext.Object
             );
 
             // Act
@@ -67,9 +70,14 @@ namespace Test
             mockAwsS3.Setup(a => AwsS3.S3FileIsExists("Authorization", "Users/_register_test_example_com.json"))
                 .ReturnsAsync(false);
 
-            var controller = new ConfigController(mockAwsS3.Object,
+           
+            var mockDbContext = new Mock<SqlContext>();
+
+            var controller = new ConfigController(
+                mockAwsS3.Object,
                 mockServiceHelper.Object,
-                mockTradingApiOAuthHelper.Object
+                mockTradingApiOAuthHelper.Object,
+                mockDbContext.Object
             );
 
             // Act
@@ -97,10 +105,14 @@ namespace Test
             mockServiceHelper.Setup(s => s.TransformEmail(It.IsAny<string>()))
                 .Throws(new System.Exception("Mocked exception"));
 
+            
+            var mockDbContext = new Mock<SqlContext>();
+
             var controller = new ConfigController(
                 mockAwsS3.Object,
                 mockServiceHelper.Object,
-                mockTradingApiOAuthHelper.Object
+                mockTradingApiOAuthHelper.Object,
+                mockDbContext.Object
             );
 
             // Act

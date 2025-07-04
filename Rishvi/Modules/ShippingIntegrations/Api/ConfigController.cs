@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
@@ -16,12 +18,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly AwsS3 _awsS3;
         private readonly ServiceHelper _serviceHelper;
         private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
-
-        public ConfigController(AwsS3 awsS3, ServiceHelper serviceHelper, TradingApiOAuthHelper tradingApiOAuthHelper)
+        private readonly SqlContext _dbContext;
+        public ConfigController(AwsS3 awsS3, ServiceHelper serviceHelper, TradingApiOAuthHelper tradingApiOAuthHelper, SqlContext dbContext)
         {
             _awsS3 = awsS3;
             _serviceHelper = serviceHelper;
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
+            _dbContext = dbContext;
         }
 
         [HttpPost, Route("Register")]
@@ -29,8 +32,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                var transformedEmail = _serviceHelper.TransformEmail(request.Email);
-                if (!await AwsS3.S3FileIsExists("Authorization", "Users/" + "_register_" + transformedEmail + ".json"))
+                var transformedEmail = (request.Email);
+                var existsInDb = _dbContext.IntegrationSettings
+                    .Any(x => x.Email == transformedEmail);
+
+                if (!existsInDb)
                 {
                     request.Password = _serviceHelper.HashPassword(request.Password);
 

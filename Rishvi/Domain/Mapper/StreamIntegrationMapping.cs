@@ -2,6 +2,7 @@
 using Rishvi.Domain.DTOs.Ebay;
 using Rishvi.Domain.DTOs.IntegrationSettings;
 using Rishvi.Domain.DTOs.LinnworksSettings;
+using Rishvi.Domain.DTOs.ReportModel;
 using Rishvi.Domain.DTOs.StreamSettings;
 using Rishvi.Domain.DTOs.SyncSettings;
 using Rishvi.DTOs.Address;
@@ -14,6 +15,8 @@ using Rishvi.DTOs.ShippingInfo;
 using Rishvi.DTOs.TaxInfo;
 using Rishvi.DTOs.TotalsInfo;
 using Rishvi.Models;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Address = Rishvi.Models.Address;
 
 
 namespace Rishvi.Domain.Mapper
@@ -51,6 +54,7 @@ namespace Rishvi.Domain.Mapper
             CreateMap<LinnworksSettingsDto, LinnworksSettings>();
             CreateMap<IntegrationSettingsDto, IntegrationSettings>();
             CreateMap<EbayListDto, Ebay>();
+            CreateMap<ReportModelDto, ReportModel>();
 
         }
     }

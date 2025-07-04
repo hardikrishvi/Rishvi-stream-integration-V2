@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
 
@@ -12,12 +14,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
     public class ReportsController : ControllerBase
     {
         private readonly Lazy<IServiceHelper> _serviceHelper;
-        public ReportsController(Lazy<IServiceHelper> serviceHelper)
+        private readonly IUnitOfWork _unitOfWork;
+        public ReportsController(Lazy<IServiceHelper> serviceHelper,IUnitOfWork unitOfWork)
         {
             _serviceHelper = serviceHelper;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost, Route("GetReportData")]
+        // public async Task<List<ReportModel>> GetReportData([FromBody] ReportModelReq value)
+        // {
+        //     if (value == null || string.IsNullOrWhiteSpace(value.email))
+        //     {
+        //         throw new ArgumentException("Email is required for fetching report data.");
+        //     }
+        //
+        //     var reports = await _unitOfWork.Context.Set<ReportModel>()
+        //         .Where(r => r.email == value.email)
+        //         .ToListAsync();
+        //
+        //     return reports;
+        // }
         public async Task<List<ReportModel>> GetReportData([FromBody] ReportModelReq value)
         {
             try
@@ -27,16 +44,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 {
                     throw new ArgumentException("Email is required for fetching report data.");
                 }
-
+        
                 // Transform email for S3 file path
                 var filePath = $"Reports/{_serviceHelper.Value.TransformEmail(value.email)}_report.json";
-
+        
                 // Check if the report file exists
                 if (await AwsS3.S3FileIsExists("Authorization", filePath))
                 {
                     var fileContent = AwsS3.GetS3File("Authorization", filePath);
                     var reports = JsonConvert.DeserializeObject<List<ReportModel>>(fileContent);
-
+        
                     return reports ?? new List<ReportModel>(); // Return an empty list if deserialization yields null
                 }
                 else

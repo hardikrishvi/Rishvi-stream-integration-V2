@@ -806,21 +806,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         }
         #endregion
         #region Save s3 data
-        public void RegisterSave(string s, string AuthorizationToken, string email = "",string token = "")
+        // public void RegisterSave(string s, string AuthorizationToken, string email = "",string token = "")
+        // {
+        //     RegisterSaveFromJson(s);
+        //     var Stream = new MemoryStream();
+        //     StreamWriter sw = new StreamWriter(Stream);
+        //     sw.Write(s);;
+        //     sw.Flush();
+        //     Stream.Position = 0;
+        //     AwsS3.UploadFileToS3("Authorization", Stream, "Users/_register_" + email + ".json");
+        //     var stream1 = new MemoryStream();
+        //     StreamWriter sw1 = new StreamWriter(stream1);
+        //     sw1.Write(s);
+        //     sw1.Flush();
+        //     stream1.Position = 0;
+        //     //AwsS3.UploadFileToS3("Authorization", stream1, "Files/" + token.ToString() + ".json");
+        // }
+        public void RegisterSave(string s, string AuthorizationToken, string email = "", string token = "")
         {
-            RegisterSaveFromJson(s);
-            var Stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(Stream);
-            sw.Write(s);;
-            sw.Flush();
-            Stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", Stream, "Users/_register_" + email + ".json");
-            var stream1 = new MemoryStream();
-            StreamWriter sw1 = new StreamWriter(stream1);
-            sw1.Write(s);
-            sw1.Flush();
-            stream1.Position = 0;
-            //AwsS3.UploadFileToS3("Authorization", stream1, "Files/" + token.ToString() + ".json");
+            RegisterSaveFromJson(s).GetAwaiter().GetResult();
         }
         public async Task RegisterSaveFromJson(string json)
         {
@@ -937,40 +941,114 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             sw.Flush();
             stream.Position = 0;
             AwsS3.UploadFileToS3("Authorization", stream, "Reports/" + email.ToLower().Replace("@", "_").Replace(".", "_").ToString() + "_report.json");
-
+        
         }
+        private void EnsureValidDates(ReportModel report)
+        {
+            DateTime sqlMinDate = new DateTime(1753, 1, 1);
+
+            if (report.createdDate < sqlMinDate) report.createdDate = DateTime.Now;
+            if (report.updatedDate < sqlMinDate) report.updatedDate = DateTime.Now;
+            if (report.DownloadLinnOrderInSystem < sqlMinDate) report.DownloadLinnOrderInSystem = DateTime.Now;
+            if (report.DownloadEbayOrderInSystem < sqlMinDate) report.DownloadEbayOrderInSystem = DateTime.Now;
+            if (report.DispatchEbayOrderInStream < sqlMinDate) report.DispatchEbayOrderInStream = DateTime.Now;
+            if (report.DispatchEbayOrderFromStream < sqlMinDate) report.DispatchEbayOrderFromStream = DateTime.Now;
+            if (report.CreateLinnOrderInStream < sqlMinDate) report.CreateLinnOrderInStream = DateTime.Now;
+            if (report.LastUpdateLinnOrderForStream < sqlMinDate) report.LastUpdateLinnOrderForStream = DateTime.Now;
+            if (report.DispatchLinnOrderFromStream < sqlMinDate) report.DispatchLinnOrderFromStream = DateTime.Now;
+            if (report.DispatchLinnOrderInStream < sqlMinDate) report.DispatchLinnOrderInStream = DateTime.Now;
+            if (report.CreateEbayOrderInStream < sqlMinDate) report.CreateEbayOrderInStream = DateTime.Now;
+            if (report.CreatedAt < sqlMinDate) report.CreatedAt = DateTime.Now;
+            if (report.UpdatedAt.HasValue && report.UpdatedAt.Value < sqlMinDate) report.UpdatedAt = DateTime.Now;
+        }
+        public async Task SaveReportDataForTEst(List<ReportModel> reportData)
+        {
+            foreach (var report in reportData)
+            {
+                EnsureValidDates(report);
+
+                var existing = await _unitOfWork.Context.Set<ReportModel>()
+                    .FirstOrDefaultAsync(x => x._id == report._id);
+
+                if (existing == null)
+                {
+                    _unitOfWork.Context.Add(report);
+                }
+                else
+                {
+                    existing.updatedDate = DateTime.Now;
+                    existing.DownloadLinnOrderInSystem = report.DownloadLinnOrderInSystem;
+                    existing.LinnOrderDetailsJson = report.LinnOrderDetailsJson;
+                    existing.AuthorizationToken = report.AuthorizationToken;
+                    existing.LinnNumOrderId = report.LinnNumOrderId;
+                    existing.email = report.email;
+                }
+            }
+
+            await _unitOfWork.Context.SaveChangesAsync();
+        }
+        // public async Task SaveLinnOrder(string s, string AuthorizationToken, string email, string linnorderid = "")
+        // {
+        //     InsertOrderFromJson(s);
+        //     var stream = new MemoryStream();
+        //     StreamWriter sw = new StreamWriter(stream);
+        //     sw.Write(s);
+        //     sw.Flush();
+        //     stream.Position = 0;
+        //     AwsS3.UploadFileToS3("Authorization", stream, "LinnOrder/" + AuthorizationToken.ToString() + "_linnorder_" + linnorderid + ".json");
+        //     var alldata = _reportsController.GetReportData(new ReportModelReq() { email = email }).Result;
+        //     if (alldata.Count(f => f.LinnNumOrderId == linnorderid) == 0)
+        //     {
+        //         alldata.Add(new ReportModel()
+        //         {
+        //             _id = Guid.NewGuid().ToString(),
+        //             updatedDate = DateTime.Now,
+        //             email = email,
+        //             DownloadLinnOrderInSystem = DateTime.Now,
+        //             createdDate = DateTime.Now,
+        //             AuthorizationToken = AuthorizationToken,
+        //             LinnNumOrderId = linnorderid,
+        //             LinnOrderDetailsJson = "LinnOrder/" + AuthorizationToken.ToString() + "_linnorder_" + linnorderid + ".json"
+        //         });
+        //         await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+        //     }
+        //     else
+        //     {
+        //         alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid).LinnOrderDetailsJson = "LinnOrder/" + AuthorizationToken.ToString() + "_linnorder_" + linnorderid + ".json";
+        //         alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid).DownloadLinnOrderInSystem = DateTime.Now;
+        //         alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid).updatedDate = DateTime.Now;
+        //        await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+        //     }
+        // }
         public async Task SaveLinnOrder(string s, string AuthorizationToken, string email, string linnorderid = "")
         {
             InsertOrderFromJson(s);
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", stream, "LinnOrder/" + AuthorizationToken.ToString() + "_linnorder_" + linnorderid + ".json");
-            var alldata = _reportsController.GetReportData(new ReportModelReq() { email = email }).Result;
-            if (alldata.Count(f => f.LinnNumOrderId == linnorderid) == 0)
+
+            var alldata = await _reportsController.GetReportData(new ReportModelReq() { email = email });
+
+            var existing = alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid);
+            if (existing == null)
             {
-                alldata.Add(new ReportModel()
+                alldata.Add(new ReportModel
                 {
                     _id = Guid.NewGuid().ToString(),
                     updatedDate = DateTime.Now,
+                    createdDate = DateTime.Now,
                     email = email,
                     DownloadLinnOrderInSystem = DateTime.Now,
-                    createdDate = DateTime.Now,
                     AuthorizationToken = AuthorizationToken,
                     LinnNumOrderId = linnorderid,
-                    LinnOrderDetailsJson = "LinnOrder/" + AuthorizationToken.ToString() + "_linnorder_" + linnorderid + ".json"
+                    LinnOrderDetailsJson = s // save JSON directly in DB field
                 });
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
             }
             else
             {
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid).LinnOrderDetailsJson = "LinnOrder/" + AuthorizationToken.ToString() + "_linnorder_" + linnorderid + ".json";
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid).DownloadLinnOrderInSystem = DateTime.Now;
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid).updatedDate = DateTime.Now;
-               await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+                existing.LinnOrderDetailsJson = s;
+                existing.DownloadLinnOrderInSystem = DateTime.Now;
+                existing.updatedDate = DateTime.Now;
             }
+
+            await SaveReportDataForTEst(alldata);
         }
         public void InsertOrderFromJson(string json)
         {
