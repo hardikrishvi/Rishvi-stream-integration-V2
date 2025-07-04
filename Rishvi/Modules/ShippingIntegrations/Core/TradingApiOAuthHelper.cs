@@ -27,7 +27,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         private readonly ReportsController _reportsController;
         private readonly SetupController _setupController;
 
-       // private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
+        // private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
         //public TradingApiOAuthHelper(ReportsController reportsController, SetupController setupController);
 
         private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
@@ -43,7 +43,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         private readonly IRepository<ClientAuth> _ClientAuth;
         private readonly IRepository<Rishvi.Models.Item> _Item;
         private readonly IUnitOfWork _unitOfWork;
-        
+
         private readonly IRepository<Rishvi.Models.IntegrationSettings> _IntegrationSettings;
         private readonly IRepository<Rishvi.Models.LinnworksSettings> _LinnworksSettings;
         private readonly IRepository<Rishvi.Models.StreamSettings> _StreamSettings;
@@ -57,7 +57,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             IRepository<GeneralInfo> generalInfo, IRepository<OrderRoot> orderRoot, IRepository<ShippingInfo> shippingInfo,
             IRepository<TaxInfo> taxInfo, IRepository<TotalsInfo> totalsInfo, IRepository<Rishvi.Models.Item> item,
             IRepository<IntegrationSettings> integrationSettings, IRepository<LinnworksSettings> linnworksSettings, IRepository<Rishvi.Models.StreamSettings> streamSettings,
-            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay, IRepository<ClientAuth> ClientAuth, ManageToken manageToken)
+            IRepository<Rishvi.Models.SyncSettings> syncSettings, IRepository<Rishvi.Models.Ebay> ebay, IRepository<ClientAuth> ClientAuth, ManageToken manageToken)
 
         {
             _reportsController = reportsController;
@@ -73,11 +73,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _TaxInfo = taxInfo;
             _TotalsInfo = totalsInfo;
             _Item = item;
-            _IntegrationSettings= integrationSettings; 
-            _LinnworksSettings =  linnworksSettings;
-            _StreamSettings    =  streamSettings;
-            _SyncSettings      = syncSettings;
-            _Ebay      = ebay;
+            _IntegrationSettings = integrationSettings;
+            _LinnworksSettings = linnworksSettings;
+            _StreamSettings = streamSettings;
+            _SyncSettings = syncSettings;
+            _Ebay = ebay;
             _ClientAuth = ClientAuth;
             _manageToken = manageToken;
         }
@@ -265,8 +265,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //                                        + @"<RequesterCredentials>
         //                                            <eBayAuthToken>##AuthToken##</eBayAuthToken>
         //                                          </RequesterCredentials>
-	       //                                         <ErrorLanguage>en_US</ErrorLanguage>
-	       //                                         <WarningLevel>High</WarningLevel> 
+        //                                         <ErrorLanguage>en_US</ErrorLanguage>
+        //                                         <WarningLevel>High</WarningLevel> 
         //                                          ##FromTo##
         //                                          <OrderRole>Seller</OrderRole>
         //                                          ##OrderList##
@@ -418,7 +418,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     {
                         if (linnorderid.IsValidInt32())
                         {
-                            await DispatchOrderInLinnworks(_User, Convert.ToInt32(linnorderid), "Stream", streamdata.response.trackingId, streamdata.response.trackingURL, linntoken,null);
+                            await DispatchOrderInLinnworks(_User, Convert.ToInt32(linnorderid), "Stream", streamdata.response.trackingId, streamdata.response.trackingURL, linntoken, null);
                         }
                     }
                 }
@@ -616,7 +616,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
             return differences;
         }
-        
+
         public async Task UpdateOrderExProperty(string linntoken, int orderid, Dictionary<string, string> values)
         {
             var obj = new LinnworksBaseStream(linntoken);
@@ -686,7 +686,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                         Region = jsopndata.CustomerInfo.Address.Region,
                         Town = jsopndata.CustomerInfo.Address.Town,
-                        
+
                     }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
@@ -779,20 +779,21 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
-        public async Task DispatchOrderInLinnworks(AuthorizationConfigClass _User, int OrderRef,string linntoken, 
-            string Service, string TrackingNumber, string TrackingUrl,string dispatchdate)
+        public async Task DispatchOrderInLinnworks(AuthorizationConfigClass _User, int OrderRef, string linntoken,
+            string Service, string TrackingNumber, string TrackingUrl, string dispatchdate)
         {
             string ProductResp = "";
             var obj = new LinnworksBaseStream(linntoken);
             // create identifier 
             var orderdata = obj.Api.Orders.GetOrderDetailsByNumOrderId(OrderRef);
-            var list = obj.Api.Orders.SetOrderShippingInfo(orderdata.OrderId, new UpdateOrderShippingInfoRequest() { 
-             ItemWeight = orderdata.ShippingInfo.ItemWeight,
-             ManualAdjust = orderdata.ShippingInfo.ManualAdjust,
-             PostageCost = orderdata.ShippingInfo.PostageCost,  
-             PostalServiceId = orderdata.ShippingInfo.PostalServiceId,
-             TotalWeight = orderdata.ShippingInfo.TotalWeight,
-             TrackingNumber = TrackingNumber
+            var list = obj.Api.Orders.SetOrderShippingInfo(orderdata.OrderId, new UpdateOrderShippingInfoRequest()
+            {
+                ItemWeight = orderdata.ShippingInfo.ItemWeight,
+                ManualAdjust = orderdata.ShippingInfo.ManualAdjust,
+                PostageCost = orderdata.ShippingInfo.PostageCost,
+                PostalServiceId = orderdata.ShippingInfo.PostalServiceId,
+                TotalWeight = orderdata.ShippingInfo.TotalWeight,
+                TrackingNumber = TrackingNumber
             });
             var generalinfo = orderdata.GeneralInfo;
             generalinfo.DespatchByDate = dispatchdate == null ? DateTime.Now : DateTime.Parse(dispatchdate);
@@ -841,7 +842,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         {
             try
             {
-                
+
                 var root = JsonConvert.DeserializeObject<RegistrationData>(json);
                 var linnworks = new LinnworksSettings
                 {
@@ -857,9 +858,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = null
                 };
-                
+
                 var stream = new StreamSettings
-                { 
+                {
                     Id = Guid.NewGuid(),
                     GetTrackingDetails = root.Stream?.GetTrackingDetails ?? false,
                     EnableWebhook = root.Stream?.EnableWebhook ?? false,
@@ -905,8 +906,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     AuthorizationToken = root.AuthorizationToken ?? string.Empty,
                     LinnworksSyncToken = root.LinnworksSyncToken ?? string.Empty,
                     Linnworks = linnworks,
-                    Stream =  stream,
-                    Sync =  sync,
+                    Stream = stream,
+                    Sync = sync,
                     Ebay = ebay, // or handle if you add a proper class later
                     LastSyncOnDate = root.LastSyncOnDate,
                     LastSyncOn = root.LastSyncOn ?? string.Empty,
@@ -922,10 +923,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 _SyncSettings.Add(sync);
                 _Ebay.Add(ebay);
                 _IntegrationSettings.Add(integrationSettings);
-                
+
 
                 await _unitOfWork.Context.SaveChangesAsync();
-                
+
                 Console.WriteLine("✅ Order inserted successfully");
             }
             catch (Exception ex)
@@ -952,7 +953,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             sw.Flush();
             stream.Position = 0;
             AwsS3.UploadFileToS3("Authorization", stream, "Reports/" + email.ToLower().Replace("@", "_").Replace(".", "_").ToString() + "_report.json");
-        
+
         }
         private void EnsureValidDates(ReportModel report)
         {
@@ -1342,7 +1343,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
             }
         }
-        
+
         public async Task SaveEbayOrder(string s, string AuthorizationToken, string email, string orderlineitemid, string ebayorderid = "")
         {
             var stream = new MemoryStream();
@@ -1499,16 +1500,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
-        public async Task SaveLinnChangeOrder(string s, string AuthorizationToken, string order = "")
-        {
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", stream, "LinnChange/" + AuthorizationToken.ToString() + "_linnchangeorder_" + order + ".json");
+        //public async Task SaveLinnChangeOrder(string s, string AuthorizationToken, string order = "")
+        //{
+        //    var stream = new MemoryStream();
+        //    StreamWriter sw = new StreamWriter(stream);
+        //    sw.Write(s);
+        //    sw.Flush();
+        //    stream.Position = 0;
+        //    AwsS3.UploadFileToS3("Authorization", stream, "LinnChange/" + AuthorizationToken.ToString() + "_linnchangeorder_" + order + ".json");
 
-        }
+        //}
         public async Task SaveLinnDispatch(string s, string AuthorizationToken, string email, int linnorderid)
         {
             var stream = new MemoryStream();
@@ -1574,9 +1575,69 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             AwsS3.UploadFileToS3("Authorization", stream, "InstallLogs/" + AuthorizationToken.ToString() + "_installlogs_" + reference + ".json");
 
         }
+        public RegistrationData GetRegistrationData(string email)
+        {
+            var registrationData = new RegistrationData();
+            var integrationSettings = _IntegrationSettings.Get(x => x.Email == email).FirstOrDefault();
+            registrationData.Name = integrationSettings?.Name ?? string.Empty;
+            registrationData.Email = integrationSettings?.Email ?? string.Empty;
+            registrationData.Password = integrationSettings?.Password ?? string.Empty;
+            registrationData.AuthorizationToken = integrationSettings?.AuthorizationToken ?? string.Empty;
+            registrationData.LinnworksSyncToken = integrationSettings?.LinnworksSyncToken ?? string.Empty;
+            registrationData.Linnworks = new LinnworksModel
+            {
+                //Id = integrationSettings?.Linnworks?.Id ?? Guid.Empty,
+                DownloadOrderFromEbay = integrationSettings?.Linnworks?.DownloadOrderFromStream ?? false,
+                DownloadOrderFromStream = integrationSettings?.Linnworks?.DownloadOrderFromEbay ?? false,
+                PrintLabelFromStream = integrationSettings?.Linnworks?.PrintLabelFromStream ?? false,
+                PrintLabelFromLinnworks = integrationSettings?.Linnworks?.PrintLabelFromLinnworks ?? false,
+                DispatchOrderFromStream = integrationSettings?.Linnworks?.DispatchOrderFromStream ?? false,
+                DispatchOrderFromEbay = integrationSettings?.Linnworks?.DispatchOrderFromEbay ?? false,
+                SendChangeToEbay = integrationSettings?.Linnworks?.SendChangeToEbay ?? false,
+                SendChangeToStream = integrationSettings?.Linnworks?.SendChangeToStream ?? false,
+            };
+            registrationData.Stream = new StreamModel
+            {
+                //Id = integrationSettings?.Stream?.Id ?? Guid.Empty,
+                GetTrackingDetails = integrationSettings?.Stream?.GetTrackingDetails ?? false,
+                EnableWebhook = integrationSettings?.Stream?.EnableWebhook ?? false,
+                SendChangeFromLinnworksToStream = integrationSettings?.Stream?.SendChangeFromLinnworksToStream ?? false,
+                SendChangesFromEbayToStream = integrationSettings?.Stream?.SendChangesFromEbayToStream ?? false,
+                CreateProductToStream = integrationSettings?.Stream?.CreateProductToStream ?? false,
+                DownloadProductFromStreamToLinnworks = integrationSettings?.Stream?.DownloadProductFromStreamToLinnworks ?? false,
+                GetDepotListFromStream = integrationSettings?.Stream?.GetDepotListFromStream ?? false,
+                GetRoutePlanFromStream = integrationSettings?.Stream?.GetRoutePlanFromStream ?? false,
+            };
+            registrationData.Ebay = new EbayModel
+            {
+                //Id = integrationSettings?.Ebay?.Id ?? Guid.Empty,
+                DownloadOrderFromEbay = integrationSettings?.Ebay?.DownloadOrderFromEbay ?? false,
+                SendOrderToStream = integrationSettings?.Ebay?.SendOrderToStream ?? false,
+                UpdateInformationFromEbayToStream = integrationSettings?.Ebay?.UpdateInformationFromEbayToStream ?? false,
+                DispatchOrderFromEbay = integrationSettings?.Ebay?.DispatchOrderFromEbay ?? false,
+                UpdateTrackingDetailsFromStream = integrationSettings?.Ebay?.UpdateTrackingDetailsFromStream ?? false,
+            };
+            registrationData.Sync = new SyncModel
+            {
+                SyncEbayOrder = integrationSettings?.Sync?.SyncEbayOrder ?? false,
+                SyncLinnworksOrder = integrationSettings?.Sync?.SyncLinnworksOrder ?? false,
+                CreateEbayOrderToStream = integrationSettings?.Sync?.CreateEbayOrderToStream ?? false,
+                CreateLinnworksOrderToStream = integrationSettings?.Sync?.CreateLinnworksOrderToStream ?? false,
+                DispatchEbayOrderFromStream = integrationSettings?.Sync?.DispatchEbayOrderFromStream ?? false,
+                DispatchLinnworksOrderFromStream = integrationSettings?.Sync?.DispatchLinnworksOrderFromStream ?? false,
+                UpdateLinnworksOrderToStream = integrationSettings?.Sync?.UpdateLinnworksOrderToStream ?? false,
+            };
+            registrationData.LastSyncOnDate = integrationSettings?.LastSyncOnDate ?? DateTime.MinValue;
+            registrationData.LastSyncOn = integrationSettings?.LastSyncOn ?? DateTime.MinValue.ToString();
+            registrationData.ebaypage = integrationSettings?.ebaypage ?? 1;
+            registrationData.ebayhour = integrationSettings?.ebayhour ?? 0;
+            registrationData.linnhour = integrationSettings?.linnhour ?? 0;
+            registrationData.linnpage = integrationSettings?.linnpage ?? 1;
+            return registrationData;
+        }
         #endregion
         #region Messian function
-       
+
         #endregion
 
 

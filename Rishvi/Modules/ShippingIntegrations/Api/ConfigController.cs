@@ -61,13 +61,21 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 var transformedEmail = _serviceHelper.TransformEmail(value.Email);
-                var fileName = "Users/" + "_register_" + transformedEmail + ".json";
-                if (!await AwsS3.S3FileIsExists("Authorization", fileName))
+                var getData = _dbContext.IntegrationSettings
+                    .FirstOrDefault(x => x.Email == transformedEmail);
+                //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
+                //if (!await AwsS3.S3FileIsExists("Authorization", fileName))
+                //{
+                //    return NotFound("Email not registered.");
+                //}
+                if (getData == null)
                 {
                     return NotFound("Email not registered.");
                 }
-                var output = AwsS3.GetS3File("Authorization", fileName);
-                var res = JsonConvert.DeserializeObject<RegistrationData>(output);
+                var res = _tradingApiOAuthHelper.GetRegistrationData(transformedEmail);
+
+                //var output = AwsS3.GetS3File("Authorization", fileName);
+                //var res = JsonConvert.DeserializeObject<RegistrationData>(output);
                 if (res.Password == _serviceHelper.HashPassword(value.Password))
                 {
                     return Ok("ok");
@@ -91,17 +99,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 var transformedEmail = _serviceHelper.TransformEmail(email);
-                var fileName = "Users/" + "_register_" + transformedEmail + ".json";
+                //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
+
+                var getData = _dbContext.IntegrationSettings
+                    .FirstOrDefault(x => x.Email == transformedEmail);
 
                 // Retrieve the file directly
-                if (await AwsS3.S3FileIsExists("Authorization", fileName))
+                //if (await AwsS3.S3FileIsExists("Authorization", fileName))
+                //{
+                //    var result = AwsS3.GetS3File("Authorization", fileName);
+                //    var output = JsonConvert.DeserializeObject<RegistrationData>(result);
+                //    // Ensure SyncModel is not null
+                //    output.Sync ??= new SyncModel();
+                //    return Ok(output);
+
+                //}
+                if (getData != null)
                 {
-                    var result = AwsS3.GetS3File("Authorization", fileName);
-                    var output = JsonConvert.DeserializeObject<RegistrationData>(result);
+                    var output = _tradingApiOAuthHelper.GetRegistrationData(transformedEmail);
                     // Ensure SyncModel is not null
                     output.Sync ??= new SyncModel();
                     return Ok(output);
-
                 }
                 else
                 {
@@ -125,12 +143,81 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 value.Sync ??= new SyncModel();
 
                 var transformedEmail = _serviceHelper.TransformEmail(value.Email);
-                var fileName = "Users/" + "_register_" + transformedEmail + ".json";
+                var getData = _dbContext.IntegrationSettings
+                    .FirstOrDefault(x => x.Email == transformedEmail);
 
-                // Check if file exists
-                if (await AwsS3.S3FileIsExists("Authorization", fileName))
+                if (getData != null)
                 {
-                    _tradingApiOAuthHelper.RegisterSave(JsonConvert.SerializeObject(value), "", transformedEmail,value.AuthorizationToken);
+                    // Update existing user data
+                    getData.Name = value.Name;
+                    getData.Password = _serviceHelper.HashPassword(value.Password);
+                    getData.AuthorizationToken = value.AuthorizationToken;
+                    getData.LinnworksSyncToken = value.LinnworksSyncToken;
+
+                    // Map LinnworksModel to LinnworksSettings
+                    getData.Linnworks = new LinnworksSettings
+                    {
+                        DownloadOrderFromStream = value.Linnworks.DownloadOrderFromStream,
+                        DownloadOrderFromEbay = value.Linnworks.DownloadOrderFromEbay,
+                        PrintLabelFromStream = value.Linnworks.PrintLabelFromStream,
+                        PrintLabelFromLinnworks = value.Linnworks.PrintLabelFromLinnworks,
+                        DispatchOrderFromStream = value.Linnworks.DispatchOrderFromStream,
+                        DispatchOrderFromEbay = value.Linnworks.DispatchOrderFromEbay,
+                        SendChangeToEbay = value.Linnworks.SendChangeToEbay,
+                        SendChangeToStream = value.Linnworks.SendChangeToStream,
+                        CreatedAt = getData.Linnworks?.CreatedAt ?? DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    // Map StreamModel to StreamSettings
+                    getData.Stream = new StreamSettings
+                    {
+                        GetTrackingDetails = value.Stream.GetTrackingDetails,
+                        EnableWebhook = value.Stream.EnableWebhook,
+                        SendChangeFromLinnworksToStream = value.Stream.SendChangeFromLinnworksToStream,
+                        SendChangesFromEbayToStream = value.Stream.SendChangesFromEbayToStream,
+                        CreateProductToStream = value.Stream.CreateProductToStream,
+                        DownloadProductFromStreamToLinnworks = value.Stream.DownloadProductFromStreamToLinnworks,
+                        GetRoutePlanFromStream = value.Stream.GetRoutePlanFromStream,
+                        GetDepotListFromStream = value.Stream.GetDepotListFromStream,
+                        CreatedAt = getData.Stream?.CreatedAt ?? DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    // Map SyncModel to SyncSettings
+                    getData.Sync = new SyncSettings
+                    {
+                        SyncEbayOrder = value.Sync.SyncEbayOrder,
+                        SyncLinnworksOrder = value.Sync.SyncLinnworksOrder,
+                        CreateEbayOrderToStream = value.Sync.CreateEbayOrderToStream,
+                        CreateLinnworksOrderToStream = value.Sync.CreateLinnworksOrderToStream,
+                        DispatchLinnworksOrderFromStream = value.Sync.DispatchLinnworksOrderFromStream,
+                        DispatchEbayOrderFromStream = value.Sync.DispatchEbayOrderFromStream,
+                        UpdateLinnworksOrderToStream = value.Sync.UpdateLinnworksOrderToStream,
+                        CreatedAt = getData.Sync?.CreatedAt ?? DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    // Update the assignment to map properties from EbayModel to Ebay
+                    getData.Ebay = new Ebay
+                    {
+                        DownloadOrderFromEbay = value.Ebay.DownloadOrderFromEbay,
+                        SendOrderToStream = value.Ebay.SendOrderToStream,
+                        UpdateInformationFromEbayToStream = value.Ebay.UpdateInformationFromEbayToStream,
+                        DispatchOrderFromEbay = value.Ebay.DispatchOrderFromEbay,
+                        UpdateTrackingDetailsFromStream = value.Ebay.UpdateTrackingDetailsFromStream,
+                        CreatedAt = getData.Ebay?.CreatedAt ?? DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    getData.LastSyncOnDate = value.LastSyncOnDate;
+                    getData.LastSyncOn = value.LastSyncOn;
+                    getData.ebaypage = value.ebaypage;
+                    getData.ebayhour = value.ebayhour;
+                    getData.linnpage = value.linnpage;
+                    getData.linnhour = value.linnhour;
+
+                    _dbContext.IntegrationSettings.Update(getData);
+                    await _dbContext.SaveChangesAsync();
                     return Ok("User data saved successfully.");
                 }
                 else

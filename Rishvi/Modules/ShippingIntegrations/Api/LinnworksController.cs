@@ -434,7 +434,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
 
                 var user = _authToken.Load(token);
-               
+
                 var streamAuth = _manageToken.GetToken(user);
                 if (string.IsNullOrWhiteSpace(streamAuth?.AccessToken))
                 {
@@ -671,7 +671,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             }
                             else
                             {
-                                EmailHelper.SendEmail("Error Webhook Update","User Authentication Issue - "+ user.AuthorizationToken+" Data:"+ data);
+                                EmailHelper.SendEmail("Error Webhook Update", "User Authentication Issue - " + user.AuthorizationToken + " Data:" + data);
                             }
 
 

@@ -16,11 +16,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IAuthorizationToken _authorizationToken;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ManageToken _manageToken;
-        public SetupController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ManageToken manageToken)
+        private readonly IRepository<Authorization> _authorizationRepository;
+        public SetupController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ManageToken manageToken, IRepository<Authorization> authorizationRepository)
         {
             _authorizationToken = authorizationToken;
             _unitOfWork = unitOfWork;
             _manageToken = manageToken;
+            _authorizationRepository = authorizationRepository;
         }
 
         [HttpPost, Route("AddNewUser")]
@@ -66,7 +68,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 // Authenticate the user
                 AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
-                if (auth == null)
+                var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
+                if (auth == null || authEntity == null)
                 {
                     return new UserConfigResponse()
                     {
@@ -82,7 +85,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     if (string.IsNullOrEmpty(auth.ConfigStatus))
                     {
                         auth.ConfigStatus = "ContactStage";
-                        auth.Save();
+                        authEntity.ConfigStatus = "ContactStage";
+                        //auth.Save();
+                        _authorizationRepository.Update(authEntity);
+                        _unitOfWork.Commit();
                     }
 
                     // Handle specific config stage
@@ -130,7 +136,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 // Authenticate the user and load the config file
                 AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
-                if (auth == null)
+                var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
+                if (auth == null || authEntity == null)
                 {
                     return new UpdateConfigResponse($"Authorization failed for token {request.AuthorizationToken}");
                 }
@@ -161,7 +168,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     // Mark config as active and update status
                     auth.ConfigStatus = "CONFIG";
                     auth.IsConfigActive = true;
-                    auth.Save();
+                    //auth.Save();
+
+                    authEntity.AccountName = GetConfigValue(request, "NAME");
+                    authEntity.CompanyName = GetConfigValue(request, "COMPANY");
+                    authEntity.AddressLine1 = GetConfigValue(request, "ADDRESS1");
+                    authEntity.AddressLine2 = GetConfigValue(request, "ADDRESS2");
+                    authEntity.AddressLine3 = GetConfigValue(request, "ADDRESS3");
+                    authEntity.City = GetConfigValue(request, "CITY");
+                    authEntity.County = GetConfigValue(request, "REGION");
+                    authEntity.CountryCode = GetConfigValue(request, "COUNTRY");
+                    authEntity.ContactPhoneNo = GetConfigValue(request, "TELEPHONE");
+                    authEntity.PostCode = GetConfigValue(request, "POSTCODE");
+                    authEntity.ClientId = GetConfigValue(request, "ClientId");
+                    authEntity.ClientSecret = GetConfigValue(request, "ClientSecret");
+                    _authorizationRepository.Update(authEntity);
+                    _unitOfWork.Commit();
 
                     return new UpdateConfigResponse();
                 }
@@ -171,7 +193,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     // Allow changes to certain config properties
                     auth.AccountName = GetConfigValue(request, "NAME");
                     auth.AddressLine1 = GetConfigValue(request, "ADDRESS1");
-                    auth.Save();
+                    //auth.Save();
+
+                    authEntity.AccountName = GetConfigValue(request, "NAME");
+                    authEntity.AddressLine1 = GetConfigValue(request, "ADDRESS1");
+                    _authorizationRepository.Update(authEntity);
+                    _unitOfWork.Commit();
 
                     return new UpdateConfigResponse();
                 }

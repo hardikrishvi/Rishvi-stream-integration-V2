@@ -11,7 +11,7 @@ public class SyncSettings : IModificationHistory
     public bool CreateLinnworksOrderToStream { get; set; }
     public bool DispatchLinnworksOrderFromStream { get; set; }
     public bool DispatchEbayOrderFromStream { get; set; }
-        
+    public bool UpdateLinnworksOrderToStream { get; set; }  
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
