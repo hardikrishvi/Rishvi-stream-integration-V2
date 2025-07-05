@@ -9,7 +9,7 @@ public class OrderRoot : IModificationHistory
 {
     [Key]
     public Guid OrderId { get; set; } 
-    public int? NumOrderId { get; set; }
+    public int NumOrderId { get; set; }
     public GeneralInfo GeneralInfo { get; set; }
     public ShippingInfo ShippingInfo { get; set; }
     public CustomerInfo CustomerInfo { get; set; }

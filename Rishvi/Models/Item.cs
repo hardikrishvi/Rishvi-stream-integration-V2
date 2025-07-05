@@ -11,7 +11,7 @@ namespace Rishvi.Models
         public string ItemNumber { get; set; }
         public string SKU { get; set; }
         public string Title { get; set; }
-        public int? Quantity { get; set; }
+        public int Quantity { get; set; }
         public string CategoryName { get; set; }
         public bool? StockLevelsSpecified { get; set; }
         public int? OnOrder { get; set; }

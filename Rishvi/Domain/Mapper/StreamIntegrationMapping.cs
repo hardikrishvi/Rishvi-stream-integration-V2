@@ -3,6 +3,7 @@ using Rishvi.Domain.DTOs.Ebay;
 using Rishvi.Domain.DTOs.IntegrationSettings;
 using Rishvi.Domain.DTOs.LinnworksSettings;
 using Rishvi.Domain.DTOs.ReportModel;
+using Rishvi.Domain.DTOs.StreamOrderRecord;
 using Rishvi.Domain.DTOs.StreamSettings;
 using Rishvi.Domain.DTOs.SyncSettings;
 using Rishvi.DTOs.Address;
@@ -55,6 +56,7 @@ namespace Rishvi.Domain.Mapper
             CreateMap<IntegrationSettingsDto, IntegrationSettings>();
             CreateMap<EbayListDto, Ebay>();
             CreateMap<ReportModelDto, ReportModel>();
+            CreateMap<StreamOrderRecordDto, StreamOrderRecord>();
 
         }
     }

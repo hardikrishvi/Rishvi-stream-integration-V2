@@ -15,6 +15,7 @@ using Rishvi.Domain.DTOs.Subscription;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
 using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using Rishvi.Modules.Core.Helpers;
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
@@ -34,11 +35,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IRepository<Run> _run;
         private readonly IRepository<Event> _event;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ManageToken _manageToken;
+        private readonly SqlContext _dbSqlCContext;
         public LinnworksController(TradingApiOAuthHelper tradingApiOAuthHelper, IAuthorizationToken authToken,
             ConfigController configController, StreamController streamController,
             IServiceHelper serviceHelper, ReportsController reportsController, IRepository<Subscription> subscription, IUnitOfWork unitOfWork,
-            IRepository<WebhookOrder> webhookOrder, IRepository<Run> run, IRepository<Event> event_repo, ManageToken manageToken)
+            IRepository<WebhookOrder> webhookOrder, IRepository<Run> run, IRepository<Event> event_repo, SqlContext dbSqlCContext)
         {
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
             _configController = configController;
@@ -51,7 +52,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             _webhookOrder = webhookOrder;
             _run = run;
             _event = event_repo;
-            _manageToken = manageToken;
+            _dbSqlCContext = dbSqlCContext;
         }
 
         [HttpPost, Route("GetLinnOrderForStream")]
@@ -165,7 +166,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 if (string.IsNullOrEmpty(orderids))
                 {
                     // Get pending orders if no order IDs are provided
-                    var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
+                    var reportData = _dbSqlCContext.ReportModel
+                        .Where(x => x.email == user.Email)
+                        .ToList();
+                    
                     var pendingOrders = reportData.Where(f => f.IsLinnOrderCreatedInStream && !f.IsLinnOrderDispatchFromStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
                     foreach (var pendingOrder in pendingOrders)
                     {
@@ -174,12 +178,21 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
                 else
                 {
-                    // Process provided order IDs
+                    
                     var orderidlist = Regex.Split(orderids, ",");
-                    var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
+                    
+                    var reportData = await _dbSqlCContext.ReportModel
+                        .Where(f => 
+                            f.IsLinnOrderCreatedInStream && 
+                            orderidlist.Contains(f.LinnNumOrderId))
+                        .ToListAsync();
+                    
                     foreach (var _ord in orderidlist)
                     {
-                        var linnOrders = reportData.FirstOrDefault(f => f.IsLinnOrderCreatedInStream && !f.IsLinnOrderDispatchFromStream && f.LinnNumOrderId == _ord);
+                        
+                        
+                        var linnOrders = reportData
+                            .FirstOrDefault(f => f.LinnNumOrderId == _ord);
                         if (linnOrders != null)
                         {
                             await _tradingApiOAuthHelper.UpdateLinnworksOrdersToStream(user, _ord, linnOrders.StreamOrderId);
@@ -212,7 +225,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 if (string.IsNullOrEmpty(orderids))
                 {
                     // Process orders from report if no order IDs are provided
-                    var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
+                    //var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
+                    var reportData = _dbSqlCContext.ReportModel
+                        .Where(x => x.email == user.Email)
+                        .ToList();
                     var dispatchlinnfromstream = reportData.Where(f => !f.IsLinnOrderDispatchFromStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
 
                     foreach (var _linnord in dispatchlinnfromstream)
@@ -242,11 +258,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
         private async Task DispatchOrderInner(AuthorizationConfigClass user, string orderId, string linntoken, string token)
         {
-            var linnDispatchPath = $"LinnDispatch/{token}_linndispatch_{orderId}.json";
+            //var linnDispatchPath = $"LinnDispatch/{token}_linndispatch_{orderId}.json";
             var linnStreamPath = $"LinnStreamOrder/_streamorder_{orderId}.json";
+            var streamOrderExists = await _dbSqlCContext.StreamOrderRecord
+                .AnyAsync(x => x.LinnworksOrderId == orderId);
+            
+            var dispatchDone = await _dbSqlCContext.ReportModel
+                .Where(x => x.LinnNumOrderId == orderId)
+                .Select(x => x.IsLinnOrderDispatchFromStream)
+                .FirstOrDefaultAsync();
 
-            if (!await AwsS3.S3FileIsExists("Authorization", linnDispatchPath) &&
-                await AwsS3.S3FileIsExists("Authorization", linnStreamPath))
+            if (!dispatchDone  && streamOrderExists)
             {
                 var jsonData = AwsS3.GetS3File("Authorization", linnStreamPath);
                 var streamData = JsonConvert.DeserializeObject<StreamOrderRespModel.Root>(jsonData);
