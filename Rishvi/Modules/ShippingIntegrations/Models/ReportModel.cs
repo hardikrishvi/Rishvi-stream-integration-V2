@@ -8,7 +8,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         public string? AuthorizationToken { get; set; }
         public string? email { get; set; }
 
-        public string? LinnNumOrderId { get; set; }
+        public string LinnNumOrderId { get; set; }
         public string? EbayChannelOrderRef { get; set; }
 
         public string? OrderLineItemId { get; set; }
