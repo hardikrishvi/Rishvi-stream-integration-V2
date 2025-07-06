@@ -26,7 +26,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _authorization = authorization;
         }
 
-        public TokenDetails GetToken(AuthorizationConfigClass authorizationConfig)
+        public  TokenDetails GetToken(AuthorizationConfigClass authorizationConfig)
         {
             if (!string.IsNullOrEmpty(authorizationConfig.ClientId) && !string.IsNullOrEmpty(authorizationConfig.ClientSecret))
             {
@@ -51,7 +51,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             {
                 bool isAuthorized = false;
                 AuthorizationModel authorizationModel = new AuthorizationModel();
-                // var get_auth = _authorization.Get().FirstOrDefault();
+                // var get_auth = _AuthorizeClientauthorization.Get().FirstOrDefault();
                 var get_auth = _authorization.Get().Where(x => x.ClientId == ClientId);
                 //var get_auth = _authorization.Get(x => x.ClientId == ClientId).FirstOrDefault();
                 //var get_auth = _context.Authorizations.FirstOrDefault(x => x.ClientId == ClientId);

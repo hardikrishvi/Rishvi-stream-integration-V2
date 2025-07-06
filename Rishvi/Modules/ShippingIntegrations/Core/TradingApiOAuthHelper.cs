@@ -58,7 +58,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             IRepository<GeneralInfo> generalInfo, IRepository<OrderRoot> orderRoot, IRepository<ShippingInfo> shippingInfo,
             IRepository<TaxInfo> taxInfo, IRepository<TotalsInfo> totalsInfo, IRepository<Rishvi.Models.Item> item,
             IRepository<IntegrationSettings> integrationSettings, IRepository<LinnworksSettings> linnworksSettings, IRepository<Rishvi.Models.StreamSettings> streamSettings,
-            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay, SqlContext dbSqlCContext)
+            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay, SqlContext dbSqlCContext, ManageToken manageToken)
 
         {
             _reportsController = reportsController;
@@ -80,7 +80,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _StreamSettings    =  streamSettings;
             _SyncSettings      = syncSettings;
             _Ebay      = ebay;
-            _ClientAuth = ClientAuth;
             _manageToken = manageToken;
         }
 
@@ -268,7 +267,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             // Proper Any query
             
             List<CourierService> services = Services.GetServices;
-            var streamAuth = ManageToken.GetToken(auth);
+            var streamAuth = _manageToken.GetToken(auth);
             
 
             CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);

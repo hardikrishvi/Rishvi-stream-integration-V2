@@ -36,10 +36,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IRepository<Event> _event;
         private readonly IUnitOfWork _unitOfWork;
         private readonly SqlContext _dbSqlCContext;
+        private readonly ManageToken _managetoken;
         public LinnworksController(TradingApiOAuthHelper tradingApiOAuthHelper, IAuthorizationToken authToken,
             ConfigController configController, StreamController streamController,
             IServiceHelper serviceHelper, ReportsController reportsController, IRepository<Subscription> subscription, IUnitOfWork unitOfWork,
-            IRepository<WebhookOrder> webhookOrder, IRepository<Run> run, IRepository<Event> event_repo, SqlContext dbSqlCContext)
+            IRepository<WebhookOrder> webhookOrder, IRepository<Run> run, IRepository<Event> event_repo, SqlContext dbSqlCContext, ManageToken managetoken)
         {
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
             _configController = configController;
@@ -53,6 +54,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             _run = run;
             _event = event_repo;
             _dbSqlCContext = dbSqlCContext;
+            _managetoken = managetoken;
         }
 
         [HttpPost, Route("GetLinnOrderForStream")]
@@ -457,7 +459,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 var user = _authToken.Load(token);
                
-                var streamAuth = _manageToken.GetToken(user);
+                var streamAuth = _managetoken.GetToken(user);
                 if (string.IsNullOrWhiteSpace(streamAuth?.AccessToken))
                 {
                     return BadRequest("Invalid or missing access token.");
