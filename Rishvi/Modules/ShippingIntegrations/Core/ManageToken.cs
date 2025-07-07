@@ -26,7 +26,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _authorization = authorization;
         }
 
-        public  TokenDetails GetToken(AuthorizationConfigClass authorizationConfig)
+        public TokenDetails GetToken(AuthorizationConfigClass authorizationConfig)
         {
             if (!string.IsNullOrEmpty(authorizationConfig.ClientId) && !string.IsNullOrEmpty(authorizationConfig.ClientSecret))
             {
@@ -51,39 +51,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             {
                 bool isAuthorized = false;
                 AuthorizationModel authorizationModel = new AuthorizationModel();
-                // var get_auth = _AuthorizeClientauthorization.Get().FirstOrDefault();
                 var get_auth = _authorization.Get().Where(x => x.ClientId == ClientId);
-                //var get_auth = _authorization.Get(x => x.ClientId == ClientId).FirstOrDefault();
-                //var get_auth = _context.Authorizations.FirstOrDefault(x => x.ClientId == ClientId);
 
-                //foreach (var auth in get_auth)
-                //{
-                //    if (auth.ClientId == ClientId)
-                //    {
-                //        authorizationModel.AccessToken = auth.access_token;
-                //        authorizationModel.ExpiresIn = (int)auth.expires_in;
-                //        authorizationModel.TokenType = auth.token_type;
-                //        authorizationModel.Scope = null;
-                //    }
+                foreach (var auth in get_auth)
+                {
+                    if (auth.ExpirationTime >= DateTime.UtcNow && !string.IsNullOrEmpty(auth.access_token))
+                    {
+                        authorizationModel.AccessToken = auth.access_token;
+                        authorizationModel.ExpiresIn = (int)auth.expires_in;
+                        authorizationModel.TokenType = auth.token_type;
+                        authorizationModel.Scope = null;
 
-                //    if (authorizationModel.ExpireTime >= DateTime.UtcNow && !string.IsNullOrEmpty(authorizationModel.AccessToken))
-                //        isAuthorized = true;
-                //    isAuthorized = false;
+                        isAuthorized = true;
+                    }
+                    isAuthorized = false;
 
-                //}
-
-                //if (get_auth != null)
-                //{
-                //    authorizationModel.AccessToken = get_auth.access_token;
-                //    //authorizationModel.ExpiresIn = (int)get_auth.expires_in;
-                //    authorizationModel.TokenType = get_auth.token_type;
-
-                //    if (authorizationModel.ExpireTime >= DateTime.UtcNow &&
-                //        !string.IsNullOrEmpty(authorizationModel.AccessToken))
-                //    {
-                //        isAuthorized = true;
-                //    }
-                //}
+                }
 
 
                 //if (AwsS3.S3FileIsExists("Authorization", "StreamToken/" + ClientId + ".json").Result)
@@ -101,7 +84,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     //var client = new RestClient(ClientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath);
                     var client = new RestClient(ClientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath);
                     var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.StreamOAuthUrl), Method.Post);
-                    request.AddJsonBody(new { grant_type = AWSParameter.GetConnectionString(AppSettings.GrantType), client_id = ClientId, client_secret= ClientSecret });
+                    request.AddJsonBody(new { grant_type = AWSParameter.GetConnectionString(AppSettings.GrantType), client_id = ClientId, client_secret = ClientSecret });
                     request.AddHeader("Accept", "application/json");
                     request.AddHeader("Content-Type", "application/json");
                     request.AddHeader("Stream-Nonce", uniqueCode);
@@ -125,20 +108,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             auth.expires_in = authorizationModel.ExpiresIn;
                             auth.ExpirationTime = authorizationModel.ExpireTime;
                             _authorization.Update(auth);
-                            _unitOfWork.Commit();
                         }
-                        //if (existingAuth != null)
-                        //{
-                        //    existingAuth.access_token = authorizationModel.AccessToken;
-                        //    //existingAuth.expires_in = authorizationModel.ExpiresIn;
-                        //    //data.ExpireTime = expireTime;
-                        //    existingAuth.token_type = authorizationModel.TokenType;
-                        //    existingAuth.UpdatedAt = DateTime.UtcNow;
-
-                        //    _authorization.Update(existingAuth);
-
-                        //    _unitOfWork.Commit();
-                        //}
+                        _unitOfWork.Commit();
                     }
                     //else
                     //{

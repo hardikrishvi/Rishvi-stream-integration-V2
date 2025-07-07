@@ -13,6 +13,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         [JsonProperty("scope")]
         public string Scope { get; set; }
 
-        public DateTime ExpireTime => DateTime.Now.AddSeconds(ExpiresIn);
+        public DateTime ExpireTime => DateTime.UtcNow.AddSeconds(ExpiresIn);
     }
 }
