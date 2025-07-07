@@ -32,7 +32,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             {
                 // Create an instance of ManageToken to call the non-static method
                 //var manageTokenInstance = new ManageToken(null, null, null); // Pass appropriate arguments for IRepository and UnitOfWork if needed
-                var _Resp = AuthorizeClient(authorizationConfig.ClientId, authorizationConfig.ClientSecret);
+                var _Resp = AuthorizeClient(authorizationConfig.ClientId, authorizationConfig.ClientSecret, authorizationConfig.AuthorizationToken);
 
                 return new TokenDetails
                 {
@@ -45,27 +45,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return null;
         }
 
-        private AuthorizationModel AuthorizeClient(string ClientId, string ClientSecret)
+        private AuthorizationModel AuthorizeClient(string ClientId, string ClientSecret, string AuthorizationToken)
         {
             try
             {
                 bool isAuthorized = false;
                 AuthorizationModel authorizationModel = new AuthorizationModel();
-                var get_auth = _authorization.Get().Where(x => x.ClientId == ClientId);
-
-                foreach (var auth in get_auth)
+                var get_auth = _authorization.Get().Where(x => x.ClientId == ClientId && x.AuthorizationToken == AuthorizationToken).FirstOrDefault();
+                if (get_auth != null)
                 {
-                    if (auth.ExpirationTime >= DateTime.UtcNow && !string.IsNullOrEmpty(auth.access_token))
+                    if (get_auth.ExpirationTime >= DateTime.UtcNow && !string.IsNullOrEmpty(get_auth.access_token))
                     {
-                        authorizationModel.AccessToken = auth.access_token;
-                        authorizationModel.ExpiresIn = (int)auth.expires_in;
-                        authorizationModel.TokenType = auth.token_type;
+                        authorizationModel.AccessToken = get_auth.access_token;
+                        authorizationModel.ExpiresIn = (int)get_auth.expires_in;
+                        authorizationModel.TokenType = get_auth.token_type;
                         authorizationModel.Scope = null;
 
                         isAuthorized = true;
                     }
                     isAuthorized = false;
-
                 }
 
 
@@ -98,17 +96,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         //Stream stream = AwsS3.GenerateStreamFromString(jsonData);
                         //AwsS3.UploadFileToS3("Authorization", stream, "StreamToken/" + ClientId + ".json");
 
-                        var existingAuth = get_auth;
+                        get_auth.access_token = authorizationModel.AccessToken;
+                        get_auth.token_type = authorizationModel.TokenType;
+                        get_auth.UpdatedAt = DateTime.UtcNow;
+                        get_auth.expires_in = authorizationModel.ExpiresIn;
+                        get_auth.ExpirationTime = authorizationModel.ExpireTime;
+                        _authorization.Update(get_auth);
 
-                        foreach (var auth in get_auth)
-                        {
-                            auth.access_token = authorizationModel.AccessToken;
-                            auth.token_type = authorizationModel.TokenType;
-                            auth.UpdatedAt = DateTime.UtcNow;
-                            auth.expires_in = authorizationModel.ExpiresIn;
-                            auth.ExpirationTime = authorizationModel.ExpireTime;
-                            _authorization.Update(auth);
-                        }
                         _unitOfWork.Commit();
                     }
                     //else
