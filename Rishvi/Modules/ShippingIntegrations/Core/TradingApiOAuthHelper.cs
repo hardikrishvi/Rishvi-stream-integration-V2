@@ -216,54 +216,54 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //        }
         //    }
         //}
-        public async Task<List<ShippingTag>> GetShipping(AuthorizationConfigClass _User, string TradingAPI_ServerURL
-           , string DeveloperId, string ProdClientId, string ProdClientSecret, string TradingAPI_Version)
-        {
-            List<ShippingTag> ShippingTags = new List<ShippingTag>();
-            string PageTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?><GeteBayDetailsRequest xmlns=\"urn:ebay:apis:eBLBaseComponents\">" +
-                                                      "<RequesterCredentials>" +
-                                                        "<eBayAuthToken>##AuthToken##</eBayAuthToken>" +
-                                                      "</RequesterCredentials>" +
-                                                        "<ErrorLanguage>en_US</ErrorLanguage>" +
-                                                        "<WarningLevel>High</WarningLevel>" +
-                                                      "<DetailName>ShippingServiceDetails</DetailName>" +
-                                                    "</GeteBayDetailsRequest>";
-            PageTemplate = PageTemplate.Replace("##AuthToken##", _User.access_token);
-            XmlDocument ResponseXml = new XmlDocument();
-            var ProductResp = await HttpPostXMLAsync(PageTemplate, TradingAPI_ServerURL, new Dictionary<string, string>() {
-                    {"X-EBAY-API-DEV-NAME",DeveloperId},
-                    {"X-EBAY-API-APP-NAME",ProdClientId},
-                    {"X-EBAY-API-CERT-NAME",ProdClientSecret},
-                    {"X-EBAY-API-SITEID","2"},
-                    {"X-EBAY-API-COMPATIBILITY-LEVEL",TradingAPI_Version },
-                    {"X-EBAY-API-CALL-NAME","GeteBayDetails"}
-                       }, true);
-            ResponseXml.LoadXml(ProductResp);
-            XmlNode root = ResponseXml["GeteBayDetailsResponse"];
-            if (root["Ack"].InnerText == "Failure")
-            {
-                string errorCode = root["Errors"]["ErrorCode"].InnerText;
-                if (errorCode == "841" || errorCode == "16110" || errorCode == "17470" || errorCode == "931")
-                {
+        //public async Task<List<ShippingTag>> GetShipping(AuthorizationConfigClass _User, string TradingAPI_ServerURL
+        //   , string DeveloperId, string ProdClientId, string ProdClientSecret, string TradingAPI_Version)
+        //{
+        //    List<ShippingTag> ShippingTags = new List<ShippingTag>();
+        //    string PageTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?><GeteBayDetailsRequest xmlns=\"urn:ebay:apis:eBLBaseComponents\">" +
+        //                                              "<RequesterCredentials>" +
+        //                                                "<eBayAuthToken>##AuthToken##</eBayAuthToken>" +
+        //                                              "</RequesterCredentials>" +
+        //                                                "<ErrorLanguage>en_US</ErrorLanguage>" +
+        //                                                "<WarningLevel>High</WarningLevel>" +
+        //                                              "<DetailName>ShippingServiceDetails</DetailName>" +
+        //                                            "</GeteBayDetailsRequest>";
+        //    PageTemplate = PageTemplate.Replace("##AuthToken##", _User.access_token);
+        //    XmlDocument ResponseXml = new XmlDocument();
+        //    var ProductResp = await HttpPostXMLAsync(PageTemplate, TradingAPI_ServerURL, new Dictionary<string, string>() {
+        //            {"X-EBAY-API-DEV-NAME",DeveloperId},
+        //            {"X-EBAY-API-APP-NAME",ProdClientId},
+        //            {"X-EBAY-API-CERT-NAME",ProdClientSecret},
+        //            {"X-EBAY-API-SITEID","2"},
+        //            {"X-EBAY-API-COMPATIBILITY-LEVEL",TradingAPI_Version },
+        //            {"X-EBAY-API-CALL-NAME","GeteBayDetails"}
+        //               }, true);
+        //    ResponseXml.LoadXml(ProductResp);
+        //    XmlNode root = ResponseXml["GeteBayDetailsResponse"];
+        //    if (root["Ack"].InnerText == "Failure")
+        //    {
+        //        string errorCode = root["Errors"]["ErrorCode"].InnerText;
+        //        if (errorCode == "841" || errorCode == "16110" || errorCode == "17470" || errorCode == "931")
+        //        {
 
-                }
-            }
-            else if (root["Ack"] != null && root["Ack"].InnerText.Equals("Success", StringComparison.OrdinalIgnoreCase))
-            {
-                XmlNodeList OptionDetails = ((XmlElement)root).GetElementsByTagName("ShippingServiceDetails");
-                foreach (XmlNode __Option in OptionDetails)
-                {
-                    ShippingTags.Add(new ShippingTag
-                    {
-                        FriendlyName = __Option["Description"] == null ? __Option["ShippingService"].InnerText : __Option["Description"].InnerText,
-                        Tag = __Option["ShippingService"].InnerText,
-                        Site = __Option["ShippingCarrier"] == null ? "" : __Option["ShippingCarrier"].InnerText
-                    });
-                }
-            }
-            SaveShipping(JsonConvert.SerializeObject(ShippingTags), _User.AuthorizationToken.ToString(), "");
-            return ShippingTags;
-        }
+        //        }
+        //    }
+        //    else if (root["Ack"] != null && root["Ack"].InnerText.Equals("Success", StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        XmlNodeList OptionDetails = ((XmlElement)root).GetElementsByTagName("ShippingServiceDetails");
+        //        foreach (XmlNode __Option in OptionDetails)
+        //        {
+        //            ShippingTags.Add(new ShippingTag
+        //            {
+        //                FriendlyName = __Option["Description"] == null ? __Option["ShippingService"].InnerText : __Option["Description"].InnerText,
+        //                Tag = __Option["ShippingService"].InnerText,
+        //                Site = __Option["ShippingCarrier"] == null ? "" : __Option["ShippingCarrier"].InnerText
+        //            });
+        //        }
+        //    }
+        //    SaveShipping(JsonConvert.SerializeObject(ShippingTags), _User.AuthorizationToken.ToString(), "");
+        //    return ShippingTags;
+        //}
         //public async Task DispatchEbayOrdersFromStream(AuthorizationConfigClass _User, string orderids, string webApiURL, string TradingAPI_Version)
         //{
         //    var orderlist = Regex.Split(orderids, ",");
@@ -468,6 +468,124 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    }
         //}
         #endregion
+
+        public async Task SaveStreamOrder(string s, string AuthorizationToken, string email, string ebayorderid, string linnworksorderid, string consignmentid, string trackingnumber, string trackingurl, string order = "")
+        {
+
+            dynamic jsonData = JsonConvert.DeserializeObject(s);
+            string extractedConsignmentNo = jsonData.response.consignmentNo;
+            string extractedTrackingUrl = jsonData.response.trackingURL;
+            string extractedTrackingId = jsonData.response.trackingId;
+
+            var record = new StreamOrderRecord
+            {
+                Id = Guid.NewGuid(),
+                JsonData = s,
+                AuthorizationToken = AuthorizationToken,
+                Email = email,
+                EbayOrderId = ebayorderid,
+                LinnworksOrderId = linnworksorderid,
+                ConsignmentId = extractedConsignmentNo ?? consignmentid,
+                TrackingNumber = trackingnumber,
+                TrackingUrl = extractedTrackingUrl ?? trackingurl,
+                TrackingId = extractedTrackingId,
+                Order = order,
+                CreatedAt = DateTime.UtcNow
+            };
+            _dbSqlCContext.StreamOrderRecord.Add(record);
+            await _dbSqlCContext.SaveChangesAsync();
+
+            var existingReports = _dbSqlCContext.ReportModel
+                .Where(x => x.email == email)
+                .ToList();
+
+            var reportsToSave = new List<ReportModel>();
+
+            if (ebayorderid != null)
+            {
+                var existingEbay = existingReports
+                    .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
+
+                if (existingEbay == null)
+                {
+                    reportsToSave.Add(new ReportModel
+                    {
+                        _id = Guid.NewGuid().ToString(),
+                        AuthorizationToken = AuthorizationToken,
+                        StreamOrderId = order,
+                        StreamConsignmentId = consignmentid,
+                        StreamTrackingNumber = trackingnumber,
+                        StreamTrackingURL = trackingurl,
+                        EbayChannelOrderRef = ebayorderid,
+                        IsEbayOrderCreatedInStream = true,
+                        DownloadEbayOrderInSystem = DateTime.Now,
+                        CreateEbayOrderInStream = DateTime.Now,
+                        email = email,
+                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+                        createdDate = DateTime.Now,
+                        updatedDate = DateTime.Now
+                    });
+                }
+                else
+                {
+                    existingEbay.CreateEbayOrderInStream = DateTime.Now;
+                    existingEbay.IsEbayOrderCreatedInStream = true;
+                    existingEbay.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+                    existingEbay.StreamOrderId = order;
+                    existingEbay.StreamConsignmentId = consignmentid;
+                    existingEbay.StreamTrackingNumber = trackingnumber;
+                    existingEbay.StreamTrackingURL = trackingurl;
+                    existingEbay.updatedDate = DateTime.Now;
+
+                    reportsToSave.Add(existingEbay);
+                }
+            }
+            else if (linnworksorderid != null)
+            {
+                var existingLinn = existingReports
+                    .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
+
+                if (existingLinn == null)
+                {
+                    reportsToSave.Add(new ReportModel
+                    {
+                        _id = Guid.NewGuid().ToString(),
+                        AuthorizationToken = AuthorizationToken,
+                        StreamOrderId = order,
+                        StreamConsignmentId = consignmentid,
+                        StreamTrackingNumber = trackingnumber,
+                        StreamTrackingURL = trackingurl,
+                        LinnNumOrderId = linnworksorderid,
+                        IsLinnOrderCreatedInStream = true,
+                        email = email,
+                        CreateLinnOrderInStream = DateTime.Now,
+                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+                        createdDate = DateTime.Now,
+                        updatedDate = DateTime.Now
+                    });
+                }
+                else
+                {
+                    existingLinn.CreateLinnOrderInStream = DateTime.Now;
+                    existingLinn.IsLinnOrderCreatedInStream = true;
+                    existingLinn.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+                    existingLinn.StreamOrderId = order;
+                    existingLinn.StreamConsignmentId = consignmentid;
+                    existingLinn.StreamTrackingNumber = trackingnumber;
+                    existingLinn.StreamTrackingURL = trackingurl;
+                    existingLinn.updatedDate = DateTime.Now;
+
+                    reportsToSave.Add(existingLinn);
+                }
+            }
+
+            // ✅ Now save to DB (no AWS S3 call)
+            if (reportsToSave.Any())
+            {
+                await SaveReportDataForTEst(reportsToSave);
+            }
+        }
+
         #region Linnworks Get Order and Dispatch Function
         public List<string> CompareJsonObjects(JObject obj1, JObject obj2)
         {
@@ -1266,122 +1384,122 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
         }
         
-        public async Task SaveEbayOrder(string s, string AuthorizationToken, string email, string orderlineitemid, string ebayorderid = "")
-        {
+        //public async Task SaveEbayOrder(string s, string AuthorizationToken, string email, string orderlineitemid, string ebayorderid = "")
+        //{
             
-            dynamic jsonData = JsonConvert.DeserializeObject(s);
-            string extractedConsignmentNo = jsonData.response.consignmentNo;
-            string extractedTrackingUrl = jsonData.response.trackingURL;
-            string extractedTrackingId = jsonData.response.trackingId;
+        //    dynamic jsonData = JsonConvert.DeserializeObject(s);
+        //    string extractedConsignmentNo = jsonData.response.consignmentNo;
+        //    string extractedTrackingUrl = jsonData.response.trackingURL;
+        //    string extractedTrackingId = jsonData.response.trackingId;
 
-            var record = new StreamOrderRecord
-            {
-                Id = Guid.NewGuid(),
-                JsonData = s,
-                AuthorizationToken = AuthorizationToken,
-                Email = email,
-                EbayOrderId = ebayorderid,
-                LinnworksOrderId = linnworksorderid,
-                ConsignmentId = extractedConsignmentNo ?? consignmentid,
-                TrackingNumber = trackingnumber,
-                TrackingUrl = extractedTrackingUrl ?? trackingurl,
-                TrackingId = extractedTrackingId,
-                Order = order,
-                CreatedAt = DateTime.UtcNow
-            };
-            _dbSqlCContext.StreamOrderRecord.Add(record);
-            await _dbSqlCContext.SaveChangesAsync();
+        //    var record = new StreamOrderRecord
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        JsonData = s,
+        //        AuthorizationToken = AuthorizationToken,
+        //        Email = email,
+        //        EbayOrderId = ebayorderid,
+        //        LinnworksOrderId = linnworksorderid,
+        //        ConsignmentId = extractedConsignmentNo ?? consignmentid,
+        //        TrackingNumber = trackingnumber,
+        //        TrackingUrl = extractedTrackingUrl ?? trackingurl,
+        //        TrackingId = extractedTrackingId,
+        //        Order = order,
+        //        CreatedAt = DateTime.UtcNow
+        //    };
+        //    _dbSqlCContext.StreamOrderRecord.Add(record);
+        //    await _dbSqlCContext.SaveChangesAsync();
         
-            var existingReports = _dbSqlCContext.ReportModel
-                .Where(x => x.email == email)
-                .ToList();
+        //    var existingReports = _dbSqlCContext.ReportModel
+        //        .Where(x => x.email == email)
+        //        .ToList();
         
-            var reportsToSave = new List<ReportModel>();
+        //    var reportsToSave = new List<ReportModel>();
         
-            if (ebayorderid != null)
-            {
-                var existingEbay = existingReports
-                    .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
+        //    if (ebayorderid != null)
+        //    {
+        //        var existingEbay = existingReports
+        //            .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
         
-                if (existingEbay == null)
-                {
-                    reportsToSave.Add(new ReportModel
-                    {
-                        _id = Guid.NewGuid().ToString(),
-                        AuthorizationToken = AuthorizationToken,
-                        StreamOrderId = order,
-                        StreamConsignmentId = consignmentid,
-                        StreamTrackingNumber = trackingnumber,
-                        StreamTrackingURL = trackingurl,
-                        EbayChannelOrderRef = ebayorderid,
-                        IsEbayOrderCreatedInStream = true,
-                        DownloadEbayOrderInSystem = DateTime.Now,
-                        CreateEbayOrderInStream = DateTime.Now,
-                        email = email,
-                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
-                        createdDate = DateTime.Now,
-                        updatedDate = DateTime.Now
-                    });
-                }
-                else
-                {
-                    existingEbay.CreateEbayOrderInStream = DateTime.Now;
-                    existingEbay.IsEbayOrderCreatedInStream = true;
-                    existingEbay.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
-                    existingEbay.StreamOrderId = order;
-                    existingEbay.StreamConsignmentId = consignmentid;
-                    existingEbay.StreamTrackingNumber = trackingnumber;
-                    existingEbay.StreamTrackingURL = trackingurl;
-                    existingEbay.updatedDate = DateTime.Now;
+        //        if (existingEbay == null)
+        //        {
+        //            reportsToSave.Add(new ReportModel
+        //            {
+        //                _id = Guid.NewGuid().ToString(),
+        //                AuthorizationToken = AuthorizationToken,
+        //                StreamOrderId = order,
+        //                StreamConsignmentId = consignmentid,
+        //                StreamTrackingNumber = trackingnumber,
+        //                StreamTrackingURL = trackingurl,
+        //                EbayChannelOrderRef = ebayorderid,
+        //                IsEbayOrderCreatedInStream = true,
+        //                DownloadEbayOrderInSystem = DateTime.Now,
+        //                CreateEbayOrderInStream = DateTime.Now,
+        //                email = email,
+        //                StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+        //                createdDate = DateTime.Now,
+        //                updatedDate = DateTime.Now
+        //            });
+        //        }
+        //        else
+        //        {
+        //            existingEbay.CreateEbayOrderInStream = DateTime.Now;
+        //            existingEbay.IsEbayOrderCreatedInStream = true;
+        //            existingEbay.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+        //            existingEbay.StreamOrderId = order;
+        //            existingEbay.StreamConsignmentId = consignmentid;
+        //            existingEbay.StreamTrackingNumber = trackingnumber;
+        //            existingEbay.StreamTrackingURL = trackingurl;
+        //            existingEbay.updatedDate = DateTime.Now;
         
-                    reportsToSave.Add(existingEbay);
-                }
-            }
-            else if (linnworksorderid != null)
-            {
-                var existingLinn = existingReports
-                    .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
+        //            reportsToSave.Add(existingEbay);
+        //        }
+        //    }
+        //    else if (linnworksorderid != null)
+        //    {
+        //        var existingLinn = existingReports
+        //            .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
         
-                if (existingLinn == null)
-                {
-                    reportsToSave.Add(new ReportModel
-                    {
-                        _id = Guid.NewGuid().ToString(),
-                        AuthorizationToken = AuthorizationToken,
-                        StreamOrderId = order,
-                        StreamConsignmentId = consignmentid,
-                        StreamTrackingNumber = trackingnumber,
-                        StreamTrackingURL = trackingurl,
-                        LinnNumOrderId = linnworksorderid,
-                        IsLinnOrderCreatedInStream = true,
-                        email = email,
-                        CreateLinnOrderInStream = DateTime.Now,
-                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
-                        createdDate = DateTime.Now,
-                        updatedDate = DateTime.Now
-                    });
-                }
-                else
-                {
-                    existingLinn.CreateLinnOrderInStream = DateTime.Now;
-                    existingLinn.IsLinnOrderCreatedInStream = true;
-                    existingLinn.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
-                    existingLinn.StreamOrderId = order;
-                    existingLinn.StreamConsignmentId = consignmentid;
-                    existingLinn.StreamTrackingNumber = trackingnumber;
-                    existingLinn.StreamTrackingURL = trackingurl;
-                    existingLinn.updatedDate = DateTime.Now;
+        //        if (existingLinn == null)
+        //        {
+        //            reportsToSave.Add(new ReportModel
+        //            {
+        //                _id = Guid.NewGuid().ToString(),
+        //                AuthorizationToken = AuthorizationToken,
+        //                StreamOrderId = order,
+        //                StreamConsignmentId = consignmentid,
+        //                StreamTrackingNumber = trackingnumber,
+        //                StreamTrackingURL = trackingurl,
+        //                LinnNumOrderId = linnworksorderid,
+        //                IsLinnOrderCreatedInStream = true,
+        //                email = email,
+        //                CreateLinnOrderInStream = DateTime.Now,
+        //                StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+        //                createdDate = DateTime.Now,
+        //                updatedDate = DateTime.Now
+        //            });
+        //        }
+        //        else
+        //        {
+        //            existingLinn.CreateLinnOrderInStream = DateTime.Now;
+        //            existingLinn.IsLinnOrderCreatedInStream = true;
+        //            existingLinn.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+        //            existingLinn.StreamOrderId = order;
+        //            existingLinn.StreamConsignmentId = consignmentid;
+        //            existingLinn.StreamTrackingNumber = trackingnumber;
+        //            existingLinn.StreamTrackingURL = trackingurl;
+        //            existingLinn.updatedDate = DateTime.Now;
         
-                    reportsToSave.Add(existingLinn);
-                }
-            }
+        //            reportsToSave.Add(existingLinn);
+        //        }
+        //    }
         
-            // ✅ Now save to DB (no AWS S3 call)
-            if (reportsToSave.Any())
-            {
-                await SaveReportDataForTEst(reportsToSave);
-            }
-        }
+        //    // ✅ Now save to DB (no AWS S3 call)
+        //    if (reportsToSave.Any())
+        //    {
+        //        await SaveReportDataForTEst(reportsToSave);
+        //    }
+        //}
         //public async Task SaveLinnChangeOrder(string s, string AuthorizationToken, string order = "")
         //{
         //    var stream = new MemoryStream();

@@ -459,7 +459,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 var user = _authToken.Load(token);
                
-                var streamAuth = _manageToken.GetToken(user);
+                var streamAuth = _managetoken.GetToken(user);
                 if (string.IsNullOrWhiteSpace(streamAuth?.AccessToken))
                 {
                     return BadRequest("Invalid or missing access token.");

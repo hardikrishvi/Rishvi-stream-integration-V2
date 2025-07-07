@@ -8,6 +8,9 @@ using YamlDotNet.Core.Tokens;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Options;
 using Hangfire;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.Core.Data;
+using Rishvi.Models;
 
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
@@ -19,15 +22,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly LinnworksController _linnworksController;
         private readonly StreamController _streamController;
         private readonly MessinaSettings _settings;
+        private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
+        private readonly IRepository<IntegrationSettings> _integrationSettingsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public SyncController(ConfigController configController,
             LinnworksController linnworksController,
-            StreamController streamController, IOptions<MessinaSettings> settings)
+            StreamController streamController, IOptions<MessinaSettings> settings, TradingApiOAuthHelper tradingApiOAuthHelper,
+            IRepository<IntegrationSettings> integrationSettingRepository, IUnitOfWork unitOfWork)
         {
             _configController = configController;
             _linnworksController = linnworksController;
             _streamController = streamController;
             _settings = settings.Value;
+            _tradingApiOAuthHelper = tradingApiOAuthHelper;
+            _integrationSettingsRepository = integrationSettingRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost, Route("RunService/{service}")]
@@ -95,15 +105,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                var listuser = await AwsS3.ListFilesInS3Folder("Authorization/Users");
-                foreach (var _user in listuser)
+                //var listuser = await AwsS3.ListFilesInS3Folder("Authorization/Users");
+                var listuser = _integrationSettingsRepository.Get().ToList();
+                foreach (var res in listuser)
                 {
-                    var userdata = AwsS3.GetS3File("Authorization", _user.Replace("Authorization/", ""));
-                    var res = JsonConvert.DeserializeObject<RegistrationData>(userdata);
+                    //var userdata = AwsS3.GetS3File("Authorization", _user.Replace("Authorization/", ""));
+                    //var res = JsonConvert.DeserializeObject<IntegrationSettings>(_user);
 
                     if (res.Sync == null)
                     {
-                        res.Sync = new SyncModel();
+                        res.Sync = new SyncSettings();
                     }
 
                     //if (res.Sync.SyncEbayOrder)
@@ -137,7 +148,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                     res.LastSyncOn = DateTime.UtcNow.ToString("dd/MM/yyyy hh:mm:ss");
                     res.LastSyncOnDate = DateTime.Now;
-                    await _configController.Save(res);
+                    //await _configController.Save(res);
+                    _integrationSettingsRepository.Update(res);
+                    _unitOfWork.Commit();
 
                     new MessianApiOAuthHelper().SyncLogs(
                         DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"),
