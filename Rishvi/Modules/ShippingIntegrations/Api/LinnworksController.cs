@@ -513,7 +513,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             var output = JsonConvert.DeserializeObject<WebhookResponse.Root>(data);
             await _tradingApiOAuthHelper.SaveWebhook(data, output.webhook.subscription.party_id, DateTime.Now.ToString("ddMMyyyyhhmmss"));
-            //SqlHelper.SystemLogInsert("Webhook_riddhi", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook", "", false);
+            SqlHelper.SystemLogInsert("Webhook_riddhi", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook", "", false);
 
             var subscription = new Subscription()
             {
@@ -561,7 +561,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
 
             _unitOfWork.Context.SaveChanges();
-            //EmailHelper.SendEmail("Req Json", data);
+            EmailHelper.SendEmail("Req Json", data);
             try
             {
 
@@ -810,7 +810,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             catch (Exception ex)
             {
 
-                //  EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
+                EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
             }
             return new Dictionary<string, string>();
         }

@@ -131,7 +131,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
-        
+
         #endregion
         #region Ebay Get Order and Order Dispatch Function
         //public async Task GetEbayOrdersFromApi(AuthorizationConfigClass _User, int FromHour, string ordersids,
@@ -283,7 +283,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //        }
         //    }
         //}
-
+        #endregion
         public async Task DispatchLinnOrdersFromStream(AuthorizationConfigClass _User, string orderids, string linntoken)
         {
             var orderlist = Regex.Split(orderids, ",");
@@ -467,122 +467,128 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //        }
         //    }
         //}
-        #endregion
-
-        public async Task SaveStreamOrder(string s, string AuthorizationToken, string email, string ebayorderid, string linnworksorderid, string consignmentid, string trackingnumber, string trackingurl, string order = "")
+        public Task SaveStreamOrder(string s, string AuthorizationToken, string email, string ebayorderid, string linnworksorderid, string consignmentid, string trackingnumber, string trackingurl, string order = "")
         {
-
-            dynamic jsonData = JsonConvert.DeserializeObject(s);
-            string extractedConsignmentNo = jsonData.response.consignmentNo;
-            string extractedTrackingUrl = jsonData.response.trackingURL;
-            string extractedTrackingId = jsonData.response.trackingId;
-
-            var record = new StreamOrderRecord
+            try
             {
-                Id = Guid.NewGuid(),
-                JsonData = s,
-                AuthorizationToken = AuthorizationToken,
-                Email = email,
-                EbayOrderId = ebayorderid,
-                LinnworksOrderId = linnworksorderid,
-                ConsignmentId = extractedConsignmentNo ?? consignmentid,
-                TrackingNumber = trackingnumber,
-                TrackingUrl = extractedTrackingUrl ?? trackingurl,
-                TrackingId = extractedTrackingId,
-                Order = order,
-                CreatedAt = DateTime.UtcNow
-            };
-            _dbSqlCContext.StreamOrderRecord.Add(record);
-             _dbSqlCContext.SaveChanges();
+                dynamic jsonData = JsonConvert.DeserializeObject(s);
+                string extractedConsignmentNo = jsonData.response.consignmentNo;
+                string extractedTrackingUrl = jsonData.response.trackingURL;
+                string extractedTrackingId = jsonData.response.trackingId;
 
-            var existingReports = _dbSqlCContext.ReportModel
-                .Where(x => x.email == email)
-                .ToList();
-
-            var reportsToSave = new List<ReportModel>();
-
-            if (ebayorderid != null)
-            {
-                var existingEbay = existingReports
-                    .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
-
-                if (existingEbay == null)
+                var record = new StreamOrderRecord
                 {
-                    reportsToSave.Add(new ReportModel
+                    Id = Guid.NewGuid(),
+                    JsonData = s,
+                    AuthorizationToken = AuthorizationToken,
+                    Email = email,
+                    EbayOrderId = ebayorderid ?? "0",
+                    LinnworksOrderId = linnworksorderid,
+                    ConsignmentId = extractedConsignmentNo ?? consignmentid,
+                    TrackingNumber = trackingnumber ?? string.Empty,
+                    TrackingUrl = extractedTrackingUrl ?? trackingurl,
+                    TrackingId = extractedTrackingId ?? "0",
+                    Order = order,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _dbSqlCContext.StreamOrderRecord.Add(record);
+                _dbSqlCContext.SaveChanges();
+
+                var existingReports = _dbSqlCContext.ReportModel
+                    .Where(x => x.email == email)
+                    .ToList();
+
+                var reportsToSave = new List<ReportModel>();
+
+                if (ebayorderid != null)
+                {
+                    var existingEbay = existingReports
+                        .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
+
+                    if (existingEbay == null)
                     {
-                        _id = Guid.NewGuid().ToString(),
-                        AuthorizationToken = AuthorizationToken,
-                        StreamOrderId = order,
-                        StreamConsignmentId = consignmentid,
-                        StreamTrackingNumber = trackingnumber,
-                        StreamTrackingURL = trackingurl,
-                        EbayChannelOrderRef = ebayorderid,
-                        IsEbayOrderCreatedInStream = true,
-                        DownloadEbayOrderInSystem = DateTime.Now,
-                        CreateEbayOrderInStream = DateTime.Now,
-                        email = email,
-                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
-                        createdDate = DateTime.Now,
-                        updatedDate = DateTime.Now
-                    });
-                }
-                else
-                {
-                    existingEbay.CreateEbayOrderInStream = DateTime.Now;
-                    existingEbay.IsEbayOrderCreatedInStream = true;
-                    existingEbay.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
-                    existingEbay.StreamOrderId = order;
-                    existingEbay.StreamConsignmentId = consignmentid;
-                    existingEbay.StreamTrackingNumber = trackingnumber;
-                    existingEbay.StreamTrackingURL = trackingurl;
-                    existingEbay.updatedDate = DateTime.Now;
-
-                    reportsToSave.Add(existingEbay);
-                }
-            }
-            else if (linnworksorderid != null)
-            {
-                var existingLinn = existingReports
-                    .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
-
-                if (existingLinn == null)
-                {
-                    reportsToSave.Add(new ReportModel
+                        reportsToSave.Add(new ReportModel
+                        {
+                            _id = Guid.NewGuid().ToString(),
+                            AuthorizationToken = AuthorizationToken,
+                            StreamOrderId = order,
+                            StreamConsignmentId = consignmentid,
+                            StreamTrackingNumber = trackingnumber,
+                            StreamTrackingURL = trackingurl,
+                            EbayChannelOrderRef = ebayorderid,
+                            IsEbayOrderCreatedInStream = true,
+                            DownloadEbayOrderInSystem = DateTime.Now,
+                            CreateEbayOrderInStream = DateTime.Now,
+                            email = email,
+                            StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+                            createdDate = DateTime.Now,
+                            updatedDate = DateTime.Now
+                        });
+                    }
+                    else
                     {
-                        _id = Guid.NewGuid().ToString(),
-                        AuthorizationToken = AuthorizationToken,
-                        StreamOrderId = order,
-                        StreamConsignmentId = consignmentid,
-                        StreamTrackingNumber = trackingnumber,
-                        StreamTrackingURL = trackingurl,
-                        LinnNumOrderId = linnworksorderid,
-                        IsLinnOrderCreatedInStream = true,
-                        email = email,
-                        CreateLinnOrderInStream = DateTime.Now,
-                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
-                        createdDate = DateTime.Now,
-                        updatedDate = DateTime.Now
-                    });
+                        existingEbay.CreateEbayOrderInStream = DateTime.Now;
+                        existingEbay.IsEbayOrderCreatedInStream = true;
+                        existingEbay.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+                        existingEbay.StreamOrderId = order;
+                        existingEbay.StreamConsignmentId = consignmentid;
+                        existingEbay.StreamTrackingNumber = trackingnumber;
+                        existingEbay.StreamTrackingURL = trackingurl;
+                        existingEbay.updatedDate = DateTime.Now;
+
+                        reportsToSave.Add(existingEbay);
+                    }
                 }
-                else
+                else if (linnworksorderid != null)
                 {
-                    existingLinn.CreateLinnOrderInStream = DateTime.Now;
-                    existingLinn.IsLinnOrderCreatedInStream = true;
-                    existingLinn.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
-                    existingLinn.StreamOrderId = order;
-                    existingLinn.StreamConsignmentId = consignmentid;
-                    existingLinn.StreamTrackingNumber = trackingnumber;
-                    existingLinn.StreamTrackingURL = trackingurl;
-                    existingLinn.updatedDate = DateTime.Now;
+                    var existingLinn = existingReports
+                        .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
 
-                    reportsToSave.Add(existingLinn);
+                    if (existingLinn == null)
+                    {
+                        reportsToSave.Add(new ReportModel
+                        {
+                            _id = Guid.NewGuid().ToString(),
+                            AuthorizationToken = AuthorizationToken,
+                            StreamOrderId = order,
+                            StreamConsignmentId = consignmentid,
+                            StreamTrackingNumber = trackingnumber,
+                            StreamTrackingURL = trackingurl,
+                            LinnNumOrderId = linnworksorderid,
+                            IsLinnOrderCreatedInStream = true,
+                            email = email,
+                            CreateLinnOrderInStream = DateTime.Now,
+                            StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+                            createdDate = DateTime.Now,
+                            updatedDate = DateTime.Now
+                        });
+                    }
+                    else
+                    {
+                        existingLinn.CreateLinnOrderInStream = DateTime.Now;
+                        existingLinn.IsLinnOrderCreatedInStream = true;
+                        existingLinn.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+                        existingLinn.StreamOrderId = order;
+                        existingLinn.StreamConsignmentId = consignmentid;
+                        existingLinn.StreamTrackingNumber = trackingnumber;
+                        existingLinn.StreamTrackingURL = trackingurl;
+                        existingLinn.updatedDate = DateTime.Now;
+
+                        reportsToSave.Add(existingLinn);
+                    }
                 }
-            }
 
-            // ✅ Now save to DB (no AWS S3 call)
-            if (reportsToSave.Any())
+                if (reportsToSave.Any())
+                {
+                    SaveReportDataForTEst(reportsToSave);
+                }
+
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
             {
-                await SaveReportDataForTEst(reportsToSave);
+                Console.WriteLine($"Error in SaveStreamOrder: {ex.Message}");
+                throw;
             }
         }
 

@@ -54,7 +54,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 var get_auth = _authorization.Get().Where(x => x.ClientId == ClientId && x.AuthorizationToken == AuthorizationToken).FirstOrDefault();
                 if (get_auth != null)
                 {
-                    if (get_auth.ExpirationTime >= DateTime.UtcNow && !string.IsNullOrEmpty(get_auth.access_token))
+                    if (get_auth.ExpirationTime >= DateTime.Now && !string.IsNullOrEmpty(get_auth.access_token))
                     {
                         authorizationModel.AccessToken = get_auth.access_token;
                         authorizationModel.ExpiresIn = (int)get_auth.expires_in;
