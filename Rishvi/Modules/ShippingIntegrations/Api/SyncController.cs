@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Rishvi.Modules.Core.Aws;
-using Rishvi.Modules.ShippingIntegrations.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using YamlDotNet.Core.Tokens;
-using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Hangfire;
-using Rishvi.Modules.ShippingIntegrations.Core;
-using Rishvi.Modules.Core.Data;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Rishvi.Models;
+using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using YamlDotNet.Core.Tokens;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
@@ -18,27 +19,52 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
     [Route("api/Sync")]
     public class SyncController : ControllerBase
     {
-        private readonly ConfigController _configController;
-        private readonly LinnworksController _linnworksController;
-        private readonly StreamController _streamController;
-        private readonly MessinaSettings _settings;
+        //private readonly ConfigController _configController;
+        //private readonly LinnworksController _linnworksController;
+        //private readonly StreamController _streamController;
+        //private readonly MessinaSettings _settings;
+        //private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
+        //private readonly IRepository<IntegrationSettings> _integrationSettingsRepository;
+        //private readonly IUnitOfWork _unitOfWork;
+        //private readonly IRepository<SyncSettings> _syncSettings;
+        //private readonly SqlContext _dbSqlCContext;
+        private readonly ConfigController _configController; 
+        private readonly LinnworksController _linnworksController; 
+        private readonly StreamController _streamController; 
+        private readonly MessinaSettings _settings; 
         private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
         private readonly IRepository<IntegrationSettings> _integrationSettingsRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public SyncController(ConfigController configController,
-            LinnworksController linnworksController,
-            StreamController streamController, IOptions<MessinaSettings> settings, TradingApiOAuthHelper tradingApiOAuthHelper,
-            IRepository<IntegrationSettings> integrationSettingRepository, IUnitOfWork unitOfWork)
-        {
-            _configController = configController;
+        private readonly IUnitOfWork _unitOfWork; 
+        private readonly SqlContext _dbSqlCContext;
+        public SyncController(ConfigController configController, LinnworksController linnworksController, StreamController streamController, 
+            IOptions<MessinaSettings> settings, TradingApiOAuthHelper tradingApiOAuthHelper, IRepository<IntegrationSettings> integrationSettingRepository, 
+            IUnitOfWork unitOfWork, SqlContext dbSqlCContext)
+        { _configController = configController;
             _linnworksController = linnworksController;
-            _streamController = streamController;
+            _streamController = streamController; 
             _settings = settings.Value;
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
             _integrationSettingsRepository = integrationSettingRepository;
             _unitOfWork = unitOfWork;
+            _dbSqlCContext = dbSqlCContext; 
         }
+
+
+        //public SyncController(ConfigController configController,
+        //    LinnworksController linnworksController,
+        //    StreamController streamController, IOptions<MessinaSettings> settings, TradingApiOAuthHelper tradingApiOAuthHelper,
+        //    IRepository<IntegrationSettings> integrationSettingRepository, IUnitOfWork unitOfWork, IRepository<SyncSettings> syncSettings,SqlContext dbSqlCContext)
+        //{
+        //    _configController = configController;
+        //    _linnworksController = linnworksController;
+        //    _streamController = streamController;
+        //    _settings = settings.Value;
+        //    _tradingApiOAuthHelper = tradingApiOAuthHelper;
+        //    _integrationSettingsRepository = integrationSettingRepository;
+        //    _unitOfWork = unitOfWork;
+        //    _syncSettings = syncSettings;
+        //    _dbSqlCContext = dbSqlCContext; 
+        //}
 
         [HttpPost, Route("RunService/{service}")]
         public async Task<bool> RunService([FromBody] SyncReq value, string service)
@@ -106,12 +132,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 //var listuser = await AwsS3.ListFilesInS3Folder("Authorization/Users");
-                var listuser = _integrationSettingsRepository.Get().ToList();
+                // var listuser = _integrationSettingsRepository.Get().ToList();
+                //var listuser = _dbSqlCContext.IntegrationSettings.ToList();
+
+                var listuser = _dbSqlCContext.IntegrationSettings.Include(o => o.Sync).Include(o => o.Linnworks).Include(o => o.Stream).Include(o => o.Ebay).ToList();
+
                 foreach (var res in listuser)
                 {
                     //var userdata = AwsS3.GetS3File("Authorization", _user.Replace("Authorization/", ""));
                     //var res = JsonConvert.DeserializeObject<IntegrationSettings>(_user);
-
+                    //var id = 
+                  //  res.Sync = _dbSqlCContext.SyncSettings.Where(x => x.Id == res.SyncId).FirstOrDefault();
                     if (res.Sync == null)
                     {
                         res.Sync = new SyncSettings();

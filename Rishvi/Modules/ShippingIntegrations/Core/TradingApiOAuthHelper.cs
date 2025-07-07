@@ -493,7 +493,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 CreatedAt = DateTime.UtcNow
             };
             _dbSqlCContext.StreamOrderRecord.Add(record);
-            await _dbSqlCContext.SaveChangesAsync();
+             _dbSqlCContext.SaveChanges();
 
             var existingReports = _dbSqlCContext.ReportModel
                 .Where(x => x.email == email)

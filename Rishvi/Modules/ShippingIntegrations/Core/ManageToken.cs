@@ -63,7 +63,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                         isAuthorized = true;
                     }
-                    isAuthorized = false;
+                  
+                       
                 }
 
 

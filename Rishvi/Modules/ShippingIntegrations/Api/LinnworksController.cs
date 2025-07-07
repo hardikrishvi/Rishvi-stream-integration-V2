@@ -92,8 +92,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     var allorderdetails = obj.Api.Orders.GetOrders(allorder.Skip(0).Take(linnpage).ToList(), Guid.Empty, true, true);
                     foreach (var _order in allorderdetails)
                     {
-                        var fileName = $"LinnOrder/{token}_linnorder_{_order.NumOrderId}.json";
-                        if (!await AwsS3.S3FileIsExists("Authorization", fileName))
+
+                        var orderexists = _dbSqlCContext.ReportModel
+              .Where(x => x.LinnNumOrderId == _order.NumOrderId.ToString())
+              .ToList().Count;
+
+                        if (orderexists == 0)
                         {
                             var newjson = JsonConvert.SerializeObject(_order);
                             await _tradingApiOAuthHelper.SaveLinnOrder(newjson, token, user.Email, _order.NumOrderId.ToString());
@@ -126,7 +130,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 if (string.IsNullOrEmpty(orderids))
                 {
                     // Get pending orders if no order IDs are provided
-                    var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
+                    // var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
+
+                    var reportData = _dbSqlCContext.ReportModel
+              .Where(x => x.email == user.Email)
+              .ToList();
 
                     var pendingOrders = reportData.Where(f => !f.IsLinnOrderCreatedInStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
                     foreach (var pendingOrder in pendingOrders)
@@ -171,7 +179,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     var reportData = _dbSqlCContext.ReportModel
                         .Where(x => x.email == user.Email)
                         .ToList();
-                    
+
                     var pendingOrders = reportData.Where(f => f.IsLinnOrderCreatedInStream && !f.IsLinnOrderDispatchFromStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
                     foreach (var pendingOrder in pendingOrders)
                     {
@@ -180,19 +188,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
                 else
                 {
-                    
+
                     var orderidlist = Regex.Split(orderids, ",");
-                    
+
                     var reportData = await _dbSqlCContext.ReportModel
-                        .Where(f => 
-                            f.IsLinnOrderCreatedInStream && 
+                        .Where(f =>
+                            f.IsLinnOrderCreatedInStream &&
                             orderidlist.Contains(f.LinnNumOrderId))
                         .ToListAsync();
-                    
+
                     foreach (var _ord in orderidlist)
                     {
-                        
-                        
+
+
                         var linnOrders = reportData
                             .FirstOrDefault(f => f.LinnNumOrderId == _ord);
                         if (linnOrders != null)
@@ -264,13 +272,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             var linnStreamPath = $"LinnStreamOrder/_streamorder_{orderId}.json";
             var streamOrderExists = await _dbSqlCContext.StreamOrderRecord
                 .AnyAsync(x => x.LinnworksOrderId == orderId);
-            
+
             var dispatchDone = await _dbSqlCContext.ReportModel
                 .Where(x => x.LinnNumOrderId == orderId)
                 .Select(x => x.IsLinnOrderDispatchFromStream)
                 .FirstOrDefaultAsync();
 
-            if (!dispatchDone  && streamOrderExists)
+            if (!dispatchDone && streamOrderExists)
             {
                 var jsonData = AwsS3.GetS3File("Authorization", linnStreamPath);
                 var streamData = JsonConvert.DeserializeObject<StreamOrderRespModel.Root>(jsonData);
@@ -458,7 +466,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
 
                 var user = _authToken.Load(token);
-               
+
                 var streamAuth = _managetoken.GetToken(user);
                 if (string.IsNullOrWhiteSpace(streamAuth?.AccessToken))
                 {

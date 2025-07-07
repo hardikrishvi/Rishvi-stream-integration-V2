@@ -21,7 +21,9 @@ public class IntegrationSettings : IModificationHistory
     public int ebayhour { get; set; }
     public int linnpage { get; set; }
     public int linnhour { get; set; }
+    public Guid SyncId { get; set; }
     
+
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
