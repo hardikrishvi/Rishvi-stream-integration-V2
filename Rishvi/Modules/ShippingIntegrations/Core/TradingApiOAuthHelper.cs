@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Rishvi.Modules.Core.Data;
 using Address = Rishvi.Models.Address;
 using static Rishvi.Modules.ShippingIntegrations.Models.WebhookResponse;
-using Rishvi.Modules.Core.Authorization;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Rishvi.Modules.ShippingIntegrations.Core
 {
@@ -32,6 +32,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
         private readonly Guid _selectedServiceGuid = new Guid("6A476315-04DB-4D25-A25C-E6917A1BCAD9");
         private readonly ApplicationDbContext _dbContext;
+        private readonly SqlContext _dbSqlCContext;
         private readonly IRepository<Address> _Address;
         private readonly IRepository<CustomerInfo> _CustomerInfo;
         private readonly IRepository<Fulfillment> _Fulfillment;
@@ -57,12 +58,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             IRepository<GeneralInfo> generalInfo, IRepository<OrderRoot> orderRoot, IRepository<ShippingInfo> shippingInfo,
             IRepository<TaxInfo> taxInfo, IRepository<TotalsInfo> totalsInfo, IRepository<Rishvi.Models.Item> item,
             IRepository<IntegrationSettings> integrationSettings, IRepository<LinnworksSettings> linnworksSettings, IRepository<Rishvi.Models.StreamSettings> streamSettings,
-            IRepository<Rishvi.Models.SyncSettings> syncSettings, IRepository<Rishvi.Models.Ebay> ebay, IRepository<ClientAuth> ClientAuth, ManageToken manageToken)
+            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay, SqlContext dbSqlCContext, ManageToken manageToken)
 
         {
             _reportsController = reportsController;
             _setupController = setupController;
             _dbContext = dbContext;
+            _dbSqlCContext = dbSqlCContext;
             _Address = address;
             _unitOfWork = unitOfWork;
             _CustomerInfo = customerInfo;
@@ -73,12 +75,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _TaxInfo = taxInfo;
             _TotalsInfo = totalsInfo;
             _Item = item;
-            _IntegrationSettings = integrationSettings;
-            _LinnworksSettings = linnworksSettings;
-            _StreamSettings = streamSettings;
-            _SyncSettings = syncSettings;
-            _Ebay = ebay;
-            _ClientAuth = ClientAuth;
+            _IntegrationSettings= integrationSettings; 
+            _LinnworksSettings =  linnworksSettings;
+            _StreamSettings    =  streamSettings;
+            _SyncSettings      = syncSettings;
+            _Ebay      = ebay;
             _manageToken = manageToken;
         }
 
@@ -95,88 +96,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 return Convert.ToBase64String(tokenBytes).Replace("+", "").Replace("/", "").Replace("=", "");
             }
         }
-        public bool ValidateToken(string str1, string str2, string token, string secretKey)
-        {
-            // Generate a new token from the provided strings
-            string generatedToken = GenerateToken(str1, str2, secretKey);
-
-            // Compare the generated token with the provided token
-            return generatedToken == token;
-        }
-        public string GetSessionID(string AuthToken, string ProdRedirectURL, string TradingAPI_ServerURL, string DeveloperId, string ProdClientId, string ProdClientSecret, string TradingAPI_Version)
-        {
-            XmlDocument xmlDoc;
-            string error = "";
-            string strReq = @"<?xml version=""1.0"" encoding=""utf-8""?>
-                        <GetSessionIDRequest xmlns=""urn:ebay:apis:eBLBaseComponents"">
-                          <RuName>" + ProdRedirectURL + @"</RuName>
-                        </GetSessionIDRequest>";
-
-            xmlDoc = MakeAPICall(strReq, "GetSessionID", error, AuthToken, TradingAPI_ServerURL, DeveloperId, ProdClientId, ProdClientSecret, TradingAPI_Version);
-            if (error == "")
-            {
-                XmlNode root = xmlDoc["GetSessionIDResponse"];
-                if (root["Errors"] != null)
-                {
-                    string errorCode = root["Errors"]["ErrorCode"].InnerText;
-                    string errorShort = root["Errors"]["ShortMessage"].InnerText;
-                    string errorLong = root["Errors"]["LongMessage"].InnerText;
-                    throw new Exception(errorCode + " ERROR: " + errorShort + "\n" + errorLong);
-                }
-                else
-                {
-                    return root["SessionID"].InnerText;
-                }
-            }
-            else
-            {
-                throw new Exception(error);
-            }
-        }
-        public async Task<EbayAuthentication> GenerateToken(AuthorizationConfigClass _User, string SessionID, string TradingAPI_ServerURL, string DeveloperId, string ProdClientId, string ProdClientSecret, string TradingAPI_Version)
-        {
-            string error = "";
-            string strReq = @"<?xml version=""1.0"" encoding=""utf-8""?>
-                        <FetchTokenRequest xmlns=""urn:ebay:apis:eBLBaseComponents"">
-                          <SessionID>" + SessionID + @"</SessionID>
-                        </FetchTokenRequest>";
-
-            XmlDocument xmlDoc = MakeAPICall(strReq, "FetchToken",
-                error, _User.AuthorizationToken.ToString(), TradingAPI_ServerURL, DeveloperId, ProdClientId, ProdClientSecret, TradingAPI_Version);
-
-            if (error == "")
-            {
-                XmlNode root = xmlDoc["FetchTokenResponse"];
-                if (root["Errors"] != null)
-                {
-                    string errorCode = root["Errors"]["ErrorCode"].InnerText;
-                    string errorShort = root["Errors"]["ShortMessage"].InnerText;
-                    string errorLong = root["Errors"]["LongMessage"].InnerText;
-                    throw new Exception(errorCode + " ERROR: " + errorShort + "\n" + errorLong);
-                }
-                else
-                {
-
-                    var EbayAuthenticationApiResponse = new EbayAuthentication
-                    {
-                        access_token = root["eBayAuthToken"].InnerText,
-                        ExpirationTime = root["HardExpirationTime"].InnerText,
-                        token_type = "User Access Token"
-                    };
-                    _User.IsConfigActive = true;
-                    _User.IntegratedDateTime = DateTime.UtcNow;
-                    _User.access_token = root["eBayAuthToken"].InnerText;
-                    _User.ExpirationTime = root["HardExpirationTime"].InnerText;
-                    _User.token_type = "User Access Token";
-                    _User.Save();
-                    return EbayAuthenticationApiResponse;
-                }
-            }
-            else
-            {
-                throw new Exception(error);
-            }
-        }
+        
+        
         public async Task<string> HttpPostXMLAsync(string XMLData, string URL, Dictionary<string, string> Header, bool DeleteFile = false)
         {
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -210,49 +131,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
-        private XmlDocument MakeAPICall(string requestBody, string callname,
-         string error, string AuthToken, string TradingAPI_ServerURL, string DeveloperId, string ProdClientId, string ProdClientSecret, string TradingAPI_Version)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-
-            string APIServerURL = TradingAPI_ServerURL;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(APIServerURL);
-            request.Headers.Add("X-EBAY-API-DEV-NAME", DeveloperId);
-            request.Headers.Add("X-EBAY-API-APP-NAME", ProdClientId);
-            request.Headers.Add("X-EBAY-API-CERT-NAME", ProdClientSecret);
-            request.Headers.Add("X-EBAY-API-COMPATIBILITY-LEVEL", TradingAPI_Version);
-            request.Headers.Add("X-EBAY-API-SITEID", "2");
-            request.Headers.Add("X-EBAY-API-CALL-NAME", callname);
-            request.Method = "POST";
-            request.ContentType = "text/xml";
-            try
-            {
-                using (new MemoryStream())
-                {
-                    using (var streamWriter = new StreamWriter(request.GetRequestStream()))
-                    {
-                        streamWriter.Write(requestBody);
-                        streamWriter.Close();
-                    }
-                }
-                using (HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse())
-                {
-                    using (StreamReader sr = new StreamReader(webResponse.GetResponseStream()))
-                    {
-                        string responsefromchanne = sr.ReadToEnd();
-                        xmlDoc.LoadXml(responsefromchanne);
-                        SaveLogs(responsefromchanne, AuthToken);
-                    }
-                }
-
-            }
-            catch (Exception Ex)
-            {
-                SaveLogs(Ex.ToString(), AuthToken);
-                error = Ex.Message;
-            }
-            return xmlDoc;
-        }
+        
         #endregion
         #region Ebay Get Order and Order Dispatch Function
         //public async Task GetEbayOrdersFromApi(AuthorizationConfigClass _User, int FromHour, string ordersids,
@@ -648,14 +527,42 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             //var streamAuth = manageToken.GetToken(auth);
 
             CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
+            bool existsInDb = _dbSqlCContext.ReportModel
+                .Any(x => x.LinnNumOrderId == OrderId);
 
-            if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
+            if (existsInDb)
             {
-                var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
+                int numOrderId = int.Parse(OrderId);
+                var orderRoot = await _dbSqlCContext.OrderRoot
+                    .Include(o => o.GeneralInfo)
+                    .Include(o => o.ShippingInfo)
+                    .Include(o => o.CustomerInfo).ThenInclude(c => c.Address)
+                    .Include(o => o.CustomerInfo).ThenInclude(c => c.BillingAddress)
+                    .Include(o => o.TotalsInfo)
+                    .Include(o => o.TaxInfo)
+                    .Include(o => o.Fulfillment)
+                    .Include(o => o.Items)
+                    .FirstOrDefaultAsync(o => o.NumOrderId == (numOrderId));
+
+                if (orderRoot == null)
+                {
+                    throw new Exception($"Order with ID {OrderId} not found in database.");
+                }
+                if (orderRoot.Items == null || !orderRoot.Items.Any())
+                {
+                    orderRoot.Items = await _dbSqlCContext.Item
+                        .Where(i => i.OrderId == orderRoot.OrderId)
+                        .ToListAsync();
+                }
+                
+                // Serialize to indented JSON
+                var json = JsonConvert.SerializeObject(orderRoot);
+                
                 int orderId = Convert.ToInt32(StreamOrderId);
                 try
                 {
-                    var jsopndata = JsonConvert.DeserializeObject<OpenOrder>(json);
+                    
+                    var jsopndata = orderRoot;
                     var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
                     {
                         AuthorizationToken = auth.AuthorizationToken,
@@ -711,22 +618,54 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
         public async Task CreateLinnworksOrdersToStream(AuthorizationConfigClass auth, string OrderId)
         {
+            
+
+            // Proper Any query
+            
             List<CourierService> services = Services.GetServices;
             var streamAuth = _manageToken.GetToken(auth);
-            //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
-            //var streamAuth = manageToken.GetToken(auth);
+            
 
             CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
+            bool existsInDb = _dbSqlCContext.ReportModel
+                .Any(x => x.LinnNumOrderId == OrderId);
+            
+            
 
-            if (AwsS3.S3FileIsExists("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json").Result)
+            if (existsInDb)
             {
-                var json = AwsS3.GetS3File("Authorization", "LinnOrder/" + auth.AuthorizationToken.ToString() + "_linnorder_" + OrderId + ".json");
+                
+                int numOrderId = int.Parse(OrderId);
+                var orderRoot = await _dbSqlCContext.OrderRoot
+                    .Include(o => o.GeneralInfo)
+                    .Include(o => o.ShippingInfo)
+                    .Include(o => o.CustomerInfo).ThenInclude(c => c.Address)
+                    .Include(o => o.CustomerInfo).ThenInclude(c => c.BillingAddress)
+                    .Include(o => o.TotalsInfo)
+                    .Include(o => o.TaxInfo)
+                    .Include(o => o.Fulfillment)
+                    .Include(o => o.Items)
+                    .FirstOrDefaultAsync(o => o.NumOrderId == (numOrderId));
 
+                if (orderRoot == null)
+                {
+                    throw new Exception($"Order with ID {OrderId} not found in database.");
+                }
+                if (orderRoot.Items == null || !orderRoot.Items.Any())
+                {
+                    orderRoot.Items = await _dbSqlCContext.Item
+                        .Where(i => i.OrderId == orderRoot.OrderId)
+                        .ToListAsync();
+                }
+                
+                // Serialize to indented JSON
+                var json = JsonConvert.SerializeObject(orderRoot);
+                
                 if (json != "null")
                 {
                     try
                     {
-                        var jsopndata = JsonConvert.DeserializeObject<OpenOrder>(json);
+                        var jsopndata = orderRoot;
                         int orderId = jsopndata.NumOrderId;
                         var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
                         {
@@ -774,27 +713,30 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     }
                     catch
                     {
-
+                        throw new Exception("Order data not found for OrderId: " + OrderId);
                     }
+                }
+                else
+                {
+                        throw new Exception("Order data not found for OrderId: " + OrderId);
                 }
             }
         }
-        public async Task DispatchOrderInLinnworks(AuthorizationConfigClass _User, int OrderRef, string linntoken,
-            string Service, string TrackingNumber, string TrackingUrl, string dispatchdate)
+        public async Task DispatchOrderInLinnworks(AuthorizationConfigClass _User, int OrderRef,string linntoken, 
+            string Service, string TrackingNumber, string TrackingUrl,string dispatchdate)
         {
             string ProductResp = "";
             var obj = new LinnworksBaseStream(linntoken);
             // create identifier 
             var orderdata = obj.Api.Orders.GetOrderDetailsByNumOrderId(OrderRef);
-            var list = obj.Api.Orders.SetOrderShippingInfo(orderdata.OrderId, new UpdateOrderShippingInfoRequest()
-            {
-                ItemWeight = orderdata.ShippingInfo.ItemWeight,
-                ManualAdjust = orderdata.ShippingInfo.ManualAdjust,
-                PostageCost = orderdata.ShippingInfo.PostageCost,
-                PostalServiceId = orderdata.ShippingInfo.PostalServiceId,
-                TotalWeight = orderdata.ShippingInfo.TotalWeight,
-                TrackingNumber = TrackingNumber
-            });
+            // var list = obj.Api.Orders.SetOrderShippingInfo(orderdata.OrderId, new UpdateOrderShippingInfoRequest() { 
+            //  ItemWeight = orderdata.ShippingInfo.ItemWeight,
+            //  ManualAdjust = orderdata.ShippingInfo.ManualAdjust,
+            //  PostageCost = orderdata.ShippingInfo.PostageCost,  
+            //  PostalServiceId = orderdata.ShippingInfo.PostalServiceId,
+            //  TotalWeight = orderdata.ShippingInfo.TotalWeight,
+            //  TrackingNumber = TrackingNumber
+            // });
             var generalinfo = orderdata.GeneralInfo;
             generalinfo.DespatchByDate = dispatchdate == null ? DateTime.Now : DateTime.Parse(dispatchdate);
             obj.Api.Orders.SetOrderGeneralInfo(orderdata.OrderId, generalinfo, false);
@@ -818,22 +760,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         }
         #endregion
         #region Save s3 data
-        // public void RegisterSave(string s, string AuthorizationToken, string email = "",string token = "")
-        // {
-        //     RegisterSaveFromJson(s);
-        //     var Stream = new MemoryStream();
-        //     StreamWriter sw = new StreamWriter(Stream);
-        //     sw.Write(s);;
-        //     sw.Flush();
-        //     Stream.Position = 0;
-        //     AwsS3.UploadFileToS3("Authorization", Stream, "Users/_register_" + email + ".json");
-        //     var stream1 = new MemoryStream();
-        //     StreamWriter sw1 = new StreamWriter(stream1);
-        //     sw1.Write(s);
-        //     sw1.Flush();
-        //     stream1.Position = 0;
-        //     //AwsS3.UploadFileToS3("Authorization", stream1, "Files/" + token.ToString() + ".json");
-        // }
+        
         public void RegisterSave(string s, string AuthorizationToken, string email = "", string token = "")
         {
             RegisterSaveFromJson(s).GetAwaiter().GetResult();
@@ -936,15 +863,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
             }
         }
-        public static Stream GenerateStreamFromString(string s)
-        {
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            return stream;
-        }
+        
         public async Task SaveReportData(string s, string email)
         {
             var stream = new MemoryStream();
@@ -1036,7 +955,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         {
             InsertOrderFromJson(s);
 
-            var alldata = await _reportsController.GetReportData(new ReportModelReq() { email = email });
+            //var alldata = await _reportsController.GetReportData(new ReportModelReq() { email = email });
+            var alldata = _dbSqlCContext.ReportModel
+                .Where(x => x.email == email)
+                .ToList();
 
             var existing = alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid);
             if (existing == null)
@@ -1220,7 +1142,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 var order = new OrderRoot
                 {
                     OrderId = root.OrderId != Guid.Empty ? root.OrderId : Guid.NewGuid(),
-                    NumOrderId = root.NumOrderId ?? 0,
+                    NumOrderId = root.NumOrderId ,
 
                     GeneralInfo = generalInfo,
                     ShippingInfo = shippingInfo,
@@ -1251,7 +1173,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         ItemNumber = i.ItemNumber ?? "",
                         SKU = i.SKU ?? "",
                         Title = i.Title ?? "",
-                        Quantity = i.Quantity ?? 0,
+                        Quantity = i.Quantity ,
                         CategoryName = i.CategoryName ?? "",
                         StockLevelsSpecified = i.StockLevelsSpecified ?? false,
                         OnOrder = i.OnOrder ?? 0,
@@ -1288,7 +1210,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             ItemNumber = c.ItemNumber ?? "",
                             SKU = c.SKU ?? "",
                             Title = c.Title ?? "",
-                            Quantity = c.Quantity ?? 0,
+                            Quantity = c.Quantity,
                             CategoryName = c.CategoryName ?? "",
                             StockLevelsSpecified = c.StockLevelsSpecified ?? false,
                             OnOrder = c.OnOrder ?? 0,
@@ -1343,99 +1265,47 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
             }
         }
-
+        
         public async Task SaveEbayOrder(string s, string AuthorizationToken, string email, string orderlineitemid, string ebayorderid = "")
         {
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", stream, "EbayOrder/" + AuthorizationToken.ToString() + "_ebayorder_" + ebayorderid + ".json");
-            var alldata = _reportsController.GetReportData(new ReportModelReq() { email = email }).Result;
-            if (alldata.Count(d => d.EbayChannelOrderRef == ebayorderid) == 0)
-            {
-                alldata.Add(new ReportModel()
-                {
-                    _id = Guid.NewGuid().ToString(),
-                    AuthorizationToken = AuthorizationToken,
-                    createdDate = DateTime.Now,
-                    updatedDate = DateTime.Now,
-                    OrderLineItemId = orderlineitemid,
-                    DownloadEbayOrderInSystem = DateTime.Now,
-                    EbayOrderDetaailJson = "EbayOrder/" + AuthorizationToken.ToString() + "_ebayorder_" + ebayorderid + ".json",
-                    EbayChannelOrderRef = ebayorderid,
-                    email = email
-                });
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
-            }
-            else
-            {
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).updatedDate = DateTime.Now;
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).OrderLineItemId = orderlineitemid;
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).EbayOrderDetaailJson = "EbayOrder/" + AuthorizationToken.ToString() + "_ebayorder_" + ebayorderid + ".json";
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).IsEbayOrderDispatchFromStream = true;
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).DownloadEbayOrderInSystem = DateTime.Now;
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
-            }
-        }
-        public async Task SaveEbayDispatch(string s, string AuthorizationToken, string email, string reference = "")
-        {
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", stream, "EbayDispatch/" + AuthorizationToken.ToString() + "_ebaydispatch_" + reference + ".json");
-            var alldata = _reportsController.GetReportData(new ReportModelReq() { email = email }).Result;
-            if (alldata.Count(d => d.EbayChannelOrderRef == reference) == 0)
-            {
-                alldata.Add(new ReportModel()
-                {
-                    _id = Guid.NewGuid().ToString(),
-                    AuthorizationToken = AuthorizationToken,
-                    createdDate = DateTime.Now,
-                    updatedDate = DateTime.Now,
-                    DispatchEbayOrderFromStream = DateTime.Now,
-                    IsEbayOrderDispatchFromStream = true,
-                    DispatchOrderInEbayJson = "EbayDispatch/" + AuthorizationToken.ToString() + "_ebaydispatch_" + reference + ".json",
-                    EbayChannelOrderRef = reference,
-                    email = email
-                });
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
-            }
-            else
-            {
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == reference).updatedDate = DateTime.Now;
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == reference).DispatchOrderInEbayJson = "EbayDispatch/" + AuthorizationToken.ToString() + "_ebaydispatch_" + reference + ".json";
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == reference).IsEbayOrderDispatchFromStream = true;
-                alldata.FirstOrDefault(f => f.EbayChannelOrderRef == reference).DispatchEbayOrderFromStream = DateTime.Now;
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
-            }
-        }
-        public async Task SaveStreamOrder(string s, string AuthorizationToken, string email, string ebayorderid, string linnworksorderid, string consignmentid, string trackingnumber, string trackingurl, string order = "")
-        {
-            Stream stream1 = GenerateStreamFromString(s);
-            AwsS3.UploadFileToS3("Authorization", stream1, "UserStreamOrder/" + AuthorizationToken + "_streamorder_" + order + ".json");
-            Stream stream2 = GenerateStreamFromString(s);
-            AwsS3.UploadFileToS3("Authorization", stream2, "StreamOrder/" + "_streamorder_" + order + ".json");
-            if (ebayorderid != null)
-            {
-                Stream stream3 = GenerateStreamFromString(s);
-                AwsS3.UploadFileToS3("Authorization", stream3, "EbayStreamOrder/" + "_streamorder_" + ebayorderid + ".json");
-            }
-            if (linnworksorderid != null)
-            {
-                Stream stream4 = GenerateStreamFromString(s);
-                AwsS3.UploadFileToS3("Authorization", stream4, "LinnStreamOrder/" + "_streamorder_" + linnworksorderid + ".json");
-            }
+            
+            dynamic jsonData = JsonConvert.DeserializeObject(s);
+            string extractedConsignmentNo = jsonData.response.consignmentNo;
+            string extractedTrackingUrl = jsonData.response.trackingURL;
+            string extractedTrackingId = jsonData.response.trackingId;
 
-            var alldata = _reportsController.GetReportData(new ReportModelReq() { email = email }).Result;
+            var record = new StreamOrderRecord
+            {
+                Id = Guid.NewGuid(),
+                JsonData = s,
+                AuthorizationToken = AuthorizationToken,
+                Email = email,
+                EbayOrderId = ebayorderid,
+                LinnworksOrderId = linnworksorderid,
+                ConsignmentId = extractedConsignmentNo ?? consignmentid,
+                TrackingNumber = trackingnumber,
+                TrackingUrl = extractedTrackingUrl ?? trackingurl,
+                TrackingId = extractedTrackingId,
+                Order = order,
+                CreatedAt = DateTime.UtcNow
+            };
+            _dbSqlCContext.StreamOrderRecord.Add(record);
+            await _dbSqlCContext.SaveChangesAsync();
+        
+            var existingReports = _dbSqlCContext.ReportModel
+                .Where(x => x.email == email)
+                .ToList();
+        
+            var reportsToSave = new List<ReportModel>();
+        
             if (ebayorderid != null)
             {
-                if (alldata.Count(f => f.EbayChannelOrderRef == ebayorderid) == 0)
+                var existingEbay = existingReports
+                    .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
+        
+                if (existingEbay == null)
                 {
-                    alldata.Add(new ReportModel()
+                    reportsToSave.Add(new ReportModel
                     {
                         _id = Guid.NewGuid().ToString(),
                         AuthorizationToken = AuthorizationToken,
@@ -1448,31 +1318,35 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         DownloadEbayOrderInSystem = DateTime.Now,
                         CreateEbayOrderInStream = DateTime.Now,
                         email = email,
-                        StreamOrderCreateJson = "UserStreamOrder/" + AuthorizationToken.ToString() + "_streamorder_" + order + ".json"
+                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+                        createdDate = DateTime.Now,
+                        updatedDate = DateTime.Now
                     });
-                    await SaveReportData(JsonConvert.SerializeObject(alldata), email);
                 }
                 else
                 {
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).CreateEbayOrderInStream = DateTime.Now;
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).IsEbayOrderCreatedInStream = true;
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).StreamOrderCreateJson = "UserStreamOrder/" + AuthorizationToken.ToString() + "_streamorder_" + order + ".json";
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).StreamOrderId = order;
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).StreamConsignmentId = consignmentid;
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).StreamTrackingNumber = trackingnumber;
-                    alldata.FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid).StreamTrackingURL = trackingurl;
-                    await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+                    existingEbay.CreateEbayOrderInStream = DateTime.Now;
+                    existingEbay.IsEbayOrderCreatedInStream = true;
+                    existingEbay.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+                    existingEbay.StreamOrderId = order;
+                    existingEbay.StreamConsignmentId = consignmentid;
+                    existingEbay.StreamTrackingNumber = trackingnumber;
+                    existingEbay.StreamTrackingURL = trackingurl;
+                    existingEbay.updatedDate = DateTime.Now;
+        
+                    reportsToSave.Add(existingEbay);
                 }
             }
             else if (linnworksorderid != null)
             {
-                if (alldata.Count(f => f.LinnNumOrderId == linnworksorderid) == 0)
+                var existingLinn = existingReports
+                    .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
+        
+                if (existingLinn == null)
                 {
-                    alldata.Add(new ReportModel()
+                    reportsToSave.Add(new ReportModel
                     {
                         _id = Guid.NewGuid().ToString(),
-                        updatedDate = DateTime.Now,
-                        createdDate = DateTime.Now,
                         AuthorizationToken = AuthorizationToken,
                         StreamOrderId = order,
                         StreamConsignmentId = consignmentid,
@@ -1482,22 +1356,30 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         IsLinnOrderCreatedInStream = true,
                         email = email,
                         CreateLinnOrderInStream = DateTime.Now,
-                        StreamOrderCreateJson = "UserStreamOrder/" + AuthorizationToken + "_streamorder_" + order + ".json"
+                        StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json",
+                        createdDate = DateTime.Now,
+                        updatedDate = DateTime.Now
                     });
-                    await SaveReportData(JsonConvert.SerializeObject(alldata), email);
                 }
                 else
                 {
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).CreateLinnOrderInStream = DateTime.Now;
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).IsLinnOrderCreatedInStream = true;
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).StreamOrderCreateJson = "UserStreamOrder/" + AuthorizationToken + "_streamorder_" + order + ".json";
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).StreamOrderId = order;
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).StreamConsignmentId = consignmentid;
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).StreamTrackingNumber = trackingnumber;
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).StreamTrackingURL = trackingurl;
-                    alldata.FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid).updatedDate = DateTime.Now;
-                    await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+                    existingLinn.CreateLinnOrderInStream = DateTime.Now;
+                    existingLinn.IsLinnOrderCreatedInStream = true;
+                    existingLinn.StreamOrderCreateJson = $"UserStreamOrder/{AuthorizationToken}_streamorder_{order}.json";
+                    existingLinn.StreamOrderId = order;
+                    existingLinn.StreamConsignmentId = consignmentid;
+                    existingLinn.StreamTrackingNumber = trackingnumber;
+                    existingLinn.StreamTrackingURL = trackingurl;
+                    existingLinn.updatedDate = DateTime.Now;
+        
+                    reportsToSave.Add(existingLinn);
                 }
+            }
+        
+            // ✅ Now save to DB (no AWS S3 call)
+            if (reportsToSave.Any())
+            {
+                await SaveReportDataForTEst(reportsToSave);
             }
         }
         //public async Task SaveLinnChangeOrder(string s, string AuthorizationToken, string order = "")
@@ -1512,16 +1394,24 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //}
         public async Task SaveLinnDispatch(string s, string AuthorizationToken, string email, int linnorderid)
         {
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", stream, "LinnDispatch/" + AuthorizationToken.ToString() + "_linndispatch_" + linnorderid + ".json");
-            var alldata = _reportsController.GetReportData(new ReportModelReq() { email = email }).Result;
-            if (alldata.Count(d => d.LinnNumOrderId == linnorderid.ToString()) == 0)
+            // var stream = new MemoryStream();
+            // StreamWriter sw = new StreamWriter(stream);
+            // sw.Write(s);
+            // sw.Flush();
+            // stream.Position = 0;
+            // AwsS3.UploadFileToS3("Authorization", stream, "LinnDispatch/" + AuthorizationToken.ToString() + "_linndispatch_" + linnorderid + ".json");
+            //
+
+            InsertOrderFromJson(s);
+            
+            
+            
+            var existingReport = await _dbSqlCContext.ReportModel
+                .FirstOrDefaultAsync(d => d.LinnNumOrderId == linnorderid.ToString() && d.email == email);
+
+            if (existingReport == null)
             {
-                alldata.Add(new ReportModel()
+                var newReport = new ReportModel()
                 {
                     _id = Guid.NewGuid().ToString(),
                     AuthorizationToken = AuthorizationToken,
@@ -1529,32 +1419,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     updatedDate = DateTime.Now,
                     DispatchLinnOrderFromStream = DateTime.Now,
                     IsLinnOrderDispatchFromStream = true,
-                    DispatchOrderInLinnJson = "LinnDispatch/" + AuthorizationToken.ToString() + "_linndispatch_" + linnorderid + ".json",
+                    DispatchOrderInLinnJson = $"LinnDispatch/{AuthorizationToken}_linndispatch_{linnorderid}.json",
                     EbayChannelOrderRef = linnorderid.ToString(),
+                    LinnNumOrderId = linnorderid.ToString(),
                     email = email
-                });
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+                };
+
+                await SaveReportDataForTEst(new List<ReportModel> { newReport });
             }
             else
             {
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid.ToString()).updatedDate = DateTime.Now;
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid.ToString()).DispatchOrderInLinnJson = "LinnDispatch/" + AuthorizationToken.ToString() + "_linndispatch_" + linnorderid + ".json";
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid.ToString()).IsLinnOrderDispatchFromStream = true;
-                alldata.FirstOrDefault(f => f.LinnNumOrderId == linnorderid.ToString()).DispatchLinnOrderFromStream = DateTime.Now;
-                await SaveReportData(JsonConvert.SerializeObject(alldata), email);
+                existingReport.updatedDate = DateTime.Now;
+                existingReport.DispatchOrderInLinnJson = $"LinnDispatch/{AuthorizationToken}_linndispatch_{linnorderid}.json";
+                existingReport.IsLinnOrderDispatchFromStream = true;
+                existingReport.DispatchLinnOrderFromStream = DateTime.Now;
+
+                await SaveReportDataForTEst(new List<ReportModel> { existingReport });
             }
+            
         }
 
-        public async Task SaveShipping(string s, string AuthorizationToken, string reference = "")
-        {
-            var stream = new MemoryStream();
-            StreamWriter sw = new StreamWriter(stream);
-            sw.Write(s);
-            sw.Flush();
-            stream.Position = 0;
-            AwsS3.UploadFileToS3("Authorization", stream, "EbayShipping/" + AuthorizationToken.ToString() + "_ebayshipping_" + reference + ".json");
-
-        }
+        
         public async Task SaveWebhook(string s, string AuthorizationToken, string reference = "")
         {
             var stream = new MemoryStream();
@@ -1636,9 +1521,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return registrationData;
         }
         #endregion
-        #region Messian function
-
-        #endregion
+        
 
 
     }

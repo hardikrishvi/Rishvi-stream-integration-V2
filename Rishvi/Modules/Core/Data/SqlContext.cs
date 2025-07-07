@@ -42,6 +42,7 @@ namespace Rishvi.Modules.Core.Data
         public DbSet<SyncSettings> SyncSettings { get; set; }
         public DbSet<Ebay> Ebay { get; set; }
         public DbSet<ReportModel> ReportModel { get; set; }
+        public DbSet<StreamOrderRecord> StreamOrderRecord { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
