@@ -98,11 +98,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                var transformedEmail = _serviceHelper.TransformEmail(email);
+                //var transformedEmail = _serviceHelper.TransformEmail(email);
                 //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
 
                 var getData = _dbContext.IntegrationSettings
-                    .FirstOrDefault(x => x.Email == transformedEmail);
+                    .FirstOrDefault(x => x.Email == email);
 
                 // Retrieve the file directly
                 //if (await AwsS3.S3FileIsExists("Authorization", fileName))
@@ -116,7 +116,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //}
                 if (getData != null)
                 {
-                    var output = _tradingApiOAuthHelper.GetRegistrationData(transformedEmail);
+                    var output = _tradingApiOAuthHelper.GetRegistrationData(email);
                     // Ensure SyncModel is not null
                     output.Sync ??= new SyncModel();
                     return Ok(output);
