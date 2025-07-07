@@ -37,10 +37,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IUnitOfWork _unitOfWork;
         private readonly SqlContext _dbSqlCContext;
         private readonly ManageToken _managetoken;
+        private readonly IRepository<Rishvi.Models.Authorization> _authorization;
         public LinnworksController(TradingApiOAuthHelper tradingApiOAuthHelper, IAuthorizationToken authToken,
             ConfigController configController, StreamController streamController,
             IServiceHelper serviceHelper, ReportsController reportsController, IRepository<Subscription> subscription, IUnitOfWork unitOfWork,
-            IRepository<WebhookOrder> webhookOrder, IRepository<Run> run, IRepository<Event> event_repo, SqlContext dbSqlCContext, ManageToken managetoken)
+            IRepository<WebhookOrder> webhookOrder, IRepository<Run> run, IRepository<Event> event_repo, SqlContext dbSqlCContext, ManageToken managetoken,
+            IRepository<Authorization> authorization)
         {
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
             _configController = configController;
@@ -55,6 +57,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             _event = event_repo;
             _dbSqlCContext = dbSqlCContext;
             _managetoken = managetoken;
+            _authorization = authorization;
         }
 
         [HttpPost, Route("GetLinnOrderForStream")]
@@ -133,8 +136,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     // var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
 
                     var reportData = _dbSqlCContext.ReportModel
-              .Where(x => x.email == user.Email)
-              .ToList();
+                      .Where(x => x.email == user.Email)
+                      .ToList();
 
                     var pendingOrders = reportData.Where(f => !f.IsLinnOrderCreatedInStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
                     foreach (var pendingOrder in pendingOrders)
@@ -512,7 +515,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 query.Add(sItem, Request.Query[sItem].ToString());
             }
             var output = JsonConvert.DeserializeObject<WebhookResponse.Root>(data);
-            await _tradingApiOAuthHelper.SaveWebhook(data, output.webhook.subscription.party_id, DateTime.Now.ToString("ddMMyyyyhhmmss"));
+            //await _tradingApiOAuthHelper.SaveWebhook(data, output.webhook.subscription.party_id, DateTime.Now.ToString("ddMMyyyyhhmmss"));
             SqlHelper.SystemLogInsert("Webhook_riddhi", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook", "", false);
 
             var subscription = new Subscription()
@@ -589,8 +592,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             string Stream_rundescription = output.webhook.run.description;
                             string Stream_orderid = strorder.order;
                             // call order api to get driver detail or driver detail
-                            string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
-                            var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
+                            //string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
+                            Authorization user = _authorization.Get().Where(x => x.ClientId == output.webhook.subscription.party_id).FirstOrDefault();
+                            //var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
                             if (user == null)
                             {
                                 var webhookOrder2 = new WebhookOrder
@@ -716,8 +720,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         string Stream_rundescription = output.webhook.run.description;
                         string Stream_orderid = output.webhook.order.id;
                         // call order api to get driver detail or driver detail
-                        string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
-                        var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
+                        //string json = AwsS3.GetS3File("Authorization", "StreamParty/" + output.webhook.subscription.party_id + ".json");
+                        Authorization user = _authorization.Get().Where(x => x.ClientId == output.webhook.subscription.party_id).FirstOrDefault();
+                        //var user = JsonConvert.DeserializeObject<AuthorizationConfigClass>(json);
                         var logindata = await _configController.Get(user.Email);
                         var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
                         if (strorderdaat.response.valid)
