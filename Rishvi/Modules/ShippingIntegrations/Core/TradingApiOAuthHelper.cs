@@ -749,14 +749,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
-                    if (streamOrderResponse.Item1.response == null)
-                    {
-                        await SaveStreamOrder(streamOrderResponse.Item2, auth.AuthorizationToken.ToString(), auth.Email, null, OrderId, "Error", "Error", "Error", OrderId);
-                    }
-                    else
-                    {
-                        await SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth.AuthorizationToken.ToString(), auth.Email, null, OrderId, streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
-                    }
+                    //if (streamOrderResponse.Item1.response == null)
+                    //{
+                    //    await SaveStreamOrder(streamOrderResponse.Item2, auth.AuthorizationToken.ToString(), auth.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                    //}
+                    //else
+                    //{
+                    //    await SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth.AuthorizationToken.ToString(), auth.Email, null, OrderId, streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                    //}
                 }
                 catch(Exception ex)
                 {
