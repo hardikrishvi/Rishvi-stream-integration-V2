@@ -166,7 +166,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     }
                     if (res.Sync.UpdateLinnworksOrderToStream)
                     {
-                        await _linnworksController.UpdateLinnworksOrdersToStream(res.AuthorizationToken, "");
+                        await _linnworksController.UpdateLinnworksOrdersToStream(res.AuthorizationToken, res.LinnworksSyncToken, "");
                     }
                     //if (res.Sync.DispatchEbayOrderFromStream)
                     //{

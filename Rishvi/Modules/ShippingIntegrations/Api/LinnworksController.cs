@@ -166,16 +166,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         }
 
         [HttpGet, Route("UpdateLinnworksOrdersToStream")]
-        public async Task<IActionResult> UpdateLinnworksOrdersToStream(string token, string orderids)
+        public async Task<IActionResult> UpdateLinnworksOrdersToStream(string token,string linntoken, string orderids)
         {
             try
             {
+                
                 // Load user configuration
                 var user = _authToken.Load(token);
                 if (string.IsNullOrEmpty(user?.ClientId))
                 {
                     return BadRequest("Invalid client ID.");
                 }
+                linntoken = string.IsNullOrEmpty(linntoken) ? user.LinnworksToken : linntoken;
+
+                if (String.IsNullOrEmpty(linntoken))
+                {
+                    return BadRequest("Linnworks token is missing.");
+                }
+
+                var obj = new LinnworksBaseStream(linntoken);
+
+
                 if (string.IsNullOrEmpty(orderids))
                 {
                     // Get pending orders if no order IDs are provided
@@ -208,6 +219,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             .FirstOrDefault(f => f.LinnNumOrderId == _ord);
                         if (linnOrders != null)
                         {
+                            var orderdetails = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(linnOrders.LinnNumOrderId));
                             await _tradingApiOAuthHelper.UpdateLinnworksOrdersToStream(user, _ord, linnOrders.StreamOrderId);
                         }
                     }

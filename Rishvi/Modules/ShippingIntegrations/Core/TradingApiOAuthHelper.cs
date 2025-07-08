@@ -730,9 +730,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         await SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth.AuthorizationToken.ToString(), auth.Email, null, OrderId, streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
-
+                    var str = ex.Message;   
                 }
             }
         }
