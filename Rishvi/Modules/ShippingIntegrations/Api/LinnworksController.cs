@@ -197,6 +197,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     var pendingOrders = reportData.Where(f => f.IsLinnOrderCreatedInStream && !f.IsLinnOrderDispatchFromStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
                     foreach (var pendingOrder in pendingOrders)
                     {
+                        var orderdetails = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(pendingOrder.LinnNumOrderId));
+                        var newjson = JsonConvert.SerializeObject(orderdetails);
+                        var updatedOrder = JsonConvert.DeserializeObject<OrderRoot>(newjson);
+                        await _tradingApiOAuthHelper.UpdateOrderRootFullAsync(updatedOrder);
                         await _tradingApiOAuthHelper.UpdateLinnworksOrdersToStream(user, pendingOrder.LinnNumOrderId.ToString(), pendingOrder.StreamOrderId);
                     }
                 }
@@ -219,7 +223,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             .FirstOrDefault(f => f.LinnNumOrderId == _ord);
                         if (linnOrders != null)
                         {
-                            var orderdetails = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(linnOrders.LinnNumOrderId));
+                            var orderdata = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(linnOrders.LinnNumOrderId));
+                            var newjson = JsonConvert.SerializeObject(orderdata);
+                            var updatedOrder = JsonConvert.DeserializeObject<OrderRoot>(newjson);
+                            await _tradingApiOAuthHelper.UpdateOrderRootFullAsync(updatedOrder);
                             await _tradingApiOAuthHelper.UpdateLinnworksOrdersToStream(user, _ord, linnOrders.StreamOrderId);
                         }
                     }

@@ -471,27 +471,55 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         {
             try
             {
+                
+                var streamOrderRecordExists = _dbSqlCContext.StreamOrderRecord
+                    .Where(x => x.LinnworksOrderId == linnworksorderid)
+                    .ToList();
+
                 dynamic jsonData = JsonConvert.DeserializeObject(s);
                 string extractedConsignmentNo = jsonData.response.consignmentNo;
                 string extractedTrackingUrl = jsonData.response.trackingURL;
                 string extractedTrackingId = jsonData.response.trackingId;
 
-                var record = new StreamOrderRecord
+                if (streamOrderRecordExists.Any())
                 {
-                    Id = Guid.NewGuid(),
-                    JsonData = s,
-                    AuthorizationToken = AuthorizationToken,
-                    Email = email,
-                    EbayOrderId = ebayorderid ?? "0",
-                    LinnworksOrderId = linnworksorderid,
-                    ConsignmentId = extractedConsignmentNo ?? consignmentid,
-                    TrackingNumber = trackingnumber ?? string.Empty,
-                    TrackingUrl = extractedTrackingUrl ?? trackingurl,
-                    TrackingId = extractedTrackingId ?? "0",
-                    Order = order,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _dbSqlCContext.StreamOrderRecord.Add(record);
+                    // Update the existing record (or multiple if applicable)
+                    foreach (var existingRecord in streamOrderRecordExists)
+                    {
+                        existingRecord.JsonData = s;
+                        existingRecord.AuthorizationToken = AuthorizationToken;
+                        existingRecord.Email = email;
+                        existingRecord.EbayOrderId = ebayorderid ?? "0";
+                        existingRecord.ConsignmentId = extractedConsignmentNo ?? consignmentid;
+                        existingRecord.TrackingNumber = trackingnumber ?? string.Empty;
+                        existingRecord.TrackingUrl = extractedTrackingUrl ?? trackingurl;
+                        existingRecord.TrackingId = extractedTrackingId ?? "0";
+                        existingRecord.Order = order;
+                        existingRecord.CreatedAt = DateTime.UtcNow; // or keep original
+                    }
+                }
+                else
+                {
+                    // Insert new
+                    var newRecord = new StreamOrderRecord
+                    {
+                        Id = Guid.NewGuid(),
+                        JsonData = s,
+                        AuthorizationToken = AuthorizationToken,
+                        Email = email,
+                        EbayOrderId = ebayorderid ?? "0",
+                        LinnworksOrderId = linnworksorderid,
+                        ConsignmentId = extractedConsignmentNo ?? consignmentid,
+                        TrackingNumber = trackingnumber ?? string.Empty,
+                        TrackingUrl = extractedTrackingUrl ?? trackingurl,
+                        TrackingId = extractedTrackingId ?? "0",
+                        Order = order,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    _dbSqlCContext.StreamOrderRecord.Add(newRecord);
+                }
+                
                 _dbSqlCContext.SaveChanges();
 
                 var existingReports = _dbSqlCContext.ReportModel
@@ -1388,6 +1416,262 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 if (ex.InnerException != null)
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
             }
+        }
+        public async Task UpdateOrderRootFullAsync(OrderRoot updatedOrder)
+        {
+            var existingOrder = await _dbSqlCContext.OrderRoot
+                .Include(o => o.GeneralInfo)
+                .Include(o => o.ShippingInfo)
+                .Include(o => o.CustomerInfo).ThenInclude(c => c.Address)
+                .Include(o => o.CustomerInfo).ThenInclude(c => c.BillingAddress)
+                .Include(o => o.TotalsInfo)
+                .Include(o => o.TaxInfo)
+                .Include(o => o.Fulfillment)
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.NumOrderId == updatedOrder.NumOrderId);
+
+            if (existingOrder == null)
+            {
+                throw new Exception($"Order with NumOrderId {updatedOrder.NumOrderId} not found.");
+            }
+
+            // =========================
+            // Update OrderRoot
+            // =========================
+            existingOrder.FolderName = updatedOrder.FolderName ?? new List<string>();
+            existingOrder.IsPostFilteredOut = updatedOrder.IsPostFilteredOut ?? false;
+            existingOrder.CanFulfil = updatedOrder.CanFulfil ?? false;
+            existingOrder.HasItems = updatedOrder.HasItems ?? false;
+            existingOrder.TotalItemsSum = updatedOrder.TotalItemsSum ?? 0;
+            existingOrder.TempColumn = "placeholder";
+            existingOrder.UpdatedAt = DateTime.UtcNow;
+            
+
+            // =========================
+            // GeneralInfo
+            // =========================
+            if (existingOrder.GeneralInfo != null && updatedOrder.GeneralInfo != null)
+            {
+                existingOrder.GeneralInfo.Status = updatedOrder.GeneralInfo.Status ?? 0;
+                existingOrder.GeneralInfo.LabelPrinted = updatedOrder.GeneralInfo.LabelPrinted ?? false;
+                existingOrder.GeneralInfo.LabelError = updatedOrder.GeneralInfo.LabelError ?? "";
+                existingOrder.GeneralInfo.InvoicePrinted = updatedOrder.GeneralInfo.InvoicePrinted ?? false;
+                existingOrder.GeneralInfo.PickListPrinted = updatedOrder.GeneralInfo.PickListPrinted ?? false;
+                existingOrder.GeneralInfo.IsRuleRun = updatedOrder.GeneralInfo.IsRuleRun ?? false;
+                existingOrder.GeneralInfo.Notes = updatedOrder.GeneralInfo.Notes ?? 0;
+                existingOrder.GeneralInfo.PartShipped = updatedOrder.GeneralInfo.PartShipped ?? false;
+                existingOrder.GeneralInfo.Marker = updatedOrder.GeneralInfo.Marker ?? 0;
+                existingOrder.GeneralInfo.IsParked = updatedOrder.GeneralInfo.IsParked ?? false;
+                existingOrder.GeneralInfo.ReferenceNum = updatedOrder.GeneralInfo.ReferenceNum ?? "";
+                existingOrder.GeneralInfo.SecondaryReference = updatedOrder.GeneralInfo.SecondaryReference ?? "";
+                existingOrder.GeneralInfo.ExternalReferenceNum = updatedOrder.GeneralInfo.ExternalReferenceNum ?? "";
+                existingOrder.GeneralInfo.ReceivedDate = updatedOrder.GeneralInfo.ReceivedDate ?? DateTime.UtcNow;
+                existingOrder.GeneralInfo.Source = updatedOrder.GeneralInfo.Source ?? "N/A";
+                existingOrder.GeneralInfo.SubSource = updatedOrder.GeneralInfo.SubSource ?? "N/A";
+                existingOrder.GeneralInfo.SiteCode = updatedOrder.GeneralInfo.SiteCode ?? "N/A";
+                existingOrder.GeneralInfo.HoldOrCancel = updatedOrder.GeneralInfo.HoldOrCancel ?? false;
+                existingOrder.GeneralInfo.DespatchByDate = updatedOrder.GeneralInfo.DespatchByDate ?? DateTime.UtcNow;
+                existingOrder.GeneralInfo.HasScheduledDelivery = updatedOrder.GeneralInfo.HasScheduledDelivery ?? false;
+                existingOrder.GeneralInfo.Location = updatedOrder.GeneralInfo.Location ?? Guid.Empty;
+                existingOrder.GeneralInfo.NumItems = updatedOrder.GeneralInfo.NumItems ?? 0;
+                existingOrder.GeneralInfo.UpdatedAt = DateTime.UtcNow;
+                
+                
+            }
+
+            // =========================
+            // ShippingInfo
+            // =========================
+            if (existingOrder.ShippingInfo != null && updatedOrder.ShippingInfo != null)
+            {
+                existingOrder.ShippingInfo.Vendor = updatedOrder.ShippingInfo.Vendor ?? "N/A";
+                existingOrder.ShippingInfo.PostalServiceId = updatedOrder.ShippingInfo.PostalServiceId ?? Guid.Empty;
+                existingOrder.ShippingInfo.PostalServiceName = updatedOrder.ShippingInfo.PostalServiceName ?? "N/A";
+                existingOrder.ShippingInfo.TotalWeight = updatedOrder.ShippingInfo.TotalWeight ?? 0;
+                existingOrder.ShippingInfo.ItemWeight = updatedOrder.ShippingInfo.ItemWeight ?? 0;
+                existingOrder.ShippingInfo.PackageCategoryId = updatedOrder.ShippingInfo.PackageCategoryId ?? Guid.Empty;
+                existingOrder.ShippingInfo.PackageCategory = updatedOrder.ShippingInfo.PackageCategory ?? "Default";
+                existingOrder.ShippingInfo.PackageTypeId = updatedOrder.ShippingInfo.PackageTypeId ?? Guid.Empty;
+                existingOrder.ShippingInfo.PackageType = updatedOrder.ShippingInfo.PackageType ?? "Default";
+                existingOrder.ShippingInfo.PostageCost = updatedOrder.ShippingInfo.PostageCost ?? 0;
+                existingOrder.ShippingInfo.PostageCostExTax = updatedOrder.ShippingInfo.PostageCostExTax ?? 0;
+                existingOrder.ShippingInfo.TrackingNumber = updatedOrder.ShippingInfo.TrackingNumber ?? "";
+                existingOrder.ShippingInfo.ManualAdjust = updatedOrder.ShippingInfo.ManualAdjust ?? false;
+                existingOrder.ShippingInfo.UpdatedAt = DateTime.UtcNow;
+                
+                
+            }
+
+            // =========================
+            // CustomerInfo
+            // =========================
+            if (existingOrder.CustomerInfo != null && updatedOrder.CustomerInfo != null)
+            {
+                existingOrder.CustomerInfo.ChannelBuyerName = updatedOrder.CustomerInfo.ChannelBuyerName;
+                existingOrder.CustomerInfo.UpdatedAt = DateTime.UtcNow;
+
+                if (existingOrder.CustomerInfo.Address != null && updatedOrder.CustomerInfo.Address != null)
+                {
+                    var addr = updatedOrder.CustomerInfo.Address;
+                    existingOrder.CustomerInfo.Address.EmailAddress = addr.EmailAddress ?? "";
+                    existingOrder.CustomerInfo.Address.Address1 = addr.Address1 ?? "";
+                    existingOrder.CustomerInfo.Address.Address2 = addr.Address2 ?? "";
+                    existingOrder.CustomerInfo.Address.Address3 = addr.Address3 ?? "";
+                    existingOrder.CustomerInfo.Address.Town = addr.Town ?? "";
+                    existingOrder.CustomerInfo.Address.Region = addr.Region ?? "";
+                    existingOrder.CustomerInfo.Address.PostCode = addr.PostCode ?? "";
+                    existingOrder.CustomerInfo.Address.Country = addr.Country ?? "";
+                    existingOrder.CustomerInfo.Address.Continent = addr.Continent ?? "N/A";
+                    existingOrder.CustomerInfo.Address.FullName = addr.FullName ?? "";
+                    existingOrder.CustomerInfo.Address.Company = addr.Company ?? "";
+                    existingOrder.CustomerInfo.Address.PhoneNumber = addr.PhoneNumber ?? "";
+                    existingOrder.CustomerInfo.Address.CountryId = addr.CountryId ?? Guid.Empty ;
+                    existingOrder.CustomerInfo.Address.UpdatedAt = DateTime.UtcNow;
+                    
+                }
+
+                if (existingOrder.CustomerInfo.BillingAddress != null && updatedOrder.CustomerInfo.BillingAddress != null)
+                {
+                    var bill = updatedOrder.CustomerInfo.BillingAddress;
+                    existingOrder.CustomerInfo.BillingAddress.EmailAddress = bill.EmailAddress ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Address1 = bill.Address1 ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Address2 = bill.Address2 ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Address3 = bill.Address3 ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Town = bill.Town ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Region = bill.Region ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.PostCode = bill.PostCode ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Country = bill.Country ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Continent = bill.Continent ?? "N/A";
+                    existingOrder.CustomerInfo.BillingAddress.FullName = bill.FullName ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.Company = bill.Company ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.PhoneNumber = bill.PhoneNumber ?? "";
+                    existingOrder.CustomerInfo.BillingAddress.CountryId = bill.CountryId ?? Guid.Empty ;
+                    existingOrder.CustomerInfo.BillingAddress.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            // =========================
+            // TotalsInfo
+            // =========================
+            if (existingOrder.TotalsInfo != null && updatedOrder.TotalsInfo != null)
+            {
+                var tot = updatedOrder.TotalsInfo;
+                existingOrder.TotalsInfo.Subtotal = tot.Subtotal  ?? 0;
+                existingOrder.TotalsInfo.PostageCost = tot.PostageCost  ?? 0;
+                existingOrder.TotalsInfo.PostageCostExTax = tot.PostageCostExTax  ?? 0;
+                existingOrder.TotalsInfo.Tax = tot.Tax  ?? 0;
+                existingOrder.TotalsInfo.TotalCharge = tot.TotalCharge ?? 0;
+                existingOrder.TotalsInfo.PaymentMethod = tot.PaymentMethod ?? "N/A";
+                existingOrder.TotalsInfo.PaymentMethodId = tot.PaymentMethodId ?? Guid.Empty;
+                existingOrder.TotalsInfo.ProfitMargin = tot.ProfitMargin ?? 0;
+                existingOrder.TotalsInfo.TotalDiscount = tot.TotalDiscount ?? 0;
+                existingOrder.TotalsInfo.Currency = tot.Currency ?? "N/A";
+                existingOrder.TotalsInfo.CountryTaxRate = tot.CountryTaxRate ?? 0;
+                existingOrder.TotalsInfo.ConversionRate = tot.ConversionRate ?? 1;
+                existingOrder.TotalsInfo.UpdatedAt = DateTime.UtcNow;
+                
+                
+            }
+
+            // =========================
+            // TaxInfo
+            // =========================
+            if (existingOrder.TaxInfo != null && updatedOrder.TaxInfo != null)
+            {
+                existingOrder.TaxInfo.TaxNumber = updatedOrder.TaxInfo.TaxNumber ?? "N/A";
+                existingOrder.TaxInfo.UpdatedAt = DateTime.UtcNow;
+            }
+
+            // =========================
+            // Fulfillment
+            // =========================
+            if (existingOrder.Fulfillment != null && updatedOrder.Fulfillment != null)
+            {
+                existingOrder.Fulfillment.FulfillmentState = updatedOrder.Fulfillment.FulfillmentState ?? "Unknown";
+                existingOrder.Fulfillment.PurchaseOrderState = updatedOrder.Fulfillment.PurchaseOrderState ?? "N/A";
+                existingOrder.Fulfillment.UpdatedAt = DateTime.UtcNow;
+            }
+
+            // =========================
+            // Items & CompositeSubItems
+            // =========================
+            
+            if (existingOrder.Items != null && updatedOrder.Items != null)
+            {
+                foreach (var updatedItem in updatedOrder.Items)
+                {
+                    var existingItem = existingOrder.Items.FirstOrDefault(i => i.ItemId == updatedItem.ItemId);
+                    if (existingItem != null)
+                    {
+                        existingItem.ItemNumber = updatedItem.ItemNumber ?? "";
+                        existingItem.SKU = updatedItem.SKU ?? "";
+                        existingItem.Title = updatedItem.Title ?? "";
+                        existingItem.Quantity = updatedItem.Quantity;
+                        existingItem.CategoryName = updatedItem.CategoryName ?? "";
+                        existingItem.StockLevelsSpecified = updatedItem.StockLevelsSpecified ?? false;
+                        existingItem.OnOrder = updatedItem.OnOrder ?? 0;
+                        existingItem.InOrderBook = updatedItem.InOrderBook ?? 0;
+                        existingItem.Level = updatedItem.Level ?? 0;
+                        existingItem.MinimumLevel = updatedItem.MinimumLevel ?? 0;
+                        existingItem.AvailableStock = updatedItem.AvailableStock ?? 0;
+                        existingItem.PricePerUnit = updatedItem.PricePerUnit ?? 0;
+                        existingItem.UnitCost = updatedItem.UnitCost ?? 0;
+                        existingItem.Cost = updatedItem.Cost ?? 0;
+                        existingItem.CostIncTax = updatedItem.CostIncTax ?? 0;
+                        existingItem.Weight = updatedItem.Weight ?? 0;
+                        existingItem.BarcodeNumber = updatedItem.BarcodeNumber ?? "";
+                        existingItem.ChannelSKU = updatedItem.ChannelSKU ?? "";
+                        existingItem.ChannelTitle = updatedItem.ChannelTitle ?? "";
+                        existingItem.BinRack = updatedItem.BinRack ?? "";
+                        existingItem.ImageId = updatedItem.ImageId ?? "";
+                        existingItem.RowId = updatedItem.RowId ?? Guid.NewGuid();
+                        existingItem.StockItemId = updatedItem.StockItemId ?? Guid.NewGuid();
+                        existingItem.StockItemIntId = updatedItem.StockItemIntId ?? 0;
+                        existingItem.UpdatedAt = DateTime.UtcNow;
+                        
+
+                        if (existingItem.CompositeSubItems != null && updatedItem.CompositeSubItems != null)
+                        {
+                            foreach (var updatedSub in updatedItem.CompositeSubItems)
+                            {
+                                var existingSub = existingItem.CompositeSubItems
+                                    .FirstOrDefault(s => s.ItemId == updatedSub.ItemId);
+
+                                if (existingSub != null)
+                                {
+                                    existingSub.ItemNumber = updatedSub.ItemNumber ?? "";
+                                    existingSub.SKU = updatedSub.SKU ?? "";
+                                    existingSub.Title = updatedSub.Title ?? "";
+                                    existingSub.Quantity = updatedSub.Quantity;
+                                    existingSub.CategoryName = updatedSub.CategoryName ?? "";
+                                    existingSub.StockLevelsSpecified = updatedSub.StockLevelsSpecified ?? false;
+                                    existingSub.OnOrder = updatedSub.OnOrder ?? 0;
+                                    existingSub.InOrderBook = updatedSub.InOrderBook ?? 0;
+                                    existingSub.Level = updatedSub.Level ?? 0;
+                                    existingSub.MinimumLevel = updatedSub.MinimumLevel ?? 0;
+                                    existingSub.AvailableStock = updatedSub.AvailableStock ?? 0;
+                                    existingSub.PricePerUnit = updatedSub.PricePerUnit ?? 0;
+                                    existingSub.UnitCost = updatedSub.UnitCost ?? 0;
+                                    existingSub.Cost = updatedSub.Cost ?? 0;
+                                    existingSub.CostIncTax = updatedSub.CostIncTax ?? 0;
+                                    existingSub.Weight = updatedSub.Weight ?? 0;
+                                    existingSub.BarcodeNumber = updatedSub.BarcodeNumber ?? "";
+                                    existingSub.ChannelSKU = updatedSub.ChannelSKU ?? "";
+                                    existingSub.ChannelTitle = updatedSub.ChannelTitle ?? "";
+                                    existingSub.BinRack = updatedSub.BinRack ?? "";
+                                    existingSub.ImageId = updatedSub.ImageId ?? "";
+                                    existingSub.RowId = updatedSub.RowId ?? Guid.NewGuid();
+                                    existingSub.StockItemId = updatedSub.StockItemId ?? Guid.NewGuid();
+                                    existingSub.StockItemIntId = updatedSub.StockItemIntId ?? 0;
+                                    existingSub.UpdatedAt = DateTime.UtcNow;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            await _dbSqlCContext.SaveChangesAsync();
         }
         
         //public async Task SaveEbayOrder(string s, string AuthorizationToken, string email, string orderlineitemid, string ebayorderid = "")
