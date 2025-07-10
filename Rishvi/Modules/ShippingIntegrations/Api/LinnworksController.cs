@@ -605,6 +605,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
                         foreach (var strorder in output.webhook.orders)
                         {
+                            try
+                            {
+
+
                             // need to update on linn order
                             string Stream_runloadid = output.webhook.run.loadId;
                             string Stream_runstatus = output.webhook.run.status;
@@ -636,6 +640,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 {
                                     foreach (var gr in strorderdaat.response.order.groups)
                                     {
+
+
                                         string Stream_trackingURL = strorderdaat.response.order.trackingURL;
                                         string Stream_trackingId = strorderdaat.response.order.trackingId;
                                         string Stream_driverName = gr.runDetails.driverName;
@@ -733,6 +739,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 EmailHelper.SendEmail("Error Webhook Update", "User Authentication Issue - " + user.AuthorizationToken + " Data:" + data);
                             }
 
+                            }
+                            catch (Exception ex)
+                            {
+
+                                EmailHelper.SendEmail("Error Webhook Update", "webhook error Data:" + data + "  ex: " + ex.ToString());
+                            }
 
                         }
                     }
