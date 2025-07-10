@@ -263,7 +263,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true);
+                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true,"Generate Lebel");
                 EmailHelper.SendEmail("Failed generate label", ex.Message);
             }
             return string.Empty;
@@ -292,7 +292,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, barcodeNumber, null, "BarcodeGenerateError", ex.Message, true);
+                SqlHelper.SystemLogInsert("CreateOrder", null, barcodeNumber, null, "BarcodeGenerateError", ex.Message, true,"Generate lebel");
                 EmailHelper.SendEmail("Failed generate barcode", ex.Message);
             }
             return null;
@@ -318,7 +318,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, qrCodeNumber, null, "QRCodeGenerateError", ex.Message, true);
+                SqlHelper.SystemLogInsert("CreateOrder", null, qrCodeNumber, null, "QRCodeGenerateError", ex.Message, true,"Generate Lebel");
                 EmailHelper.SendEmail("Failed generate QRCode", ex.Message);
             }
             return null;

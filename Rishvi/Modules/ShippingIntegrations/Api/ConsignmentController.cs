@@ -27,6 +27,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost(), Route("CreateOrder")]
         public GenerateLabelResponse CreateOrder([FromBody] GenerateLabelRequest request)
         {
+            string Email = "";
+
             try
             {
                 // lets authenticate the user and make sure we have their config details
@@ -35,8 +37,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 {
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
-
-                SqlHelper.SystemLogInsert("CreateOrder", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false);
+                Email = auth.Email;
+                SqlHelper.SystemLogInsert("CreateOrder", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false,auth.Email);
                 // load all the services we have (either for this user specifically or all services)
                 List<CourierService> services = Services.GetServices;
 
@@ -110,7 +112,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true);
+                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
                 EmailHelper.SendEmail("Failed generate lable", ex.Message);
                 return new GenerateLabelResponse("Unhandled error " + ex.Message);
             }
@@ -119,6 +121,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("GenerateLabel")]
         public GenerateLabelResponse GenerateLabel([FromBody] GenerateLabelRequest request)
         {
+            string Email = "";
+
             try
             {
                 // lets authenticate the user and make sure we have their config details
@@ -127,8 +131,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 {
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
-
-                SqlHelper.SystemLogInsert("CreateOrder", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false);
+                Email = auth.Email; 
+                SqlHelper.SystemLogInsert("CreateOrder", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
                 // load all the services we have (either for this user specifically or all services)
                 List<CourierService> services = Services.GetServices;
 
@@ -271,7 +275,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true);
+                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
                 EmailHelper.SendEmail("Failed generate lable", ex.ToString());
                 return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
             }
@@ -296,7 +300,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                SqlHelper.SystemLogInsert("DeleteOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "CancelLabelStart", null, false);
+                SqlHelper.SystemLogInsert("DeleteOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "CancelLabelStart", null, false,"");
 
                 AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)

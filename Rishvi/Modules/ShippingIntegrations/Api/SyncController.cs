@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using YamlDotNet.Core.Tokens;
@@ -69,6 +70,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("RunService/{service}")]
         public async Task<bool> RunService([FromBody] SyncReq value, string service)
         {
+            string Email = "";
             try
             {
                 if (value.orderids != null && value.orderids != "")
@@ -129,6 +131,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [AllowAnonymous]
         public async Task<bool> StartService()
         {
+            string Email = "";
             try
             {
                 //var listuser = await AwsS3.ListFilesInS3Folder("Authorization/Users");
@@ -139,6 +142,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 foreach (var res in listuser)
                 {
+                    Email = res.Email;
+
                     //var userdata = AwsS3.GetS3File("Authorization", _user.Replace("Authorization/", ""));
                     //var res = JsonConvert.DeserializeObject<IntegrationSettings>(_user);
                     //var id = 
@@ -194,6 +199,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
+                SqlHelper.SystemLogInsert("UpdateOrder", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true,Email );
                 // Log the exception for debugging
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return false; // Indicate failure

@@ -650,8 +650,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
         public async Task UpdateOrderExProperty(string linntoken, int orderid, Dictionary<string, string> values)
         {
+            if (string.IsNullOrWhiteSpace(linntoken))
+            {
+                throw new ArgumentException("Invalid Linnworks token.");
+            }
+            
+
             var obj = new LinnworksBaseStream(linntoken);
             var linnorderid = obj.Api.Orders.GetOrderDetailsByNumOrderId(orderid);
+            // Fetch the Linnworks order details
+            if (linnorderid == null)
+            {
+                throw new Exception($"Order with ID {orderid} not found.");
+            }
             var res = obj.Api.Orders.AddExtendedProperties(new AddExtendedPropertiesRequest()
             {
                 ExtendedProperties = values.Where(d => !string.IsNullOrEmpty(d.Value)).Select(g => new BasicExtendedProperty()

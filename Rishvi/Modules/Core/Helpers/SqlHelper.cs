@@ -41,7 +41,7 @@ namespace Rishvi.Modules.Core.Helpers
             return 0;
         }
 
-        public static int SystemLogInsert(string moduleName, string requestHeader, string requestJson, string responseJson,string status, string message, bool isError)
+        public static int SystemLogInsert(string moduleName, string requestHeader, string requestJson, string responseJson,string status, string message, bool isError,string UserID)
         {
             message = message == null ? "" : message;
             string query = "Insert into Systemlog(SystemLogID, UserId,ModuleName,RequestHeader,RequestJson,ResponseJson,Status,Message,IsError,CreatedAt,UpdatedAt)Values(newId(),null,'" + moduleName + "','" + requestHeader + "','" + requestJson + "','" + responseJson + "','" + status + "','" + message.Replace("'"," ")+ "',"+ (isError ? '1':'0') + ",GetDate(),GetDate())";

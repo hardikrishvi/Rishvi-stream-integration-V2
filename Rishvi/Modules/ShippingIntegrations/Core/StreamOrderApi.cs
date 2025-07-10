@@ -51,7 +51,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             else
             {
                 string errorMessage = response.Content;
-                SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true);
+                SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true,clientId);
             }
             return null;
         }
@@ -67,7 +67,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     string uniqueCode = CodeHelper.GenerateUniqueCode(32);
                     var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
                     var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
-                    var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.CreateOrderUrl), Method.Post);
+                    var request = new RestRequest(AppSettings.CreateOrderUrl, Method.Post);
                     request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type));
                     request.AddHeader("Accept", "application/json");
                     request.AddHeader("Content-Type", "application/json");
@@ -84,7 +84,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         errorMessage = response.Content;
                         try
                         {
-                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true);
+                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
                         }
                         catch
                         {
@@ -269,7 +269,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 else
                 {
                     errorMessage = response.Content;
-                    SqlHelper.SystemLogInsert("UpdateOrder", null, finalreq, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderUpdated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true);
+                    SqlHelper.SystemLogInsert("UpdateOrder", null, finalreq, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderUpdated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
 
                 }
             }
@@ -316,7 +316,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 {
                     //failed order log
                     errorMessage = response.Content;
-                    SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true);
+                    SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
                 }
             }
             catch (WebException ex)
@@ -371,7 +371,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 {
                     //failed order log
                     errorMessage = response.Content;
-                    SqlHelper.SystemLogInsert("WebhookSubscribe", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "WebhookSubscribe", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true);
+                    SqlHelper.SystemLogInsert("WebhookSubscribe", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "WebhookSubscribe", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
                 }
             }
             catch (WebException ex)
