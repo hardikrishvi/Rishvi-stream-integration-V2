@@ -1694,6 +1694,89 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             }
                         }
                     }
+                    else
+                    {
+                        var item = new Rishvi.Models.Item
+                        {
+                          
+                            Id = Guid.NewGuid(),
+                            ItemId = updatedItem.ItemId ?? "",
+                            ItemNumber = updatedItem.ItemNumber ?? "",
+                            SKU = updatedItem.SKU ?? "",
+                            Title = updatedItem.Title ?? "",
+                            Quantity = updatedItem.Quantity,
+                            CategoryName = updatedItem.CategoryName ?? "",
+                            StockLevelsSpecified = updatedItem.StockLevelsSpecified ?? false,
+                            OnOrder = updatedItem.OnOrder ?? 0,
+                            InOrderBook = updatedItem.InOrderBook ?? 0,
+                            Level = updatedItem.Level ?? 0,
+                            MinimumLevel = updatedItem.MinimumLevel ?? 0,
+                            AvailableStock = updatedItem.AvailableStock ?? 0,
+                            PricePerUnit = updatedItem.PricePerUnit ?? 0,
+                            UnitCost = updatedItem.UnitCost ?? 0,
+                            Cost = updatedItem.Cost ?? 0,
+                            CostIncTax = updatedItem.CostIncTax ?? 0,
+                            Weight = updatedItem.Weight ?? 0,
+                            BarcodeNumber = updatedItem.BarcodeNumber ?? "",
+                            ChannelSKU = updatedItem.ChannelSKU ?? "",
+                            ChannelTitle = updatedItem.ChannelTitle ?? "",
+                            BinRack = updatedItem.BinRack ?? "",
+                            ImageId = updatedItem.ImageId ?? "",
+                            RowId = updatedItem.RowId ?? Guid.NewGuid(),
+                            OrderId = existingOrder.OrderId,
+                            StockItemId = updatedItem.StockItemId,
+                            StockItemIntId = updatedItem.StockItemIntId ?? 0,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = null,
+                            CompositeSubItems = new List<Rishvi.Models.Item>()
+                        };
+
+                        // Process composite sub-items
+                        foreach (var c in updatedItem.CompositeSubItems ?? new List<Rishvi.Models.Item>())
+                        {
+                            var subItem = new Rishvi.Models.Item
+                            {
+                                Id = Guid.NewGuid(),
+                                ItemId = c.ItemId ?? "",
+                                ItemNumber = c.ItemNumber ?? "",
+                                SKU = c.SKU ?? "",
+                                Title = c.Title ?? "",
+                                Quantity = c.Quantity,
+                                CategoryName = c.CategoryName ?? "",
+                                StockLevelsSpecified = c.StockLevelsSpecified ?? false,
+                                OnOrder = c.OnOrder ?? 0,
+                                InOrderBook = c.InOrderBook ?? 0,
+                                Level = c.Level ?? 0,
+                                MinimumLevel = c.MinimumLevel ?? 0,
+                                AvailableStock = c.AvailableStock ?? 0,
+                                PricePerUnit = c.PricePerUnit ?? 0,
+                                UnitCost = c.UnitCost ?? 0,
+                                Cost = c.Cost ?? 0,
+                                CostIncTax = c.CostIncTax ?? 0,
+                                Weight = c.Weight ?? 0,
+                                BarcodeNumber = c.BarcodeNumber ?? "",
+                                ChannelSKU = c.ChannelSKU ?? "",
+                                ChannelTitle = c.ChannelTitle ?? "",
+                                BinRack = c.BinRack ?? "",
+                                ImageId = c.ImageId ?? "",
+                                RowId = c.RowId ?? Guid.NewGuid(),
+                                OrderId = existingOrder.OrderId,
+                                StockItemId = c.StockItemId,
+                                StockItemIntId = c.StockItemIntId ?? 0,
+                                CreatedAt = DateTime.UtcNow,
+                                UpdatedAt = null,
+                                CompositeSubItems = new List<Rishvi.Models.Item>()
+                            };
+
+                           
+                            _dbSqlCContext.Item.Add(subItem);
+
+                        }
+
+                        existingOrder.Items.Add(item);
+
+                        _dbSqlCContext.Item.Add(item);
+                    }
                 }
             }
 
