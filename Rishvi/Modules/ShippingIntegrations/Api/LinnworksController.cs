@@ -103,7 +103,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         if (orderexists == 0)
                         {
                             var newjson = JsonConvert.SerializeObject(_order);
-                            await _tradingApiOAuthHelper.SaveLinnOrder(newjson, token, user.Email, _order.NumOrderId.ToString());
+
+                            try
+                            {
+                                await _tradingApiOAuthHelper.SaveLinnOrder(newjson, token, user.Email, _order.NumOrderId.ToString());
+                            }
+                            catch (Exception ex)
+                            {
+
+                                
+                            }
+                            
                         }
                     }
                 }

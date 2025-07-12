@@ -119,7 +119,9 @@ namespace Rishvi.Modules.Core.Data
             }
             catch (Exception ex)
             {
+                ChangeTracker.Clear();
                 throw new InvalidOperationException(ex.Message);
+
             }
         }
 

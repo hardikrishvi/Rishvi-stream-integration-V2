@@ -58,7 +58,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             IRepository<GeneralInfo> generalInfo, IRepository<OrderRoot> orderRoot, IRepository<ShippingInfo> shippingInfo,
             IRepository<TaxInfo> taxInfo, IRepository<TotalsInfo> totalsInfo, IRepository<Rishvi.Models.Item> item,
             IRepository<IntegrationSettings> integrationSettings, IRepository<LinnworksSettings> linnworksSettings, IRepository<Rishvi.Models.StreamSettings> streamSettings,
-            IRepository<Rishvi.Models.SyncSettings> syncSettings,IRepository<Rishvi.Models.Ebay> ebay, SqlContext dbSqlCContext, ManageToken manageToken)
+            IRepository<Rishvi.Models.SyncSettings> syncSettings, IRepository<Rishvi.Models.Ebay> ebay, SqlContext dbSqlCContext, ManageToken manageToken)
 
         {
             _reportsController = reportsController;
@@ -75,11 +75,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _TaxInfo = taxInfo;
             _TotalsInfo = totalsInfo;
             _Item = item;
-            _IntegrationSettings= integrationSettings; 
-            _LinnworksSettings =  linnworksSettings;
-            _StreamSettings    =  streamSettings;
-            _SyncSettings      = syncSettings;
-            _Ebay      = ebay;
+            _IntegrationSettings = integrationSettings;
+            _LinnworksSettings = linnworksSettings;
+            _StreamSettings = streamSettings;
+            _SyncSettings = syncSettings;
+            _Ebay = ebay;
             _manageToken = manageToken;
         }
 
@@ -96,8 +96,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 return Convert.ToBase64String(tokenBytes).Replace("+", "").Replace("/", "").Replace("=", "");
             }
         }
-        
-        
+
+
         public async Task<string> HttpPostXMLAsync(string XMLData, string URL, Dictionary<string, string> Header, bool DeleteFile = false)
         {
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -471,7 +471,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         {
             try
             {
-                
+
                 var streamOrderRecordExists = _dbSqlCContext.StreamOrderRecord
                     .Where(x => x.LinnworksOrderId == linnworksorderid)
                     .ToList();
@@ -519,7 +519,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                     _dbSqlCContext.StreamOrderRecord.Add(newRecord);
                 }
-                
+
                 _dbSqlCContext.SaveChanges();
 
                 var existingReports = _dbSqlCContext.ReportModel
@@ -654,7 +654,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             {
                 throw new ArgumentException("Invalid Linnworks token.");
             }
-            
+
 
             var obj = new LinnworksBaseStream(linntoken);
             var linnorderid = obj.Api.Orders.GetOrderDetailsByNumOrderId(orderid);
@@ -717,14 +717,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         .Where(i => i.OrderId == orderRoot.OrderId)
                         .ToListAsync();
                 }
-                
+
                 // Serialize to indented JSON
                 var json = JsonConvert.SerializeObject(orderRoot);
-                
+
                 int orderId = Convert.ToInt32(StreamOrderId);
                 try
                 {
-                    
+
                     var jsopndata = orderRoot;
                     var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
                     {
@@ -769,9 +769,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     //    await SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth.AuthorizationToken.ToString(), auth.Email, null, OrderId, streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
                     //}
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    var str = ex.Message;   
+                    var str = ex.Message;
                 }
             }
         }
@@ -781,23 +781,23 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
         public async Task CreateLinnworksOrdersToStream(AuthorizationConfigClass auth, string OrderId)
         {
-            
+
 
             // Proper Any query
-            
+
             List<CourierService> services = Services.GetServices;
             var streamAuth = _manageToken.GetToken(auth);
-            
+
 
             CourierService selectedService = services.Find(s => s.ServiceUniqueId == CourierSettings.SelectedServiceId);
             bool existsInDb = _dbSqlCContext.ReportModel
                 .Any(x => x.LinnNumOrderId == OrderId);
-            
-            
+
+
 
             if (existsInDb)
             {
-                
+
                 int numOrderId = int.Parse(OrderId);
                 var orderRoot = await _dbSqlCContext.OrderRoot
                     .Include(o => o.GeneralInfo)
@@ -820,10 +820,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         .Where(i => i.OrderId == orderRoot.OrderId)
                         .ToListAsync();
                 }
-                
+
                 // Serialize to indented JSON
                 var json = JsonConvert.SerializeObject(orderRoot);
-                
+
                 if (json != "null")
                 {
                     try
@@ -881,12 +881,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
                 else
                 {
-                        throw new Exception("Order data not found for OrderId: " + OrderId);
+                    throw new Exception("Order data not found for OrderId: " + OrderId);
                 }
             }
         }
-        public async Task DispatchOrderInLinnworks(AuthorizationConfigClass _User, int OrderRef,string linntoken, 
-            string Service, string TrackingNumber, string TrackingUrl,string dispatchdate)
+        public async Task DispatchOrderInLinnworks(AuthorizationConfigClass _User, int OrderRef, string linntoken,
+            string Service, string TrackingNumber, string TrackingUrl, string dispatchdate)
         {
             string ProductResp = "";
             var obj = new LinnworksBaseStream(linntoken);
@@ -923,7 +923,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         }
         #endregion
         #region Save s3 data
-        
+
         public void RegisterSave(string s, string AuthorizationToken, string email = "", string token = "")
         {
             RegisterSaveFromJson(s).GetAwaiter().GetResult();
@@ -1026,7 +1026,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
             }
         }
-        
+
         public async Task SaveReportData(string s, string email)
         {
             var stream = new MemoryStream();
@@ -1153,273 +1153,288 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             {
                 var root = JsonConvert.DeserializeObject<OrderRoot>(json);
 
-                // Create related entities
-                var address = new Address
-                {
-                    Id = Guid.NewGuid(),
-                    EmailAddress = root.CustomerInfo?.Address?.EmailAddress ?? "",
-                    Address1 = root.CustomerInfo?.Address?.Address1 ?? "",
-                    Address2 = root.CustomerInfo?.Address?.Address2 ?? "",
-                    Address3 = root.CustomerInfo?.Address?.Address3 ?? "",
-                    Town = root.CustomerInfo?.Address?.Town ?? "",
-                    Region = root.CustomerInfo?.Address?.Region ?? "",
-                    PostCode = root.CustomerInfo?.Address?.PostCode ?? "",
-                    Country = root.CustomerInfo?.Address?.Country ?? "",
-                    Continent = root.CustomerInfo?.Address?.Continent ?? "N/A",
-                    FullName = root.CustomerInfo?.Address?.FullName ?? "",
-                    Company = root.CustomerInfo?.Address?.Company ?? "",
-                    PhoneNumber = root.CustomerInfo?.Address?.PhoneNumber ?? "",
-                    CountryId = root.CustomerInfo?.Address?.CountryId == Guid.Empty
-                                ? Guid.NewGuid()
-                                : root.CustomerInfo?.Address?.CountryId,
-                    temp = "placeholder",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = null
-                };
 
-                var billingAddress = new Address
-                {
-                    Id = Guid.NewGuid(),
-                    EmailAddress = root.CustomerInfo?.BillingAddress?.EmailAddress ?? "",
-                    Address1 = root.CustomerInfo?.BillingAddress?.Address1 ?? "",
-                    Address2 = root.CustomerInfo?.BillingAddress?.Address2 ?? "",
-                    Address3 = root.CustomerInfo?.BillingAddress?.Address3 ?? "",
-                    Town = root.CustomerInfo?.BillingAddress?.Town ?? "",
-                    Region = root.CustomerInfo?.BillingAddress?.Region ?? "",
-                    PostCode = root.CustomerInfo?.BillingAddress?.PostCode ?? "",
-                    Country = root.CustomerInfo?.BillingAddress?.Country ?? "",
-                    Continent = root.CustomerInfo?.BillingAddress?.Continent ?? "N/A",
-                    FullName = root.CustomerInfo?.BillingAddress?.FullName ?? "",
-                    Company = root.CustomerInfo?.BillingAddress?.Company ?? "",
-                    PhoneNumber = root.CustomerInfo?.BillingAddress?.PhoneNumber ?? "",
-                    CountryId = root.CustomerInfo?.BillingAddress?.CountryId == Guid.Empty
-                                ? Guid.NewGuid()
-                                : root.CustomerInfo?.BillingAddress?.CountryId,
-                    temp = "placeholder",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = null
-                };
-
-                var customerInfo = new CustomerInfo
-                {
-                    CustomerInfoId = Guid.NewGuid(),
-                    ChannelBuyerName = root.CustomerInfo?.ChannelBuyerName ?? string.Empty,
-                    AddressId = address.Id,
-                    Address = address,
-                    BillingAddressId = billingAddress.Id,
-                    BillingAddress = billingAddress,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = null
-                };
-
-                var generalInfo = root.GeneralInfo ?? new GeneralInfo();
-
-                generalInfo.Id = Guid.NewGuid();
-                generalInfo.Status = root.GeneralInfo?.Status ?? 0;
-                generalInfo.LabelPrinted = root.GeneralInfo?.LabelPrinted ?? false;
-                generalInfo.LabelError = root.GeneralInfo?.LabelError ?? "";
-                generalInfo.InvoicePrinted = root.GeneralInfo?.InvoicePrinted ?? false;
-                generalInfo.PickListPrinted = root.GeneralInfo?.PickListPrinted ?? false;
-                generalInfo.IsRuleRun = root.GeneralInfo?.IsRuleRun ?? false;
-                generalInfo.Notes = root.GeneralInfo?.Notes ?? 0;
-                generalInfo.PartShipped = root.GeneralInfo?.PartShipped ?? false;
-                generalInfo.Marker = root.GeneralInfo?.Marker ?? 0;
-                generalInfo.IsParked = root.GeneralInfo?.IsParked ?? false;
-                generalInfo.ReferenceNum = root.GeneralInfo?.ReferenceNum ?? "";
-                generalInfo.SecondaryReference = root.GeneralInfo?.SecondaryReference ?? "";
-                generalInfo.ExternalReferenceNum = root.GeneralInfo?.ExternalReferenceNum ?? "";
-                generalInfo.ReceivedDate = root.GeneralInfo?.ReceivedDate ?? DateTime.UtcNow;
-                generalInfo.Source = root.GeneralInfo?.Source ?? "N/A";
-                generalInfo.SubSource = root.GeneralInfo?.SubSource ?? "N/A";
-                generalInfo.SiteCode = string.IsNullOrWhiteSpace(root.GeneralInfo?.SiteCode) ? "N/A" : root.GeneralInfo.SiteCode;
-                generalInfo.HoldOrCancel = root.GeneralInfo?.HoldOrCancel ?? false;
-                generalInfo.DespatchByDate = root.GeneralInfo?.DespatchByDate ?? DateTime.UtcNow;
-                generalInfo.HasScheduledDelivery = root.GeneralInfo?.HasScheduledDelivery ?? false;
-                generalInfo.Location = root.GeneralInfo?.Location ?? Guid.Empty;
-                generalInfo.NumItems = root.GeneralInfo?.NumItems ?? 0;
-                generalInfo.CreatedAt = DateTime.UtcNow;
-                generalInfo.UpdatedAt = null; // or DateTime.UtcNow if you're treating it as 'just saved'
-
-                root.GeneralInfo = generalInfo;
-
-                var shippingInfo = root.ShippingInfo ?? new ShippingInfo();
-
-                shippingInfo.ShippingId = Guid.NewGuid();
-                shippingInfo.Vendor = root.ShippingInfo?.Vendor ?? "N/A";
-                shippingInfo.PostalServiceId = root.ShippingInfo?.PostalServiceId ?? Guid.Empty;
-                shippingInfo.PostalServiceName = root.ShippingInfo?.PostalServiceName ?? "N/A";
-                shippingInfo.TotalWeight = root.ShippingInfo?.TotalWeight ?? 0;
-                shippingInfo.ItemWeight = root.ShippingInfo?.ItemWeight ?? 0;
-                shippingInfo.PackageCategoryId = root.ShippingInfo?.PackageCategoryId ?? Guid.Empty;
-                shippingInfo.PackageCategory = root.ShippingInfo?.PackageCategory ?? "Default";
-                shippingInfo.PackageTypeId = root.ShippingInfo?.PackageTypeId ?? Guid.Empty;
-                shippingInfo.PackageType = root.ShippingInfo?.PackageType ?? "Default";
-                shippingInfo.PostageCost = root.ShippingInfo?.PostageCost ?? 0;
-                shippingInfo.PostageCostExTax = root.ShippingInfo?.PostageCostExTax ?? 0;
-                shippingInfo.TrackingNumber = root.ShippingInfo?.TrackingNumber ?? "";
-                shippingInfo.ManualAdjust = root.ShippingInfo?.ManualAdjust ?? false;
-                shippingInfo.CreatedAt = DateTime.UtcNow;
-                shippingInfo.UpdatedAt = null; // Set to DateTime.UtcNow if updating later
-
-                root.ShippingInfo = shippingInfo;
-
-                var totalsInfo = root.TotalsInfo ?? new TotalsInfo();
-
-                totalsInfo.TotalsInfoId = Guid.NewGuid();
-                totalsInfo.Subtotal = root.TotalsInfo?.Subtotal ?? 0;
-                totalsInfo.PostageCost = root.TotalsInfo?.PostageCost ?? 0;
-                totalsInfo.PostageCostExTax = root.TotalsInfo?.PostageCostExTax ?? 0;
-                totalsInfo.Tax = root.TotalsInfo?.Tax ?? 0;
-                totalsInfo.TotalCharge = root.TotalsInfo?.TotalCharge ?? 0;
-                totalsInfo.PaymentMethod = string.IsNullOrWhiteSpace(root.TotalsInfo?.PaymentMethod) ? "N/A" : root.TotalsInfo.PaymentMethod;
-                totalsInfo.PaymentMethodId = root.TotalsInfo?.PaymentMethodId ?? Guid.Empty;
-                totalsInfo.ProfitMargin = root.TotalsInfo?.ProfitMargin ?? 0;
-                totalsInfo.TotalDiscount = root.TotalsInfo?.TotalDiscount ?? 0;
-                totalsInfo.Currency = string.IsNullOrWhiteSpace(root.TotalsInfo?.Currency) ? "N/A" : root.TotalsInfo.Currency;
-                totalsInfo.CountryTaxRate = root.TotalsInfo?.CountryTaxRate ?? 0;
-                totalsInfo.ConversionRate = root.TotalsInfo?.ConversionRate ?? 1;
-                totalsInfo.CreatedAt = DateTime.UtcNow;
-                totalsInfo.UpdatedAt = null;
-
-                root.TotalsInfo = totalsInfo;
-
-                var taxInfo = root.TaxInfo ?? new TaxInfo();
-
-                taxInfo.TaxInfoId = Guid.NewGuid();
-                taxInfo.TaxNumber = string.IsNullOrWhiteSpace(root.TaxInfo?.TaxNumber) ? "N/A" : root.TaxInfo.TaxNumber;
-                taxInfo.CreatedAt = DateTime.UtcNow;
-                taxInfo.UpdatedAt = null;
-
-                root.TaxInfo = taxInfo;
-
-                var fulfillment = root.Fulfillment ?? new Fulfillment();
-
-                fulfillment.Id = Guid.NewGuid();
-                fulfillment.FulfillmentState = string.IsNullOrWhiteSpace(root.Fulfillment?.FulfillmentState) ? "Unknown" : root.Fulfillment.FulfillmentState;
-                fulfillment.PurchaseOrderState = string.IsNullOrWhiteSpace(root.Fulfillment?.PurchaseOrderState) ? "N/A" : root.Fulfillment.PurchaseOrderState;
-                fulfillment.CreatedAt = DateTime.UtcNow;
-                fulfillment.UpdatedAt = null;
-
-                root.Fulfillment = fulfillment;
-
-                var order = new OrderRoot
-                {
-                    OrderId = root.OrderId != Guid.Empty ? root.OrderId : Guid.NewGuid(),
-                    NumOrderId = root.NumOrderId ,
-
-                    GeneralInfo = generalInfo,
-                    ShippingInfo = shippingInfo,
-                    CustomerInfo = customerInfo,
-                    TotalsInfo = totalsInfo,
-                    TaxInfo = taxInfo,
-                    Fulfillment = fulfillment,
-
-                    FolderName = root.FolderName ?? new List<string>(),
-                    IsPostFilteredOut = root.IsPostFilteredOut ?? false,
-                    CanFulfil = root.CanFulfil ?? false,
-                    HasItems = root.HasItems ?? false,
-                    TotalItemsSum = root.TotalItemsSum ?? 0,
-
-                    TempColumn = "placeholder",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = null
-                };
-
-                var items = new List<Rishvi.Models.Item>();
-
-                foreach (var i in root.Items ?? new List<Rishvi.Models.Item>())
-                {
-                    var item = new Rishvi.Models.Item
+                
+                    try
+                    {
+                        // Create related entities
+                        var address = new Address
                     {
                         Id = Guid.NewGuid(),
-                        ItemId = i.ItemId ?? "",
-                        ItemNumber = i.ItemNumber ?? "",
-                        SKU = i.SKU ?? "",
-                        Title = i.Title ?? "",
-                        Quantity = i.Quantity ,
-                        CategoryName = i.CategoryName ?? "",
-                        StockLevelsSpecified = i.StockLevelsSpecified ?? false,
-                        OnOrder = i.OnOrder ?? 0,
-                        InOrderBook = i.InOrderBook ?? 0,
-                        Level = i.Level ?? 0,
-                        MinimumLevel = i.MinimumLevel ?? 0,
-                        AvailableStock = i.AvailableStock ?? 0,
-                        PricePerUnit = i.PricePerUnit ?? 0,
-                        UnitCost = i.UnitCost ?? 0,
-                        Cost = i.Cost ?? 0,
-                        CostIncTax = i.CostIncTax ?? 0,
-                        Weight = i.Weight ?? 0,
-                        BarcodeNumber = i.BarcodeNumber ?? "",
-                        ChannelSKU = i.ChannelSKU ?? "",
-                        ChannelTitle = i.ChannelTitle ?? "",
-                        BinRack = i.BinRack ?? "",
-                        ImageId = i.ImageId ?? "",
-                        RowId = i.RowId ?? Guid.NewGuid(),
-                        OrderId = order.OrderId,
-                        StockItemId = i.StockItemId,
-                        StockItemIntId = i.StockItemIntId ?? 0,
+                        EmailAddress = root.CustomerInfo?.Address?.EmailAddress ?? "",
+                        Address1 = root.CustomerInfo?.Address?.Address1 ?? "",
+                        Address2 = root.CustomerInfo?.Address?.Address2 ?? "",
+                        Address3 = root.CustomerInfo?.Address?.Address3 ?? "",
+                        Town = root.CustomerInfo?.Address?.Town ?? "",
+                        Region = root.CustomerInfo?.Address?.Region ?? "",
+                        PostCode = root.CustomerInfo?.Address?.PostCode ?? "",
+                        Country = root.CustomerInfo?.Address?.Country ?? "",
+                        Continent = root.CustomerInfo?.Address?.Continent ?? "N/A",
+                        FullName = root.CustomerInfo?.Address?.FullName ?? "",
+                        Company = root.CustomerInfo?.Address?.Company ?? "",
+                        PhoneNumber = root.CustomerInfo?.Address?.PhoneNumber ?? "",
+                        CountryId = root.CustomerInfo?.Address?.CountryId == Guid.Empty
+                                    ? Guid.NewGuid()
+                                    : root.CustomerInfo?.Address?.CountryId,
+                        temp = "placeholder",
                         CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = null,
-                        CompositeSubItems = new List<Rishvi.Models.Item>()
+                        UpdatedAt = null
                     };
 
-                    // Process composite sub-items
-                    foreach (var c in i.CompositeSubItems ?? new List<Rishvi.Models.Item>())
+                    var billingAddress = new Address
                     {
-                        var subItem = new Rishvi.Models.Item
+                        Id = Guid.NewGuid(),
+                        EmailAddress = root.CustomerInfo?.BillingAddress?.EmailAddress ?? "",
+                        Address1 = root.CustomerInfo?.BillingAddress?.Address1 ?? "",
+                        Address2 = root.CustomerInfo?.BillingAddress?.Address2 ?? "",
+                        Address3 = root.CustomerInfo?.BillingAddress?.Address3 ?? "",
+                        Town = root.CustomerInfo?.BillingAddress?.Town ?? "",
+                        Region = root.CustomerInfo?.BillingAddress?.Region ?? "",
+                        PostCode = root.CustomerInfo?.BillingAddress?.PostCode ?? "",
+                        Country = root.CustomerInfo?.BillingAddress?.Country ?? "",
+                        Continent = root.CustomerInfo?.BillingAddress?.Continent ?? "N/A",
+                        FullName = root.CustomerInfo?.BillingAddress?.FullName ?? "",
+                        Company = root.CustomerInfo?.BillingAddress?.Company ?? "",
+                        PhoneNumber = root.CustomerInfo?.BillingAddress?.PhoneNumber ?? "",
+                        CountryId = root.CustomerInfo?.BillingAddress?.CountryId == Guid.Empty
+                                    ? Guid.NewGuid()
+                                    : root.CustomerInfo?.BillingAddress?.CountryId,
+                        temp = "placeholder",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = null
+                    };
+
+                    var customerInfo = new CustomerInfo
+                    {
+                        CustomerInfoId = Guid.NewGuid(),
+                        ChannelBuyerName = root.CustomerInfo?.ChannelBuyerName ?? string.Empty,
+                        AddressId = address.Id,
+                        Address = address,
+                        BillingAddressId = billingAddress.Id,
+                        BillingAddress = billingAddress,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = null
+                    };
+
+                    var generalInfo = root.GeneralInfo ?? new GeneralInfo();
+
+                    generalInfo.Id = Guid.NewGuid();
+                    generalInfo.Status = root.GeneralInfo?.Status ?? 0;
+                    generalInfo.LabelPrinted = root.GeneralInfo?.LabelPrinted ?? false;
+                    generalInfo.LabelError = root.GeneralInfo?.LabelError ?? "";
+                    generalInfo.InvoicePrinted = root.GeneralInfo?.InvoicePrinted ?? false;
+                    generalInfo.PickListPrinted = root.GeneralInfo?.PickListPrinted ?? false;
+                    generalInfo.IsRuleRun = root.GeneralInfo?.IsRuleRun ?? false;
+                    generalInfo.Notes = root.GeneralInfo?.Notes ?? 0;
+                    generalInfo.PartShipped = root.GeneralInfo?.PartShipped ?? false;
+                    generalInfo.Marker = root.GeneralInfo?.Marker ?? 0;
+                    generalInfo.IsParked = root.GeneralInfo?.IsParked ?? false;
+                    generalInfo.ReferenceNum = root.GeneralInfo?.ReferenceNum ?? "";
+                    generalInfo.SecondaryReference = root.GeneralInfo?.SecondaryReference ?? "";
+                    generalInfo.ExternalReferenceNum = root.GeneralInfo?.ExternalReferenceNum ?? "";
+                    generalInfo.ReceivedDate = root.GeneralInfo?.ReceivedDate ?? DateTime.UtcNow;
+                    generalInfo.Source = root.GeneralInfo?.Source ?? "N/A";
+                    generalInfo.SubSource = root.GeneralInfo?.SubSource ?? "N/A";
+                    generalInfo.SiteCode = string.IsNullOrWhiteSpace(root.GeneralInfo?.SiteCode) ? "N/A" : root.GeneralInfo.SiteCode;
+                    generalInfo.HoldOrCancel = root.GeneralInfo?.HoldOrCancel ?? false;
+                    generalInfo.DespatchByDate = root.GeneralInfo?.DespatchByDate ?? DateTime.UtcNow;
+                    generalInfo.HasScheduledDelivery = root.GeneralInfo?.HasScheduledDelivery ?? false;
+                    generalInfo.Location = root.GeneralInfo?.Location ?? Guid.Empty;
+                    generalInfo.NumItems = root.GeneralInfo?.NumItems ?? 0;
+                    generalInfo.CreatedAt = DateTime.UtcNow;
+                    generalInfo.UpdatedAt = null; // or DateTime.UtcNow if you're treating it as 'just saved'
+
+                    root.GeneralInfo = generalInfo;
+
+                    var shippingInfo = root.ShippingInfo ?? new ShippingInfo();
+
+                    shippingInfo.ShippingId = Guid.NewGuid();
+                    shippingInfo.Vendor = root.ShippingInfo?.Vendor ?? "N/A";
+                    shippingInfo.PostalServiceId = root.ShippingInfo?.PostalServiceId ?? Guid.Empty;
+                    shippingInfo.PostalServiceName = root.ShippingInfo?.PostalServiceName ?? "N/A";
+                    shippingInfo.TotalWeight = root.ShippingInfo?.TotalWeight ?? 0;
+                    shippingInfo.ItemWeight = root.ShippingInfo?.ItemWeight ?? 0;
+                    shippingInfo.PackageCategoryId = root.ShippingInfo?.PackageCategoryId ?? Guid.Empty;
+                    shippingInfo.PackageCategory = root.ShippingInfo?.PackageCategory ?? "Default";
+                    shippingInfo.PackageTypeId = root.ShippingInfo?.PackageTypeId ?? Guid.Empty;
+                    shippingInfo.PackageType = root.ShippingInfo?.PackageType ?? "Default";
+                    shippingInfo.PostageCost = root.ShippingInfo?.PostageCost ?? 0;
+                    shippingInfo.PostageCostExTax = root.ShippingInfo?.PostageCostExTax ?? 0;
+                    shippingInfo.TrackingNumber = root.ShippingInfo?.TrackingNumber ?? "";
+                    shippingInfo.ManualAdjust = root.ShippingInfo?.ManualAdjust ?? false;
+                    shippingInfo.CreatedAt = DateTime.UtcNow;
+                    shippingInfo.UpdatedAt = null; // Set to DateTime.UtcNow if updating later
+
+                    root.ShippingInfo = shippingInfo;
+
+                    var totalsInfo = root.TotalsInfo ?? new TotalsInfo();
+
+                    totalsInfo.TotalsInfoId = Guid.NewGuid();
+                    totalsInfo.Subtotal = root.TotalsInfo?.Subtotal ?? 0;
+                    totalsInfo.PostageCost = root.TotalsInfo?.PostageCost ?? 0;
+                    totalsInfo.PostageCostExTax = root.TotalsInfo?.PostageCostExTax ?? 0;
+                    totalsInfo.Tax = root.TotalsInfo?.Tax ?? 0;
+                    totalsInfo.TotalCharge = root.TotalsInfo?.TotalCharge ?? 0;
+                    totalsInfo.PaymentMethod = string.IsNullOrWhiteSpace(root.TotalsInfo?.PaymentMethod) ? "N/A" : root.TotalsInfo.PaymentMethod;
+                    totalsInfo.PaymentMethodId = root.TotalsInfo?.PaymentMethodId ?? Guid.Empty;
+                    totalsInfo.ProfitMargin = root.TotalsInfo?.ProfitMargin ?? 0;
+                    totalsInfo.TotalDiscount = root.TotalsInfo?.TotalDiscount ?? 0;
+                    totalsInfo.Currency = string.IsNullOrWhiteSpace(root.TotalsInfo?.Currency) ? "N/A" : root.TotalsInfo.Currency;
+                    totalsInfo.CountryTaxRate = root.TotalsInfo?.CountryTaxRate ?? 0;
+                    totalsInfo.ConversionRate = root.TotalsInfo?.ConversionRate ?? 1;
+                    totalsInfo.CreatedAt = DateTime.UtcNow;
+                    totalsInfo.UpdatedAt = null;
+
+                    root.TotalsInfo = totalsInfo;
+
+                    var taxInfo = root.TaxInfo ?? new TaxInfo();
+
+                    taxInfo.TaxInfoId = Guid.NewGuid();
+                    taxInfo.TaxNumber = string.IsNullOrWhiteSpace(root.TaxInfo?.TaxNumber) ? "N/A" : root.TaxInfo.TaxNumber;
+                    taxInfo.CreatedAt = DateTime.UtcNow;
+                    taxInfo.UpdatedAt = null;
+
+                    root.TaxInfo = taxInfo;
+
+                    var fulfillment = root.Fulfillment ?? new Fulfillment();
+
+                    fulfillment.Id = Guid.NewGuid();
+                    fulfillment.FulfillmentState = string.IsNullOrWhiteSpace(root.Fulfillment?.FulfillmentState) ? "Unknown" : root.Fulfillment.FulfillmentState;
+                    fulfillment.PurchaseOrderState = string.IsNullOrWhiteSpace(root.Fulfillment?.PurchaseOrderState) ? "N/A" : root.Fulfillment.PurchaseOrderState;
+                    fulfillment.CreatedAt = DateTime.UtcNow;
+                    fulfillment.UpdatedAt = null;
+
+                    root.Fulfillment = fulfillment;
+
+                    var order = new OrderRoot
+                    {
+                        OrderId = root.OrderId != Guid.Empty ? root.OrderId : Guid.NewGuid(),
+                        NumOrderId = root.NumOrderId,
+
+                        GeneralInfo = generalInfo,
+                        ShippingInfo = shippingInfo,
+                        CustomerInfo = customerInfo,
+                        TotalsInfo = totalsInfo,
+                        TaxInfo = taxInfo,
+                        Fulfillment = fulfillment,
+
+                        FolderName = root.FolderName ?? new List<string>(),
+                        IsPostFilteredOut = root.IsPostFilteredOut ?? false,
+                        CanFulfil = root.CanFulfil ?? false,
+                        HasItems = root.HasItems ?? false,
+                        TotalItemsSum = root.TotalItemsSum ?? 0,
+
+                        TempColumn = "placeholder",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = null
+                    };
+
+                    var items = new List<Rishvi.Models.Item>();
+
+                    foreach (var i in root.Items ?? new List<Rishvi.Models.Item>())
+                    {
+                        var item = new Rishvi.Models.Item
                         {
                             Id = Guid.NewGuid(),
-                            ItemId = c.ItemId ?? "",
-                            ItemNumber = c.ItemNumber ?? "",
-                            SKU = c.SKU ?? "",
-                            Title = c.Title ?? "",
-                            Quantity = c.Quantity,
-                            CategoryName = c.CategoryName ?? "",
-                            StockLevelsSpecified = c.StockLevelsSpecified ?? false,
-                            OnOrder = c.OnOrder ?? 0,
-                            InOrderBook = c.InOrderBook ?? 0,
-                            Level = c.Level ?? 0,
-                            MinimumLevel = c.MinimumLevel ?? 0,
-                            AvailableStock = c.AvailableStock ?? 0,
-                            PricePerUnit = c.PricePerUnit ?? 0,
-                            UnitCost = c.UnitCost ?? 0,
-                            Cost = c.Cost ?? 0,
-                            CostIncTax = c.CostIncTax ?? 0,
-                            Weight = c.Weight ?? 0,
-                            BarcodeNumber = c.BarcodeNumber ?? "",
-                            ChannelSKU = c.ChannelSKU ?? "",
-                            ChannelTitle = c.ChannelTitle ?? "",
-                            BinRack = c.BinRack ?? "",
-                            ImageId = c.ImageId ?? "",
-                            RowId = c.RowId ?? Guid.NewGuid(),
+                            ItemId = i.ItemId ?? "",
+                            ItemNumber = i.ItemNumber ?? "",
+                            SKU = i.SKU ?? "",
+                            Title = i.Title ?? "",
+                            Quantity = i.Quantity,
+                            CategoryName = i.CategoryName ?? "",
+                            StockLevelsSpecified = i.StockLevelsSpecified ?? false,
+                            OnOrder = i.OnOrder ?? 0,
+                            InOrderBook = i.InOrderBook ?? 0,
+                            Level = i.Level ?? 0,
+                            MinimumLevel = i.MinimumLevel ?? 0,
+                            AvailableStock = i.AvailableStock ?? 0,
+                            PricePerUnit = i.PricePerUnit ?? 0,
+                            UnitCost = i.UnitCost ?? 0,
+                            Cost = i.Cost ?? 0,
+                            CostIncTax = i.CostIncTax ?? 0,
+                            Weight = i.Weight ?? 0,
+                            BarcodeNumber = i.BarcodeNumber ?? "",
+                            ChannelSKU = i.ChannelSKU ?? "",
+                            ChannelTitle = i.ChannelTitle ?? "",
+                            BinRack = i.BinRack ?? "",
+                            ImageId = i.ImageId ?? "",
+                            RowId = i.RowId ?? Guid.NewGuid(),
                             OrderId = order.OrderId,
-                            StockItemId = c.StockItemId,
-                            StockItemIntId = c.StockItemIntId ?? 0,
+                            StockItemId = i.StockItemId,
+                            StockItemIntId = i.StockItemIntId ?? 0,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = null,
                             CompositeSubItems = new List<Rishvi.Models.Item>()
                         };
 
-                        item.CompositeSubItems.Add(subItem);
-                        items.Add(subItem);
+                        // Process composite sub-items
+                        foreach (var c in i.CompositeSubItems ?? new List<Rishvi.Models.Item>())
+                        {
+                            var subItem = new Rishvi.Models.Item
+                            {
+                                Id = Guid.NewGuid(),
+                                ItemId = c.ItemId ?? "",
+                                ItemNumber = c.ItemNumber ?? "",
+                                SKU = c.SKU ?? "",
+                                Title = c.Title ?? "",
+                                Quantity = c.Quantity,
+                                CategoryName = c.CategoryName ?? "",
+                                StockLevelsSpecified = c.StockLevelsSpecified ?? false,
+                                OnOrder = c.OnOrder ?? 0,
+                                InOrderBook = c.InOrderBook ?? 0,
+                                Level = c.Level ?? 0,
+                                MinimumLevel = c.MinimumLevel ?? 0,
+                                AvailableStock = c.AvailableStock ?? 0,
+                                PricePerUnit = c.PricePerUnit ?? 0,
+                                UnitCost = c.UnitCost ?? 0,
+                                Cost = c.Cost ?? 0,
+                                CostIncTax = c.CostIncTax ?? 0,
+                                Weight = c.Weight ?? 0,
+                                BarcodeNumber = c.BarcodeNumber ?? "",
+                                ChannelSKU = c.ChannelSKU ?? "",
+                                ChannelTitle = c.ChannelTitle ?? "",
+                                BinRack = c.BinRack ?? "",
+                                ImageId = c.ImageId ?? "",
+                                RowId = c.RowId ?? Guid.NewGuid(),
+                                OrderId = order.OrderId,
+                                StockItemId = c.StockItemId,
+                                StockItemIntId = c.StockItemIntId ?? 0,
+                                CreatedAt = DateTime.UtcNow,
+                                UpdatedAt = null,
+                                CompositeSubItems = new List<Rishvi.Models.Item>()
+                            };
+
+                            item.CompositeSubItems.Add(subItem);
+                            items.Add(subItem);
+                        }
+
+                        items.Add(item);
                     }
 
-                    items.Add(item);
-                }
+                    _Address.Add(address);
+                    _Address.Add(billingAddress);
+                    _CustomerInfo.Add(customerInfo);
+                    _GeneralInfo.Add(generalInfo);
+                    _ShippingInfo.Add(shippingInfo);
+                    _TotalsInfo.Add(totalsInfo);
+                    _TaxInfo.Add(taxInfo);
+                    _Fulfillment.Add(fulfillment);
+                    _OrderRoot.Add(order);
+                    _Item.AddRange(items);
 
-                _Address.Add(address);
-                _Address.Add(billingAddress);
-                _CustomerInfo.Add(customerInfo);
-                _GeneralInfo.Add(generalInfo);
-                _ShippingInfo.Add(shippingInfo);
-                _TotalsInfo.Add(totalsInfo);
-                _TaxInfo.Add(taxInfo);
-                _Fulfillment.Add(fulfillment);
-                _OrderRoot.Add(order);
-                _Item.AddRange(items);
+                    
+                        _unitOfWork.Context.SaveChanges();
+                        Console.WriteLine("✅ Order inserted successfully");
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        Console.WriteLine($"❌ Failed to insert order: {ex.Message}");
+                        _unitOfWork.Context.ChangeTracker.Clear(); // EF Core >=5
+                        
+                    }
+               
 
-                _unitOfWork.Context.SaveChanges();
-                Console.WriteLine("✅ Order inserted successfully");
+
             }
             catch (Exception ex)
             {
@@ -1456,7 +1471,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             existingOrder.TotalItemsSum = updatedOrder.TotalItemsSum ?? 0;
             existingOrder.TempColumn = "placeholder";
             existingOrder.UpdatedAt = DateTime.UtcNow;
-            
+
 
             // =========================
             // GeneralInfo
@@ -1486,8 +1501,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 existingOrder.GeneralInfo.Location = updatedOrder.GeneralInfo.Location ?? Guid.Empty;
                 existingOrder.GeneralInfo.NumItems = updatedOrder.GeneralInfo.NumItems ?? 0;
                 existingOrder.GeneralInfo.UpdatedAt = DateTime.UtcNow;
-                
-                
+
+
             }
 
             // =========================
@@ -1509,8 +1524,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 existingOrder.ShippingInfo.TrackingNumber = updatedOrder.ShippingInfo.TrackingNumber ?? "";
                 existingOrder.ShippingInfo.ManualAdjust = updatedOrder.ShippingInfo.ManualAdjust ?? false;
                 existingOrder.ShippingInfo.UpdatedAt = DateTime.UtcNow;
-                
-                
+
+
             }
 
             // =========================
@@ -1536,9 +1551,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     existingOrder.CustomerInfo.Address.FullName = addr.FullName ?? "";
                     existingOrder.CustomerInfo.Address.Company = addr.Company ?? "";
                     existingOrder.CustomerInfo.Address.PhoneNumber = addr.PhoneNumber ?? "";
-                    existingOrder.CustomerInfo.Address.CountryId = addr.CountryId ?? Guid.Empty ;
+                    existingOrder.CustomerInfo.Address.CountryId = addr.CountryId ?? Guid.Empty;
                     existingOrder.CustomerInfo.Address.UpdatedAt = DateTime.UtcNow;
-                    
+
                 }
 
                 if (existingOrder.CustomerInfo.BillingAddress != null && updatedOrder.CustomerInfo.BillingAddress != null)
@@ -1556,7 +1571,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     existingOrder.CustomerInfo.BillingAddress.FullName = bill.FullName ?? "";
                     existingOrder.CustomerInfo.BillingAddress.Company = bill.Company ?? "";
                     existingOrder.CustomerInfo.BillingAddress.PhoneNumber = bill.PhoneNumber ?? "";
-                    existingOrder.CustomerInfo.BillingAddress.CountryId = bill.CountryId ?? Guid.Empty ;
+                    existingOrder.CustomerInfo.BillingAddress.CountryId = bill.CountryId ?? Guid.Empty;
                     existingOrder.CustomerInfo.BillingAddress.UpdatedAt = DateTime.UtcNow;
                 }
             }
@@ -1567,10 +1582,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             if (existingOrder.TotalsInfo != null && updatedOrder.TotalsInfo != null)
             {
                 var tot = updatedOrder.TotalsInfo;
-                existingOrder.TotalsInfo.Subtotal = tot.Subtotal  ?? 0;
-                existingOrder.TotalsInfo.PostageCost = tot.PostageCost  ?? 0;
-                existingOrder.TotalsInfo.PostageCostExTax = tot.PostageCostExTax  ?? 0;
-                existingOrder.TotalsInfo.Tax = tot.Tax  ?? 0;
+                existingOrder.TotalsInfo.Subtotal = tot.Subtotal ?? 0;
+                existingOrder.TotalsInfo.PostageCost = tot.PostageCost ?? 0;
+                existingOrder.TotalsInfo.PostageCostExTax = tot.PostageCostExTax ?? 0;
+                existingOrder.TotalsInfo.Tax = tot.Tax ?? 0;
                 existingOrder.TotalsInfo.TotalCharge = tot.TotalCharge ?? 0;
                 existingOrder.TotalsInfo.PaymentMethod = tot.PaymentMethod ?? "N/A";
                 existingOrder.TotalsInfo.PaymentMethodId = tot.PaymentMethodId ?? Guid.Empty;
@@ -1580,8 +1595,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 existingOrder.TotalsInfo.CountryTaxRate = tot.CountryTaxRate ?? 0;
                 existingOrder.TotalsInfo.ConversionRate = tot.ConversionRate ?? 1;
                 existingOrder.TotalsInfo.UpdatedAt = DateTime.UtcNow;
-                
-                
+
+
             }
 
             // =========================
@@ -1606,7 +1621,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             // =========================
             // Items & CompositeSubItems
             // =========================
-            
+
             if (existingOrder.Items != null && updatedOrder.Items != null)
             {
                 foreach (var updatedItem in updatedOrder.Items)
@@ -1639,7 +1654,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         existingItem.StockItemId = updatedItem.StockItemId ?? Guid.NewGuid();
                         existingItem.StockItemIntId = updatedItem.StockItemIntId ?? 0;
                         existingItem.UpdatedAt = DateTime.UtcNow;
-                        
+
 
                         if (existingItem.CompositeSubItems != null && updatedItem.CompositeSubItems != null)
                         {
@@ -1684,10 +1699,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
             await _dbSqlCContext.SaveChangesAsync();
         }
-        
+
         //public async Task SaveEbayOrder(string s, string AuthorizationToken, string email, string orderlineitemid, string ebayorderid = "")
         //{
-            
+
         //    dynamic jsonData = JsonConvert.DeserializeObject(s);
         //    string extractedConsignmentNo = jsonData.response.consignmentNo;
         //    string extractedTrackingUrl = jsonData.response.trackingURL;
@@ -1710,18 +1725,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    };
         //    _dbSqlCContext.StreamOrderRecord.Add(record);
         //    await _dbSqlCContext.SaveChangesAsync();
-        
+
         //    var existingReports = _dbSqlCContext.ReportModel
         //        .Where(x => x.email == email)
         //        .ToList();
-        
+
         //    var reportsToSave = new List<ReportModel>();
-        
+
         //    if (ebayorderid != null)
         //    {
         //        var existingEbay = existingReports
         //            .FirstOrDefault(f => f.EbayChannelOrderRef == ebayorderid);
-        
+
         //        if (existingEbay == null)
         //        {
         //            reportsToSave.Add(new ReportModel
@@ -1752,7 +1767,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //            existingEbay.StreamTrackingNumber = trackingnumber;
         //            existingEbay.StreamTrackingURL = trackingurl;
         //            existingEbay.updatedDate = DateTime.Now;
-        
+
         //            reportsToSave.Add(existingEbay);
         //        }
         //    }
@@ -1760,7 +1775,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    {
         //        var existingLinn = existingReports
         //            .FirstOrDefault(f => f.LinnNumOrderId == linnworksorderid);
-        
+
         //        if (existingLinn == null)
         //        {
         //            reportsToSave.Add(new ReportModel
@@ -1790,11 +1805,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //            existingLinn.StreamTrackingNumber = trackingnumber;
         //            existingLinn.StreamTrackingURL = trackingurl;
         //            existingLinn.updatedDate = DateTime.Now;
-        
+
         //            reportsToSave.Add(existingLinn);
         //        }
         //    }
-        
+
         //    // ✅ Now save to DB (no AWS S3 call)
         //    if (reportsToSave.Any())
         //    {
@@ -1822,9 +1837,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             //
 
             InsertOrderFromJson(s);
-            
-            
-            
+
+
+
             var existingReport = await _dbSqlCContext.ReportModel
                 .FirstOrDefaultAsync(d => d.LinnNumOrderId == linnorderid.ToString() && d.email == email);
 
@@ -1855,10 +1870,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                 await SaveReportDataForTEst(new List<ReportModel> { existingReport });
             }
-            
+
         }
 
-        
+
         public async Task SaveWebhook(string s, string AuthorizationToken, string reference = "")
         {
             var stream = new MemoryStream();
@@ -1940,7 +1955,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return registrationData;
         }
         #endregion
-        
+
 
 
     }

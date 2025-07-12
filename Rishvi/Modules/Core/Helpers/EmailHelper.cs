@@ -15,7 +15,7 @@ namespace Rishvi.Modules.Core.Helpers
         public static string fromEmail = "info@rishvi.co.uk";
         public static string fromName = "Rishvi";
         public static string password = "QqELbRU7aPvK5Osd";
-        public static string toEmail = "hardik@rishvi.co.uk";
+        public static string toEmail = "hardik@rishvi.co.uk,Jatin.Dangar@rishvi.co.uk";
         public static string toName = "Rishvi";
 
         public static bool SendEmail(string title, string body)

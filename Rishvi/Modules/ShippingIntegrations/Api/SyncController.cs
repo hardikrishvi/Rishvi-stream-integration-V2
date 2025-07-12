@@ -178,7 +178,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("UpdateOrder", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, Email);
+                SqlHelper.SystemLogInsert("sync Method", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, Email);
                 // Log the exception for debugging
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return false; // Indicate failure
