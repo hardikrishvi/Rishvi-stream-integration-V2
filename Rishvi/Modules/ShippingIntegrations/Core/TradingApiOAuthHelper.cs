@@ -852,9 +852,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                         PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
                                      Items = jsopndata.Items.Select(f=> new Item()
                                      {
+                                         
                                            ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
                                            ItemName =f.Title,
-                                           Quantity = f.Quantity
+                                           Quantity = f.Quantity,
+                                           UnitWeight = f.Weight != 0 ? Math.Round(f.Weight.ToDecimal() / 1000, 2) : 0,
+
                                        }).ToList()
                                   }},
                             ServiceConfigItems = new List<ServiceConfigItem>(),
