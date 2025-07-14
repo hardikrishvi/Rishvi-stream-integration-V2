@@ -146,18 +146,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     //{
                     //    await _ebayController.GetOrders(res.AuthorizationToken, "", res.ebayhour, res.ebaypage);
                     //}
-                    if (res.Sync.SyncLinnworksOrder)
-                    {
-                        await _linnworksController.GetLinnOrderForStream(res.AuthorizationToken, res.LinnworksSyncToken, "", res.linnhour, res.linnpage);
-                    }
-                    //if (res.Sync.CreateEbayOrderToStream)
+                    //if (res.Sync.SyncLinnworksOrder)
                     //{
-                    //    await _streamController.CreateEbayOrdersToStream(res.AuthorizationToken, "");
+                    //    await _linnworksController.GetLinnOrderForStream(res.AuthorizationToken, res.LinnworksSyncToken, "", res.linnhour, res.linnpage);
                     //}
-                    if (res.Sync.CreateLinnworksOrderToStream)
-                    {
-                        await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
-                    }
+                    ////if (res.Sync.CreateEbayOrderToStream)
+                    ////{
+                    ////    await _streamController.CreateEbayOrdersToStream(res.AuthorizationToken, "");
+                    ////}
+                    //if (res.Sync.CreateLinnworksOrderToStream)
+                    //{
+                    //    await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
+                    //}
               
                     //if (res.Sync.DispatchEbayOrderFromStream)
                     //{
