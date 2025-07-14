@@ -25,6 +25,10 @@ namespace Rishvi.Models
         public double? CostIncTax { get; set; }
         public List<Item> CompositeSubItems { get; set; }
         public double? Weight { get; set; }
+        public decimal? Height { get; set; }
+
+        public decimal? width { get; set; }
+        public decimal? Length { get; set; }
         public string BarcodeNumber { get; set; }
         public string ChannelSKU { get; set; }
         public string ChannelTitle { get; set; }

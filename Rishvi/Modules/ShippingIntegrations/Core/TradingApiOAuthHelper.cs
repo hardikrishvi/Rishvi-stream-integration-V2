@@ -856,7 +856,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                            ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
                                            ItemName =f.Title,
                                            Quantity = f.Quantity,
-                                           UnitWeight = f.Weight != 0 ? Math.Round(f.Weight.ToDecimal() / 1000, 2) : 0,
+                                           UnitWeight = f.Weight != 0 ? f.Weight.ToDecimal() : 0,
+                                           Height = f.Height != 0 ? f.Height.ToDecimal() : 0,
+                                           Width = f.width != 0 ? f.width.ToDecimal() : 0,
+                                           Length = f.Length != 0 ? f.Length.ToDecimal() : 0,
+
+                                          
+
+                                           //UnitWeight = f.Weight != 0 ? Math.Round(f.Weight.ToDecimal() / 1000, 2) : 0,
 
                                        }).ToList()
                                   }},
@@ -1367,6 +1374,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             StockItemIntId = i.StockItemIntId ?? 0,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = null,
+                            Height = i.Height ?? 0,
+                            width = i.width ?? 0,   
+                            Length = i.Length ?? 0,
                             CompositeSubItems = new List<Rishvi.Models.Item>()
                         };
 
@@ -1404,6 +1414,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                 StockItemIntId = c.StockItemIntId ?? 0,
                                 CreatedAt = DateTime.UtcNow,
                                 UpdatedAt = null,
+                                Height = c.Height ?? 0,
+                                width = c.width ?? 0,
+                                Length = c.Length ?? 0,
                                 CompositeSubItems = new List<Rishvi.Models.Item>()
                             };
 
@@ -1657,6 +1670,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         existingItem.StockItemId = updatedItem.StockItemId ?? Guid.NewGuid();
                         existingItem.StockItemIntId = updatedItem.StockItemIntId ?? 0;
                         existingItem.UpdatedAt = DateTime.UtcNow;
+                        existingItem.Height = updatedItem.Height ?? 0;
+                        existingItem.width = updatedItem.width ?? 0;
+                        existingItem.Length = updatedItem.Length ?? 0;
+
 
 
                         if (existingItem.CompositeSubItems != null && updatedItem.CompositeSubItems != null)
@@ -1693,6 +1710,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                     existingSub.StockItemId = updatedSub.StockItemId ?? Guid.NewGuid();
                                     existingSub.StockItemIntId = updatedSub.StockItemIntId ?? 0;
                                     existingSub.UpdatedAt = DateTime.UtcNow;
+                                    existingSub.Height = updatedItem.Height ?? 0;
+                                    existingSub.width = updatedItem.width ?? 0;
+                                    existingSub.Length = updatedItem.Length ?? 0;
+
                                 }
                             }
                         }
@@ -1729,6 +1750,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             OrderId = existingOrder.OrderId,
                             StockItemId = updatedItem.StockItemId,
                             StockItemIntId = updatedItem.StockItemIntId ?? 0,
+                            Height = updatedItem.Height ?? 0,
+                            width = updatedItem.width ?? 0, 
+                            Length = updatedItem.Length ?? 0,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = null,
                             CompositeSubItems = new List<Rishvi.Models.Item>()
@@ -1768,6 +1792,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                 StockItemIntId = c.StockItemIntId ?? 0,
                                 CreatedAt = DateTime.UtcNow,
                                 UpdatedAt = null,
+                                Height = c.Height ?? 0,
+                                width = c.width ?? 0,
+                                Length = c.Length ?? 0,
                                 CompositeSubItems = new List<Rishvi.Models.Item>()
                             };
 
