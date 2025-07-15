@@ -1,24 +1,25 @@
-﻿using LinnworksAPI;
+﻿using Azure.Core;
+using LinnworksAPI;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.ShippingIntegrations.Api;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 using System.Net;
-using System.Text;
-using System.Xml;
 using System.Security.Cryptography;
-using Item = Rishvi.Modules.ShippingIntegrations.Models.Item;
+using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc;
-using Rishvi.Modules.ShippingIntegrations.Api;
-using Microsoft.Extensions.Options;
-using Rishvi.Models;
-using Microsoft.EntityFrameworkCore;
-using Rishvi.Modules.Core.Data;
-using Address = Rishvi.Models.Address;
+using System.Xml;
 using static Rishvi.Modules.ShippingIntegrations.Models.WebhookResponse;
+using Address = Rishvi.Models.Address;
 using Formatting = Newtonsoft.Json.Formatting;
+using Item = Rishvi.Modules.ShippingIntegrations.Models.Item;
 
 namespace Rishvi.Modules.ShippingIntegrations.Core
 {
@@ -852,7 +853,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                         PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
                                      Items = jsopndata.Items.Select(f=> new Item()
                                      {
-                                         
+
                                            ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
                                            ItemName =f.Title,
                                            Quantity = f.Quantity,
@@ -914,7 +915,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             generalinfo.DespatchByDate = dispatchdate == null ? DateTime.Now : DateTime.Parse(dispatchdate);
             obj.Api.Orders.SetOrderGeneralInfo(orderdata.OrderId, generalinfo, false);
             orderdata = obj.Api.Orders.GetOrderDetailsByNumOrderId(OrderRef);
-            await SaveLinnDispatch(JsonConvert.SerializeObject(orderdata), _User.AuthorizationToken.ToString(), _User.Email, OrderRef);
+            await SaveLinnDispatch(JsonConvert.SerializeObject(orderdata), _User.AuthorizationToken.ToString(), _User.Email, linntoken, OrderRef);
 
         }
         #endregion
@@ -1124,9 +1125,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //        await SaveReportData(JsonConvert.SerializeObject(alldata), email);
         //     }
         // }
-        public async Task SaveLinnOrder(string s, string AuthorizationToken, string email, string linnorderid = "")
+        public async Task SaveLinnOrder(string s, string AuthorizationToken, string email, string linntoken, string linnorderid = "")
         {
-            InsertOrderFromJson(s);
+            InsertOrderFromJson(s, linntoken);
 
             //var alldata = await _reportsController.GetReportData(new ReportModelReq() { email = email });
             var alldata = _dbSqlCContext.ReportModel
@@ -1157,18 +1158,20 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
             await SaveReportDataForTEst(alldata);
         }
-        public void InsertOrderFromJson(string json)
+        public void InsertOrderFromJson(string json, string linntoken)
         {
             try
             {
                 var root = JsonConvert.DeserializeObject<OrderRoot>(json);
 
+                var obj = new LinnworksBaseStream(linntoken);
 
-                
-                    try
-                    {
-                        // Create related entities
-                        var address = new Address
+
+
+                try
+                {
+                    // Create related entities
+                    var address = new Address
                     {
                         Id = Guid.NewGuid(),
                         EmailAddress = root.CustomerInfo?.Address?.EmailAddress ?? "",
@@ -1184,8 +1187,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Company = root.CustomerInfo?.Address?.Company ?? "",
                         PhoneNumber = root.CustomerInfo?.Address?.PhoneNumber ?? "",
                         CountryId = root.CustomerInfo?.Address?.CountryId == Guid.Empty
-                                    ? Guid.NewGuid()
-                                    : root.CustomerInfo?.Address?.CountryId,
+                                ? Guid.NewGuid()
+                                : root.CustomerInfo?.Address?.CountryId,
                         temp = "placeholder",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = null
@@ -1343,88 +1346,120 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                     foreach (var i in root.Items ?? new List<Rishvi.Models.Item>())
                     {
-                        var item = new Rishvi.Models.Item
+                        var request = new GetStockItemsByIdsRequest
                         {
-                            Id = Guid.NewGuid(),
-                            ItemId = i.ItemId ?? "",
-                            ItemNumber = i.ItemNumber ?? "",
-                            SKU = i.SKU ?? "",
-                            Title = i.Title ?? "",
-                            Quantity = i.Quantity,
-                            CategoryName = i.CategoryName ?? "",
-                            StockLevelsSpecified = i.StockLevelsSpecified ?? false,
-                            OnOrder = i.OnOrder ?? 0,
-                            InOrderBook = i.InOrderBook ?? 0,
-                            Level = i.Level ?? 0,
-                            MinimumLevel = i.MinimumLevel ?? 0,
-                            AvailableStock = i.AvailableStock ?? 0,
-                            PricePerUnit = i.PricePerUnit ?? 0,
-                            UnitCost = i.UnitCost ?? 0,
-                            Cost = i.Cost ?? 0,
-                            CostIncTax = i.CostIncTax ?? 0,
-                            Weight = i.Weight ?? 0,
-                            BarcodeNumber = i.BarcodeNumber ?? "",
-                            ChannelSKU = i.ChannelSKU ?? "",
-                            ChannelTitle = i.ChannelTitle ?? "",
-                            BinRack = i.BinRack ?? "",
-                            ImageId = i.ImageId ?? "",
-                            RowId = i.RowId ?? Guid.NewGuid(),
-                            OrderId = order.OrderId,
-                            StockItemId = i.StockItemId,
-                            StockItemIntId = i.StockItemIntId ?? 0,
-                            CreatedAt = DateTime.UtcNow,
-                            UpdatedAt = null,
-                            Height = i.Height ?? 0,
-                            width = i.width ?? 0,   
-                            Length = i.Length ?? 0,
-                            CompositeSubItems = new List<Rishvi.Models.Item>()
+                            StockItemIds = new List<Guid> { i.StockItemId?? Guid.Empty }
                         };
+
+                        // Call the API
+                        var itemdata = obj.Api.Stock.GetStockItemsByIds(request);
+                       
+
+
+                        var item = new Rishvi.Models.Item();
+
+                        item.Id = Guid.NewGuid();
+                        item.ItemId = i.ItemId ?? "";
+                        item.ItemNumber = i.ItemNumber ?? "";
+                        item.SKU = i.SKU ?? "";
+                        item.Title = i.Title ?? "";
+                        item.Quantity = i.Quantity;
+                        item.CategoryName = i.CategoryName ?? "";
+                        item.StockLevelsSpecified = i.StockLevelsSpecified ?? false;
+                        item.OnOrder = i.OnOrder ?? 0;
+                        item.InOrderBook = i.InOrderBook ?? 0;
+                        item.Level = i.Level ?? 0;
+                        item.MinimumLevel = i.MinimumLevel ?? 0;
+                        item.AvailableStock = i.AvailableStock ?? 0;
+                        item.PricePerUnit = i.PricePerUnit ?? 0;
+                        item.UnitCost = i.UnitCost ?? 0;
+                        item.Cost = i.Cost ?? 0;
+                        item.CostIncTax = i.CostIncTax ?? 0;
+                        item.Weight = i.Weight ?? 0;
+                        item.BarcodeNumber = i.BarcodeNumber ?? "";
+                        item.ChannelSKU = i.ChannelSKU ?? "";
+                        item.ChannelTitle = i.ChannelTitle ?? "";
+                        item.BinRack = i.BinRack ?? "";
+                        item.ImageId = i.ImageId ?? "";
+                        item.RowId = i.RowId ?? Guid.NewGuid();
+                        item.OrderId = order.OrderId;
+                        item.StockItemId = i.StockItemId;
+                        item.StockItemIntId = i.StockItemIntId ?? 0;
+                        item.CreatedAt = DateTime.UtcNow;
+                        item.UpdatedAt = null;
+                        if (itemdata!=null && itemdata.Items.Count>0)
+                        {
+
+
+                            item.Height = (decimal?)itemdata.Items[0].Height;
+                            item.width = (decimal?)itemdata.Items[0].Width;
+                            item.Length = (decimal?)itemdata.Items[0].Depth;
+                        }
+                        
+                        item.CompositeSubItems = new List<Rishvi.Models.Item>();
+                        
 
                         // Process composite sub-items
                         foreach (var c in i.CompositeSubItems ?? new List<Rishvi.Models.Item>())
                         {
-                            var subItem = new Rishvi.Models.Item
+                            var requestsub = new GetStockItemsByIdsRequest
                             {
-                                Id = Guid.NewGuid(),
-                                ItemId = c.ItemId ?? "",
-                                ItemNumber = c.ItemNumber ?? "",
-                                SKU = c.SKU ?? "",
-                                Title = c.Title ?? "",
-                                Quantity = c.Quantity,
-                                CategoryName = c.CategoryName ?? "",
-                                StockLevelsSpecified = c.StockLevelsSpecified ?? false,
-                                OnOrder = c.OnOrder ?? 0,
-                                InOrderBook = c.InOrderBook ?? 0,
-                                Level = c.Level ?? 0,
-                                MinimumLevel = c.MinimumLevel ?? 0,
-                                AvailableStock = c.AvailableStock ?? 0,
-                                PricePerUnit = c.PricePerUnit ?? 0,
-                                UnitCost = c.UnitCost ?? 0,
-                                Cost = c.Cost ?? 0,
-                                CostIncTax = c.CostIncTax ?? 0,
-                                Weight = c.Weight ?? 0,
-                                BarcodeNumber = c.BarcodeNumber ?? "",
-                                ChannelSKU = c.ChannelSKU ?? "",
-                                ChannelTitle = c.ChannelTitle ?? "",
-                                BinRack = c.BinRack ?? "",
-                                ImageId = c.ImageId ?? "",
-                                RowId = c.RowId ?? Guid.NewGuid(),
-                                OrderId = order.OrderId,
-                                StockItemId = c.StockItemId,
-                                StockItemIntId = c.StockItemIntId ?? 0,
-                                CreatedAt = DateTime.UtcNow,
-                                UpdatedAt = null,
-                                Height = c.Height ?? 0,
-                                width = c.width ?? 0,
-                                Length = c.Length ?? 0,
-                                CompositeSubItems = new List<Rishvi.Models.Item>()
+                                StockItemIds = new List<Guid> { i.StockItemId ?? Guid.Empty }
                             };
+
+                            // Call the API
+                            var itemdatasub = obj.Api.Stock.GetStockItemsByIds(requestsub);
+
+                            var subItem = new Rishvi.Models.Item();
+
+                            subItem.Id = Guid.NewGuid();
+                            subItem.ItemId = c.ItemId ?? "";
+                            subItem.ItemNumber = c.ItemNumber ?? "";
+                            subItem.SKU = c.SKU ?? "";
+                            subItem.Title = c.Title ?? "";
+                            subItem.Quantity = c.Quantity;
+                            subItem.CategoryName = c.CategoryName ?? "";
+                            subItem.StockLevelsSpecified = c.StockLevelsSpecified ?? false;
+                            subItem.OnOrder = c.OnOrder ?? 0;
+                            subItem.InOrderBook = c.InOrderBook ?? 0;
+                            subItem.Level = c.Level ?? 0;
+                            subItem.MinimumLevel = c.MinimumLevel ?? 0;
+                            subItem.AvailableStock = c.AvailableStock ?? 0;
+                            subItem.PricePerUnit = c.PricePerUnit ?? 0;
+                            subItem.UnitCost = c.UnitCost ?? 0;
+                            subItem.Cost = c.Cost ?? 0;
+                            subItem.CostIncTax = c.CostIncTax ?? 0;
+                            subItem.Weight = c.Weight ?? 0;
+                            subItem.BarcodeNumber = c.BarcodeNumber ?? "";
+                            subItem.ChannelSKU = c.ChannelSKU ?? "";
+                            subItem.ChannelTitle = c.ChannelTitle ?? "";
+                            subItem.BinRack = c.BinRack ?? "";
+                            subItem.ImageId = c.ImageId ?? "";
+                            subItem.RowId = c.RowId ?? Guid.NewGuid();
+                            subItem.OrderId = order.OrderId;
+                            subItem.StockItemId = c.StockItemId;
+                            subItem.StockItemIntId = c.StockItemIntId ?? 0;
+                            subItem.CreatedAt = DateTime.UtcNow;
+                            subItem.UpdatedAt = null;
+
+                            if (itemdatasub != null && itemdatasub.Items.Count > 0)
+                            {
+
+
+                                item.Height = (decimal?)itemdatasub.Items[0].Height;
+                                item.width = (decimal?)itemdatasub.Items[0].Width;
+                                item.Length = (decimal?)itemdatasub.Items[0].Depth;
+                            }
+
+
+                            subItem.CompositeSubItems = new List<Rishvi.Models.Item>();
+
 
                             item.CompositeSubItems.Add(subItem);
                             items.Add(subItem);
                         }
-
                         items.Add(item);
+
                     }
 
                     _Address.Add(address);
@@ -1438,17 +1473,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     _OrderRoot.Add(order);
                     _Item.AddRange(items);
 
-                    
-                        _unitOfWork.Context.SaveChanges();
-                        Console.WriteLine("✅ Order inserted successfully");
-                    }
-                    catch (DbUpdateException ex)
-                    {
-                        Console.WriteLine($"❌ Failed to insert order: {ex.Message}");
-                        _unitOfWork.Context.ChangeTracker.Clear(); // EF Core >=5
-                        
-                    }
-               
+
+                    _unitOfWork.Context.SaveChanges();
+                    Console.WriteLine("✅ Order inserted successfully");
+                }
+                catch (DbUpdateException ex)
+                {
+                    Console.WriteLine($"❌ Failed to insert order: {ex.Message}");
+                    _unitOfWork.Context.ChangeTracker.Clear(); // EF Core >=5
+
+                }
+
 
 
             }
@@ -1722,7 +1757,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     {
                         var item = new Rishvi.Models.Item
                         {
-                          
+
                             Id = Guid.NewGuid(),
                             ItemId = updatedItem.ItemId ?? "",
                             ItemNumber = updatedItem.ItemNumber ?? "",
@@ -1751,7 +1786,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             StockItemId = updatedItem.StockItemId,
                             StockItemIntId = updatedItem.StockItemIntId ?? 0,
                             Height = updatedItem.Height ?? 0,
-                            width = updatedItem.width ?? 0, 
+                            width = updatedItem.width ?? 0,
                             Length = updatedItem.Length ?? 0,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = null,
@@ -1798,7 +1833,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                 CompositeSubItems = new List<Rishvi.Models.Item>()
                             };
 
-                           
+
                             _dbSqlCContext.Item.Add(subItem);
 
                         }
@@ -1939,7 +1974,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    AwsS3.UploadFileToS3("Authorization", stream, "LinnChange/" + AuthorizationToken.ToString() + "_linnchangeorder_" + order + ".json");
 
         //}
-        public async Task SaveLinnDispatch(string s, string AuthorizationToken, string email, int linnorderid)
+        public async Task SaveLinnDispatch(string s, string AuthorizationToken, string email, string linntoken, int linnorderid)
         {
             // var stream = new MemoryStream();
             // StreamWriter sw = new StreamWriter(stream);
@@ -1949,7 +1984,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             // AwsS3.UploadFileToS3("Authorization", stream, "LinnDispatch/" + AuthorizationToken.ToString() + "_linndispatch_" + linnorderid + ".json");
             //
 
-            InsertOrderFromJson(s);
+            InsertOrderFromJson(s, linntoken);
 
 
 
