@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class used for getting shipping label cancelation parameter 
     /// </summary>
     public class CancelOrderShippingLabelResponse
-	{
+    {
         /// <summary>
         /// Identifies that the label is canceled successfully in the courier system 
         /// </summary>
@@ -28,5 +26,5 @@ namespace LinnworksAPI
         /// Error Message if IsError is true 
         /// </summary>
 		public String ErrorMessage { get; set; }
-	} 
+    }
 }

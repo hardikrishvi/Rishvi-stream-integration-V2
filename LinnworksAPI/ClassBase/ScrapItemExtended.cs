@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ScrapItemExtended
-	{
+    {
         /// <summary>
         /// Nullable 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// Scrap reason (max 600 characters) 
         /// </summary>
 		public String ScrapReason { get; set; }
-	} 
+    }
 }

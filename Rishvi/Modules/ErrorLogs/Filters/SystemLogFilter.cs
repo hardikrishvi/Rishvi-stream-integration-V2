@@ -1,6 +1,5 @@
 ﻿using Rishvi.Modules.Core.Filters;
 using Rishvi.Modules.ErrorLogs.Models.DTOs;
-using System.Linq;
 namespace Rishvi.Modules.ErrorLogs.Filters
 {
     public class SystemLogFilter : BaseFilter<SystemLogListDto, SystemLogFilterDto>

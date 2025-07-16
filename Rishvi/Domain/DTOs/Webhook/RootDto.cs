@@ -1,6 +1,4 @@
-﻿using LinnworksAPI;
-
-namespace Rishvi.Domain.DTOs.Webhook
+﻿namespace Rishvi.Domain.DTOs.Webhook
 {
     public class RootDto
     {

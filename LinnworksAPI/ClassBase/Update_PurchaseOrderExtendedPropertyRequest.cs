@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class Update_PurchaseOrderExtendedPropertyRequest
-	{
+    {
         /// <summary>
         /// Purchase order uniqueidentifier 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// items to update 
         /// </summary>
 		public List<Update_PurchaseOrderExtendedPropertyItem> ExtendedPropertyItems { get; set; }
-	} 
+    }
 }

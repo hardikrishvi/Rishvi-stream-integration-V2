@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemChannelSKUWithLocation
-	{
+    {
         /// <summary>
         /// Record row ID 
         /// </summary>
@@ -66,8 +64,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32 RetryCount { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

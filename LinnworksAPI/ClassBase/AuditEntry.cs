@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class AuditEntry
-	{
+    {
         /// <summary>
         /// Audit record ID 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// Audit trail record type 
         /// </summary>
 		public String TypeDescription { get; set; }
-	} 
+    }
 }

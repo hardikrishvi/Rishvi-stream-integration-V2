@@ -22,7 +22,7 @@ namespace LinnworksMacroHelpers.Classes
             get { return _token ?? ""; }
             set { _token = (value ?? "").Trim(); }
         }
-        
+
         public override void Validate()
         {
             if (string.IsNullOrWhiteSpace(Token))

@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Routing;
-
-namespace Rishvi.Modules.Core.Modules
+﻿namespace Rishvi.Modules.Core.Modules
 {
     public abstract class BaseModule : IComparable<BaseModule>
     {

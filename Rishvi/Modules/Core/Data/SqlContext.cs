@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Rishvi.Models;
 using Rishvi.Modules.ShippingIntegrations.Models;
@@ -12,7 +8,7 @@ using Item = Rishvi.Models.Item;
 namespace Rishvi.Modules.Core.Data
 {
     public class SqlContext : DbContext
-    { 
+    {
         public SqlContext(DbContextOptions<SqlContext> context) : base(context)
         {
         }
@@ -31,11 +27,11 @@ namespace Rishvi.Modules.Core.Data
         public DbSet<ShippingInfo> ShippingInfo { get; set; }
         public DbSet<TaxInfo> TaxInfo { get; set; }
         public DbSet<Item> Item { get; set; }
-    
+
         public DbSet<CustomerInfo> CustomerInfo { get; set; }
         public DbSet<TotalsInfo> TotalsInfo { get; set; }
         public DbSet<Fulfillment> Fulfillment { get; set; }
-        
+
         public DbSet<IntegrationSettings> IntegrationSettings { get; set; }
         public DbSet<LinnworksSettings> LinnworksSettings { get; set; }
         public DbSet<StreamSettings> StreamSettings { get; set; }
@@ -49,30 +45,30 @@ namespace Rishvi.Modules.Core.Data
             builder.Entity<ReportModel>().HasKey(x => x._id);
             builder.ShadowProperties();
             base.OnModelCreating(builder);
-            builder.Entity<ReportModel>(); 
-            builder.Entity<IntegrationSettings>(); 
-            builder.Entity<LinnworksSettings>(); 
-            builder.Entity<StreamSettings>(); 
-            builder.Entity<SyncSettings>(); 
+            builder.Entity<ReportModel>();
+            builder.Entity<IntegrationSettings>();
+            builder.Entity<LinnworksSettings>();
+            builder.Entity<StreamSettings>();
+            builder.Entity<SyncSettings>();
             builder.Entity<Ebay>();
             builder.Entity<Models.Authorization>();
-            
-            builder.Entity<OrderRoot>(); 
-            builder.Entity<Address>(); 
-            builder.Entity<GeneralInfo>(); 
-            builder.Entity<ShippingInfo>(); 
-            builder.Entity<TaxInfo>(); 
-            builder.Entity<Item>(); 
-            builder.Entity<OrderRoot>(); 
-            builder.Entity<CustomerInfo>(); 
-            builder.Entity<TotalsInfo>(); 
-            builder.Entity<Fulfillment>(); 
+
+            builder.Entity<OrderRoot>();
+            builder.Entity<Address>();
+            builder.Entity<GeneralInfo>();
+            builder.Entity<ShippingInfo>();
+            builder.Entity<TaxInfo>();
+            builder.Entity<Item>();
+            builder.Entity<OrderRoot>();
+            builder.Entity<CustomerInfo>();
+            builder.Entity<TotalsInfo>();
+            builder.Entity<Fulfillment>();
             builder.Entity<CustomerInfo>()
                     .HasOne(c => c.Address)
                     .WithMany()
                     .HasForeignKey(c => c.AddressId)
                     .OnDelete(DeleteBehavior.Cascade); // Keep cascade for this
-            
+
             builder.Entity<CustomerInfo>()
                     .HasOne(c => c.BillingAddress)
                     .WithMany()
@@ -119,9 +115,7 @@ namespace Rishvi.Modules.Core.Data
             }
             catch (Exception ex)
             {
-                ChangeTracker.Clear();
                 throw new InvalidOperationException(ex.Message);
-
             }
         }
 

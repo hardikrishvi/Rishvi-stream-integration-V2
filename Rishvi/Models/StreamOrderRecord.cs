@@ -13,7 +13,7 @@ public class StreamOrderRecord : IModificationHistory
     public string ConsignmentId { get; set; }
     public string TrackingNumber { get; set; }
     public string TrackingUrl { get; set; }
-    public string TrackingId { get; set; } 
+    public string TrackingId { get; set; }
     public string Order { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

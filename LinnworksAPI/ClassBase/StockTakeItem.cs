@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockTakeItem
-	{
+    {
         /// <summary>
         /// (optional) Only applicable to non-batched and non-WMS locations. Singular BinRack will be updated for the given item for a given location. Will be ignored for a batched or WMS item. 
         /// </summary>
@@ -46,5 +45,5 @@ namespace LinnworksAPI
         /// If its newly discovered item, use BookInStockBatch call in Stock controller to create a new batch inventory	 
         /// </summary>
 		public Int32? BatchInventoryId { get; set; }
-	} 
+    }
 }

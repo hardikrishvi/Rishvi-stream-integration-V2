@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Pickwave 
     /// </summary>
     public class PickingWave
-	{
+    {
         /// <summary>
         /// Location Id 
         /// </summary>
@@ -74,10 +73,10 @@ namespace LinnworksAPI
         /// </summary>
 		public List<PickingWaveOrder> Orders { get; set; }
 
-		public PickingWaveOptions Options { get; set; }
+        public PickingWaveOptions Options { get; set; }
 
-		public Int32 PickingWaveId { get; set; }
+        public Int32 PickingWaveId { get; set; }
 
-		public PickingWaveState State { get; set; }
-	} 
+        public PickingWaveState State { get; set; }
+    }
 }

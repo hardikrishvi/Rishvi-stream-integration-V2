@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
-using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class AssignOrderItemBatches
-	{
-		public List<OrderItemBatch> Batches { get; set; }
-	} 
+    {
+        public List<OrderItemBatch> Batches { get; set; }
+    }
 }

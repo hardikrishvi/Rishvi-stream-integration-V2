@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Response class with info about stock level in each location for a list of stock items 
     /// </summary>
     public class GetStockLevel_BatchResponse
-	{
+    {
         /// <summary>
         /// Id of the stock item 
         /// </summary>
@@ -18,5 +17,5 @@ namespace LinnworksAPI
         /// List of stock level for each location 
         /// </summary>
 		public List<StockItemLevel> StockItemLevels { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
-using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetPickingWavesResponse
-	{
+    {
         /// <summary>
         /// Pickwaves 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// List of bins and batches of items in the bins. 
         /// </summary>
 		public List<BinRackStockItem> Bins { get; set; }
-	} 
+    }
 }

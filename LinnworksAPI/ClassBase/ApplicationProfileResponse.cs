@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Represents Linnworks.net application subscription profile 
     /// </summary>
     public class ApplicationProfileResponse
-	{
+    {
         /// <summary>
         /// Plan Tag as defined in your Application Configuration 
         /// </summary>
@@ -43,5 +41,5 @@ namespace LinnworksAPI
         /// Indicates whether the payment profile is active for the application, if this is set to false it means the customer canceled the profile but the profile is still active due last payment made in the last month. 
         /// </summary>
 		public Boolean IsProfileActive { get; set; }
-	} 
+    }
 }

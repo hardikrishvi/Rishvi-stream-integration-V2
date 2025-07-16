@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemScrap
-	{
+    {
         /// <summary>
         /// Year item was scraped 
         /// </summary>
@@ -31,8 +29,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Double Cost { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

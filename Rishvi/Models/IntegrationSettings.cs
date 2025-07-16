@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Rishvi.Core.Data;
 
 namespace Rishvi.Models;
@@ -22,7 +21,7 @@ public class IntegrationSettings : IModificationHistory
     public int linnpage { get; set; }
     public int linnhour { get; set; }
     public Guid SyncId { get; set; }
-    
+
 
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

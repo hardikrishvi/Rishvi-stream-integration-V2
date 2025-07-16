@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Pickwave allocated check result. 
     /// </summary>
     public class PickWaveAllocateCheckResult
-	{
+    {
         /// <summary>
         /// Order Id interger 
         /// </summary>
@@ -29,6 +28,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean HasErrors { get; set; }
 
-		public List<PickWaveAllocateCheckResultOrderDetails> OrderDetails { get; set; }
-	} 
+        public List<PickWaveAllocateCheckResultOrderDetails> OrderDetails { get; set; }
+    }
 }

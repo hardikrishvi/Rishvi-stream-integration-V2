@@ -1,14 +1,12 @@
-﻿using Moq;
-using Xunit;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Rishvi.Modules.ShippingIntegrations.Core.Helper;
-using Rishvi.Modules.ShippingIntegrations.Core;
-using Rishvi.Modules.ShippingIntegrations.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.ShippingIntegrations.Api;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.ShippingIntegrations.Core.Helper;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Xunit;
 
 namespace Test
 {
@@ -70,7 +68,7 @@ namespace Test
             mockAwsS3.Setup(a => AwsS3.S3FileIsExists("Authorization", "Users/_register_test_example_com.json"))
                 .ReturnsAsync(false);
 
-           
+
             var mockDbContext = new Mock<SqlContext>();
 
             var controller = new ConfigController(
@@ -105,7 +103,7 @@ namespace Test
             mockServiceHelper.Setup(s => s.TransformEmail(It.IsAny<string>()))
                 .Throws(new System.Exception("Mocked exception"));
 
-            
+
             var mockDbContext = new Mock<SqlContext>();
 
             var controller = new ConfigController(

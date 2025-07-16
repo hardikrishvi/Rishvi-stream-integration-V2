@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveItemComposition
-	{
+    {
         /// <summary>
         /// Stock item id 
         /// </summary>
@@ -25,5 +24,5 @@ namespace LinnworksAPI
         /// Child row relationships to parent 
         /// </summary>
 		public List<PickingWaveItemComposition> Children { get; set; }
-	} 
+    }
 }

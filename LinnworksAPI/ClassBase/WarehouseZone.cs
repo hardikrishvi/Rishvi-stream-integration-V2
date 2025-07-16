@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class WarehouseZone
-	{
+    {
         /// <summary>
         /// Unique zone id 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// Stock location interger id 
         /// </summary>
 		public Int32 StockLocationIntId { get; set; }
-	} 
+    }
 }

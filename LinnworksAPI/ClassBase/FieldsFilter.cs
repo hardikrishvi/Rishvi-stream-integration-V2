@@ -1,14 +1,12 @@
 using System.Collections.Generic;
-using System.Text;
-using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Fields filter 
     /// </summary>
     public class FieldsFilter
-	{
+    {
         /// <summary>
         /// Text type field filters 
         /// </summary>
@@ -34,6 +32,6 @@ namespace LinnworksAPI
         /// </summary>
 		public List<ListFieldFilter> ListFields { get; set; }
 
-		public List<FieldVisibility> FieldVisibility { get; set; }
-	} 
+        public List<FieldVisibility> FieldVisibility { get; set; }
+    }
 }

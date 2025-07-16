@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Bin Rack Type 
     /// </summary>
     public class WarehouseBinRackType
-	{
+    {
         /// <summary>
         /// Binrack type id - unique record identifier 
         /// </summary>
@@ -42,5 +40,5 @@ namespace LinnworksAPI
         /// Is type restricted to volumetric measurements only 
         /// </summary>
 		public Boolean IsVolumetric { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class NewRefundLine
-	{
+    {
         /// <summary>
         /// If the refund line pertains to an existing order return, this field should be populated with the unique identifier for the relevant return line 
         /// </summary>
@@ -26,20 +24,20 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32? CancelledQuantity { get; set; }
 
-		public Boolean IsFreeText { get; set; }
+        public Boolean IsFreeText { get; set; }
 
-		public String FreeTextOrNote { get; set; }
+        public String FreeTextOrNote { get; set; }
 
-		public Decimal Amount { get; set; }
+        public Decimal Amount { get; set; }
 
-		public Int32 Quantity { get; set; }
+        public Int32 Quantity { get; set; }
 
-		public String ReasonTag { get; set; }
+        public String ReasonTag { get; set; }
 
-		public String SubReasonTag { get; set; }
+        public String SubReasonTag { get; set; }
 
-		public String InsufficientRefundTag { get; set; }
+        public String InsufficientRefundTag { get; set; }
 
-		public String InsufficientRefundNote { get; set; }
-	} 
+        public String InsufficientRefundNote { get; set; }
+    }
 }

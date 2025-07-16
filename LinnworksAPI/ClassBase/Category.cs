@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Category
-	{
+    {
         /// <summary>
         /// Category ID 
         /// </summary>
@@ -21,6 +19,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32? StructureCategoryId { get; set; }
 
-		public Int32? ProductCategoryId { get; set; }
-	} 
+        public Int32? ProductCategoryId { get; set; }
+    }
 }

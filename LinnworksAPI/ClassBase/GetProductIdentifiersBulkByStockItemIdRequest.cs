@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetProductIdentifiersBulkByStockItemIdRequest
-	{
-		public IEnumerable<Guid> StockItemIds { get; set; }
-	} 
+    {
+        public IEnumerable<Guid> StockItemIds { get; set; }
+    }
 }

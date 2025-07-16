@@ -1,24 +1,22 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ScheduleConfiguration
-	{
+    {
         /// <summary>
         /// Just one time or recurrent 
         /// </summary>
 		public RepetitionType RepetitionType { get; set; }
 
-		public DateTime? OneTimeDate { get; set; }
+        public DateTime? OneTimeDate { get; set; }
 
         /// <summary>
         /// If is recurrent. Occurs daily or weekly? 
         /// </summary>
 		public DailyFrequencyType? DailyFrequency { get; set; }
 
-		public DateTime? OccursFrequencyStartingDate { get; set; }
+        public DateTime? OccursFrequencyStartingDate { get; set; }
 
         /// <summary>
         /// If recurrent, occurs each X times the quantity of 'DailyFrequency' (each 1 day, each 5 days, each 3 weeks, etc...) 
@@ -59,5 +57,5 @@ namespace LinnworksAPI
         /// Is enabled? NB : with macro schedules this property is not used (enabled exists higher in the data structure). 
         /// </summary>
 		public Boolean Enabled { get; set; }
-	} 
+    }
 }

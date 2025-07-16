@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Rishvi.Modules.CronJob
+﻿namespace Rishvi.Modules.CronJob
 {
     public class SchedulerJobSettings
     {

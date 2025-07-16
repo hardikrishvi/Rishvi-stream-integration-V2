@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ChannelOrder
-	{
+    {
         /// <summary>
         /// Validate if the tax should be overwritten on the order. 
         /// </summary>
@@ -206,5 +205,5 @@ namespace LinnworksAPI
         /// Bool to re-save order 
         /// </summary>
 		public Boolean ForceReSaveFulfilledOrder { get; set; }
-	} 
+    }
 }

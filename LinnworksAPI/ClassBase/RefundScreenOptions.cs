@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class RefundScreenOptions
-	{
+    {
         /// <summary>
         /// Information about channel refund functionality 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// If automated refund is supported 
         /// </summary>
 		public Boolean SupportsAutomatedRefunds { get; set; }
-	} 
+    }
 }

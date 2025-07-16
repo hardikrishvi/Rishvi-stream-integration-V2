@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GenerateFreeTextEmailRequest
-	{
+    {
         /// <summary>
         /// List of ids to send template for 
         /// </summary>
@@ -21,6 +20,6 @@ namespace LinnworksAPI
         /// </summary>
 		public String body { get; set; }
 
-		public String templateType { get; set; }
-	} 
+        public String templateType { get; set; }
+    }
 }

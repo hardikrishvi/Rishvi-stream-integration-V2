@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class CreateWarehouseMoveRequest
-	{
+    {
         /// <summary>
         /// Batch Inventory Id of the stock item you are moving 
         /// </summary>
@@ -36,6 +34,6 @@ namespace LinnworksAPI
         /// </summary>
 		public TransactionType TxType { get; set; }
 
-		public Guid? UserId { get; set; }
-	} 
+        public Guid? UserId { get; set; }
+    }
 }

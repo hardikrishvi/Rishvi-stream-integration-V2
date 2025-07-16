@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents parameter for adding line to the purchase order. 
     /// </summary>
     public class Add_PurchaseOrderItemParameter
-	{
+    {
         /// <summary>
         /// Purchase order id. You can only add items to pending purchase orders 
         /// </summary>
@@ -43,5 +41,5 @@ namespace LinnworksAPI
         /// Product tax rate 
         /// </summary>
 		public Decimal TaxRate { get; set; }
-	} 
+    }
 }

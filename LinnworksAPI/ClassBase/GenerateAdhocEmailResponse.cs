@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GenerateAdhocEmailResponse
-	{
+    {
         /// <summary>
         /// Send custom emails completed 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// List of failed recipients 
         /// </summary>
 		public List<String> FailedRecipients { get; set; }
-	} 
+    }
 }

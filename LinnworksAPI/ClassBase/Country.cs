@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class Country
-	{
+    {
         /// <summary>
         /// Country ID 
         /// </summary>
@@ -55,5 +54,5 @@ namespace LinnworksAPI
         /// Count of regions 
         /// </summary>
 		public Int32 RegionsCount { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveOptions
-	{
+    {
         /// <summary>
         /// Item scan type, dictates if the user must scan all items or can provide aggregate count 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// If the user must scan the binrack before picking an item. 
         /// </summary>
 		public Boolean BinRackScanRequired { get; set; }
-	} 
+    }
 }

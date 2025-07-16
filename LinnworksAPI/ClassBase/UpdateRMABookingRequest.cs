@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateRMABookingRequest
-	{
+    {
         /// <summary>
         /// The unique identifier for the order the return lines pertain to 
         /// </summary>
@@ -35,5 +34,5 @@ namespace LinnworksAPI
         /// If an existing RMA order has been deleted or cancelled, this flag determines whether a new one should be created, or an error should be returned 
         /// </summary>
 		public Boolean AllowCreationOfNewOrder { get; set; }
-	} 
+    }
 }

@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class that represents entry parameters for creating new PENDING purchase order 
     /// </summary>
     public class Create_PurchaseOrder_InitialParameter
-	{
+    {
         /// <summary>
         /// Supplier unique identifier. Use Inventory/GetSupplierList to get the supplier ids 
         /// </summary>
@@ -65,5 +63,5 @@ namespace LinnworksAPI
         /// Currency conversion rate, multiplier to change the purchase order currency into the system currecny 
         /// </summary>
 		public Decimal ConversionRate { get; set; }
-	} 
+    }
 }

@@ -111,7 +111,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         DrawMultilineText(canvas, paint13PX, AddressFormatted, 15, 175, maxWidth);
 
                         canvas.DrawText("TRACKING NO:", 210, 160, paint15PXWithBold);
-                        canvas.DrawText(newTrackingNumber==null?"":newTrackingNumber, 210, 175, paint13PX);
+                        canvas.DrawText(newTrackingNumber == null ? "" : newTrackingNumber, 210, 175, paint13PX);
 
                         canvas.DrawText("ROUTE NO:", 210, 190, paint15PXWithBold);
                         canvas.DrawText("", 210, 205, paint13PX);
@@ -263,7 +263,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true,"Generate Lebel");
+                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true);
                 EmailHelper.SendEmail("Failed generate label", ex.Message);
             }
             return string.Empty;
@@ -292,7 +292,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, barcodeNumber, null, "BarcodeGenerateError", ex.Message, true,"Generate lebel");
+                SqlHelper.SystemLogInsert("CreateOrder", null, barcodeNumber, null, "BarcodeGenerateError", ex.Message, true);
                 EmailHelper.SendEmail("Failed generate barcode", ex.Message);
             }
             return null;
@@ -318,7 +318,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, qrCodeNumber, null, "QRCodeGenerateError", ex.Message, true,"Generate Lebel");
+                SqlHelper.SystemLogInsert("CreateOrder", null, qrCodeNumber, null, "QRCodeGenerateError", ex.Message, true);
                 EmailHelper.SendEmail("Failed generate QRCode", ex.Message);
             }
             return null;

@@ -1,29 +1,9 @@
-﻿using Amazon.Runtime.Internal;
-using Amazon.SimpleSystemsManagement.Model;
-using Autofac.Core;
-using Azure.Core;
-using FluentFTP;
-using LinnworksAPI;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Rishvi.Modules.Core.Authorization;
-using Rishvi.Modules.Core.Aws;
-using Rishvi.Modules.Core.Helpers;
-using Rishvi.Modules.ShippingIntegrations.Core;
-using Rishvi.Modules.ShippingIntegrations.Core.Helper;
-using Rishvi.Modules.ShippingIntegrations.Models;
-using Rishvi.Modules.ShippingIntegrations.Models.BaseClasses;
-using Rishvi.Modules.ShippingIntegrations.Models.Classes;
-using System.Globalization;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Web;
-using System.Xml;
-using CsvHelper;
-using ThirdParty.Json.LitJson;
-using System.Security.Policy;
-using Microsoft.Extensions.Options;
+using FluentFTP;
+using Microsoft.AspNetCore.Mvc;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
 {
@@ -32,7 +12,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
     {
         //public static string host_name = "https://vetuzxfjukz4x63zcpr3433g7u0xncyc.lambda-url.eu-west-2.on.aws";
         //internal static string TradingAPI_ServerURL = "https://api.ebay.com/ws/api.dll";
-        
+
         //internal static string DeveloperId = "56fda7f3-e803-4bbd-b6dd-c7eb377a971c";
         //internal static string ProdClientId = "RishviLt-Rishvite-PRD-edec1ac47-c979c619";
         //internal static string ProdRedirectURL = "Rishvi_Ltd-RishviLt-Rishvi-gcubzb";
@@ -90,7 +70,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         }
 
         [HttpGet(), Route("PriceUpdate")]
-        public async Task PriceUpdate(string token,string filename)
+        public async Task PriceUpdate(string token, string filename)
         {
             var user = _authorizationToken.Load(token);
             if (!string.IsNullOrEmpty(user.access_token))
@@ -100,12 +80,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 user.FtpHost = String.IsNullOrEmpty(user.FtpHost) ? MessinaSettings.FtpHost : user.FtpHost;
                 var ftpConfig = new FtpClient(user.FtpHost)
                 {
-                    Credentials = new System.Net.NetworkCredential(user.FtpUsername,user.FtpPassword)
+                    Credentials = new System.Net.NetworkCredential(user.FtpUsername, user.FtpPassword)
                 };
                 string remoteFilePath = "/Messina/" + filename + ".csv"; // Replace with your FTP file path
                 string localFilePath = "local-file.csv"; // Local path to save the file
                 new MessianApiOAuthHelper().ReadCsvAndBatchProcessAsync(localFilePath, 3, user);
             }
         }
-    }   
+    }
 }

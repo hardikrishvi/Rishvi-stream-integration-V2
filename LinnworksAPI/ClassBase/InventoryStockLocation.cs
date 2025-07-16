@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Simplified StockLocation information for use in settings screen 
     /// </summary>
     public class InventoryStockLocation
-	{
+    {
         /// <summary>
         /// Location ID 
         /// </summary>
@@ -43,5 +41,5 @@ namespace LinnworksAPI
         /// If the location is warehosue managed. 
         /// </summary>
 		public Boolean? IsWarehouseManaged { get; set; }
-	} 
+    }
 }

@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// OrderItem BinRack 
     /// </summary>
     public class OrderItemBinRack
-	{
+    {
         /// <summary>
         /// Quantity for BinRack per Location 
         /// </summary>
@@ -33,5 +31,5 @@ namespace LinnworksAPI
         /// If the item is batched, identifies the unique order item batch row 
         /// </summary>
 		public Int32? OrderItemBatchId { get; set; }
-	} 
+    }
 }

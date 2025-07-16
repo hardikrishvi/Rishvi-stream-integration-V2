@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetBinrackZonesByBinrackIdOrNameRequest
-	{
+    {
         /// <summary>
         /// Binrack Ids, StockLocationIntId optional, if different to supplied binrack ids, zones will still be returned. 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// Stock Location interger id. 
         /// </summary>
 		public Int32 StockLocationIntId { get; set; }
-	} 
+    }
 }

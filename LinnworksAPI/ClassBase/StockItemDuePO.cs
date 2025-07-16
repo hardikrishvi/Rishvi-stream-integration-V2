@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemDuePO
-	{
+    {
         /// <summary>
         /// Supplier name 
         /// </summary>
@@ -46,8 +44,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Double UnitCost { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class AdjustmentOptions
-	{
+    {
         /// <summary>
         /// Product title 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// Reload all images for the template 
         /// </summary>
 		public Boolean ReloadAllImages { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveOrderDetailed
-	{
+    {
         /// <summary>
         /// Pickwave order id 
         /// </summary>
@@ -80,5 +79,5 @@ namespace LinnworksAPI
         /// Is order paid 
         /// </summary>
 		public Boolean IsPaid { get; set; }
-	} 
+    }
 }

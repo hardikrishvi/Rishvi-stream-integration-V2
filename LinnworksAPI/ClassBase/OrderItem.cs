@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Order item object 
     /// </summary>
     public class OrderItem
-	{
+    {
         /// <summary>
         /// Stock Item ID 
         /// </summary>
@@ -174,7 +173,7 @@ namespace LinnworksAPI
         /// </summary>
 		public String ChannelTitle { get; set; }
 
-		public Double DiscountValue { get; set; }
+        public Double DiscountValue { get; set; }
 
         /// <summary>
         /// If item got an image 
@@ -241,18 +240,18 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean isBatchedStockItem { get; set; }
 
-		public Boolean IsWarehouseManaged { get; set; }
+        public Boolean IsWarehouseManaged { get; set; }
 
-		public Boolean IsUnlinked { get; set; }
+        public Boolean IsUnlinked { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
+        public Int32 StockItemIntId { get; set; }
 
-		public StockItemBoxConfiguration[] Boxes { get; set; }
+        public StockItemBoxConfiguration[] Boxes { get; set; }
 
-		public Guid RowId { get; set; }
+        public Guid RowId { get; set; }
 
-		public Guid OrderId { get; set; }
+        public Guid OrderId { get; set; }
 
-		public Guid StockItemId { get; set; }
-	} 
+        public Guid StockItemId { get; set; }
+    }
 }

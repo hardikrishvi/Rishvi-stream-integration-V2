@@ -1,13 +1,11 @@
-﻿using CsvHelper;
-using FluentFTP;
-using Rishvi.Modules.Core.Aws;
-using Rishvi.Modules.ShippingIntegrations.Api;
-using Rishvi.Modules.ShippingIntegrations.Models.Classes;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Xml;
-using static Rishvi.Modules.ShippingIntegrations.Api.MessinaController;
+using CsvHelper;
+using FluentFTP;
+using Rishvi.Modules.Core.Aws;
+using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 
 namespace Rishvi.Modules.ShippingIntegrations.Models
 {

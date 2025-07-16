@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Stock Location 
     /// </summary>
     public class StockLocation
-	{
+    {
         /// <summary>
         /// 1st line of address 
         /// </summary>
@@ -64,12 +62,12 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean IsWarehouseManaged { get; set; }
 
-		public Guid StockLocationId { get; set; }
+        public Guid StockLocationId { get; set; }
 
-		public String LocationName { get; set; }
+        public String LocationName { get; set; }
 
-		public Boolean IsFulfillmentCenter { get; set; }
+        public Boolean IsFulfillmentCenter { get; set; }
 
-		public Int32 StockLocationIntId { get; set; }
-	} 
+        public Int32 StockLocationIntId { get; set; }
+    }
 }

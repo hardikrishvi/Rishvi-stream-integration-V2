@@ -1,15 +1,14 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Channel order item 
     /// </summary>
     public class ChannelOrderItem
-	{
-		public Boolean TaxCostInclusive { get; set; }
+    {
+        public Boolean TaxCostInclusive { get; set; }
 
         /// <summary>
         /// Validate if the tax should be overwritten on the orderitem. 
@@ -61,6 +60,6 @@ namespace LinnworksAPI
         /// </summary>
 		public List<ChannelOrderItemOption> Options { get; set; }
 
-		public List<ChannelOrderItemTax> Taxes { get; set; }
-	} 
+        public List<ChannelOrderItemTax> Taxes { get; set; }
+    }
 }

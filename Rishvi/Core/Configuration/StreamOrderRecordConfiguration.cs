@@ -9,7 +9,7 @@ public class StreamOrderRecordConfiguration : Rishvi.Core.Data.IEntityTypeConfig
 {
     public void Map(EntityTypeBuilder<StreamOrderRecord> builder)
     {
-        
+
         // Primary key
         builder.HasKey(x => x.Id);
 

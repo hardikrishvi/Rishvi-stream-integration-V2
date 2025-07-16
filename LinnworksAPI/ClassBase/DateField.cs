@@ -1,17 +1,14 @@
-using System.Text;
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LinnworksAPI
-{ 
+{
     [JsonConverter(typeof(StringEnumConverter))]
-	public enum DateField
-	{
-		processed,
-		payment,
-		cancelled,
-		received,
-	}
+    public enum DateField
+    {
+        processed,
+        payment,
+        cancelled,
+        received,
+    }
 }

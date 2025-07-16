@@ -3,7 +3,7 @@
 namespace Rishvi.Modules.ShippingIntegrations.Models
 {
     public class ReportModel : IModificationHistory
-    { 
+    {
         public string _id { get; set; }
         public string? AuthorizationToken { get; set; }
         public string? email { get; set; }
@@ -26,7 +26,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         public DateTime? DownloadEbayOrderInSystem { get; set; }
         public DateTime? DispatchEbayOrderInStream { get; set; }
         public DateTime? DispatchEbayOrderFromStream { get; set; }
-        public DateTime? CreateLinnOrderInStream { get;set; }
+        public DateTime? CreateLinnOrderInStream { get; set; }
         public DateTime? LastUpdateLinnOrderForStream { get; set; }
 
         public DateTime? DispatchLinnOrderFromStream { get; set; }

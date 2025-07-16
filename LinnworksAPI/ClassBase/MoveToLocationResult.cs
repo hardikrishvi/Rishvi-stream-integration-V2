@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class MoveToLocationResult
-	{
+    {
         /// <summary>
         /// List of errors 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// List of orders that were moved 
         /// </summary>
 		public List<Guid> OrdersMoved { get; set; }
-	} 
+    }
 }

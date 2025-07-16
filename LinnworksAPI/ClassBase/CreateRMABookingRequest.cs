@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class CreateRMABookingRequest
-	{
+    {
         /// <summary>
         /// Determines whether the RMA request was initiated on the channel, or within Linnworks 
         /// </summary>
@@ -35,5 +34,5 @@ namespace LinnworksAPI
         /// (Optional) If provided, sets the External Reference of the RMA header to the provided value. Otherwise, this value is automatically generated 
         /// </summary>
 		public String Reference { get; set; }
-	} 
+    }
 }

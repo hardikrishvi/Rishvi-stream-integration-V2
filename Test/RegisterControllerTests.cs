@@ -1,13 +1,13 @@
-﻿using Xunit;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc;
 using Rishvi.Modules.Core.Aws;
-using Rishvi.Modules.ShippingIntegrations.Core.Helper;
-using Rishvi.Modules.ShippingIntegrations.Api;
-using Rishvi.Modules.ShippingIntegrations.Models;
-using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.ShippingIntegrations.Api;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.ShippingIntegrations.Core.Helper;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Xunit;
 
 public class RegisterControllerTests
 {
@@ -22,7 +22,7 @@ public class RegisterControllerTests
 
         mockServiceHelper.Setup(static service => service.TransformEmail(It.IsAny<string>())).Returns("transformedEmail");
 
-        mockAwsS3.Setup( s3 => AwsS3.S3FileIsExists("Authorization", It.IsAny<string>()))
+        mockAwsS3.Setup(s3 => AwsS3.S3FileIsExists("Authorization", It.IsAny<string>()))
                  .ReturnsAsync(false);
 
         var controller = new ConfigController(mockAwsS3.Object, mockServiceHelper.Object, mockTrade.Object, mockDb.Object);

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class BatchedBookIn
-	{
+    {
         /// <summary>
         /// Product SKU 
         /// </summary>
@@ -41,7 +39,7 @@ namespace LinnworksAPI
         /// </summary>
 		public String BatchStatus { get; set; }
 
-		public Int32? PrioritySequence { get; set; }
+        public Int32? PrioritySequence { get; set; }
 
         /// <summary>
         /// Batch expiry date 
@@ -52,5 +50,5 @@ namespace LinnworksAPI
         /// Batch sell by date 
         /// </summary>
 		public DateTime? SellBy { get; set; }
-	} 
+    }
 }

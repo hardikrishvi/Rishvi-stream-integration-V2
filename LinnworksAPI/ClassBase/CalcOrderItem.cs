@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents order item for package calculation purposes only 
     /// </summary>
     public class CalcOrderItem
-	{
+    {
         /// <summary>
         /// Unique stock item identifier 
         /// </summary>
@@ -19,7 +18,7 @@ namespace LinnworksAPI
         /// </summary>
 		public Guid fkOrderItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
+        public Int32 StockItemIntId { get; set; }
 
         /// <summary>
         /// SKU 
@@ -61,8 +60,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Guid? fkCompositeParentRowId { get; set; }
 
-		public Boolean IsCompositeChild { get; set; }
+        public Boolean IsCompositeChild { get; set; }
 
-		public List<StockItemBoxConfiguration> Boxes { get; set; }
-	} 
+        public List<StockItemBoxConfiguration> Boxes { get; set; }
+    }
 }

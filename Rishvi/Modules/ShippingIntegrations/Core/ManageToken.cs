@@ -1,17 +1,11 @@
-﻿using Amazon.Runtime.Internal;
-using Hangfire.Storage;
+﻿using System.Net;
 using Newtonsoft.Json;
 using RestSharp;
-using Rishvi.Models;
-using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 using Rishvi_Vault;
-using System.Net;
-using System.Text;
-using ThirdParty.Json.LitJson;
 
 namespace Rishvi.Modules.ShippingIntegrations.Core
 {
@@ -63,8 +57,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                         isAuthorized = true;
                     }
-                  
-                       
+
+
                 }
 
 
@@ -82,8 +76,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     string uniqueCode = CodeHelper.GenerateUniqueCode(32);
                     //var client = new RestClient(ClientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath);
                     var client = new RestClient(ClientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath);
-                    var request = new RestRequest(AppSettings.StreamOAuthUrl, Method.Post);
-                    request.AddJsonBody(new { grant_type = AppSettings.GrantType, client_id = ClientId, client_secret = ClientSecret });
+                    var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.StreamOAuthUrl), Method.Post);
+                    request.AddJsonBody(new { grant_type = AWSParameter.GetConnectionString(AppSettings.GrantType), client_id = ClientId, client_secret = ClientSecret });
                     request.AddHeader("Accept", "application/json");
                     request.AddHeader("Content-Type", "application/json");
                     request.AddHeader("Stream-Nonce", uniqueCode);

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Channel
-	{
+    {
         /// <summary>
         /// Postal service ID 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Subsource name (e.g. EBAY1) 
         /// </summary>
 		public String SubSource { get; set; }
-	} 
+    }
 }

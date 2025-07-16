@@ -9,7 +9,7 @@ namespace Rishvi.Models
         public int id { get; set; }
         public int sequence { get; set; }
         public string order { get; set; }
-        
+
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// A response class used when processing an order by order id or reference 
     /// </summary>
     public class ProcessOrderByOrderIdOrReferenceResponse
-	{
+    {
         /// <summary>
         /// The processed state 
         /// </summary>
@@ -43,5 +42,5 @@ namespace LinnworksAPI
         /// The batched items 
         /// </summary>
 		public List<StockItemBatch> BatchInformation { get; set; }
-	} 
+    }
 }

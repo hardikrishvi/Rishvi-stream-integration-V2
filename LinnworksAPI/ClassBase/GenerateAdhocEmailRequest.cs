@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Custom email generation request body 
     /// </summary>
     public class GenerateAdhocEmailRequest
-	{
+    {
         /// <summary>
         /// List of ids to send template for 
         /// </summary>
@@ -28,5 +27,5 @@ namespace LinnworksAPI
         /// List of attachments to send with the email 
         /// </summary>
 		public List<String> attachments { get; set; }
-	} 
+    }
 }

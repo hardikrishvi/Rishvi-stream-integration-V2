@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rishvi.Modules.Core.Data
+﻿namespace Rishvi.Modules.Core.Data
 {
     public interface IModificationHistory
     {

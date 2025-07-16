@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Describes GeoPosition 
     /// </summary>
     public class GeoPosition
-	{
+    {
         /// <summary>
         /// X position 
         /// </summary>
@@ -23,5 +21,5 @@ namespace LinnworksAPI
         /// Z position 
         /// </summary>
 		public Decimal Z { get; set; }
-	} 
+    }
 }

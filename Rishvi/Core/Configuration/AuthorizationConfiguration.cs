@@ -51,7 +51,7 @@ namespace Rishvi.Core.Configuration
             builder.Property(x => x.PartyFileCreated)
                 .IsRequired()
                 .HasDefaultValue(false);
-            
+
             // Timestamps
             builder.Property(x => x.CreatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");

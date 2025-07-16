@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
-using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetItemBinracksResponse
-	{
+    {
         /// <summary>
         /// A list of other batches that are available in the given linnworks stock location 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// A list of stock that cannot directly be picked from 
         /// </summary>
 		public List<BinRackStockItem> NonPickableBins { get; set; }
-	} 
+    }
 }

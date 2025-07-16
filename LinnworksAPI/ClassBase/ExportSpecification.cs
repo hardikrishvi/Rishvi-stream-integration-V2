@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Export base settings 
     /// </summary>
     public class ExportSpecification
-	{
+    {
         /// <summary>
         /// Export Column Names 
         /// </summary>
@@ -29,10 +28,10 @@ namespace LinnworksAPI
         /// </summary>
 		public String CustomScript { get; set; }
 
-		public ExportGenericFeed Feed { get; set; }
+        public ExportGenericFeed Feed { get; set; }
 
-		public List<ExportColumn> ColumnMappings { get; set; }
+        public List<ExportColumn> ColumnMappings { get; set; }
 
-		public List<ExecutionOption> ExecutionOptions { get; set; }
-	} 
+        public List<ExecutionOption> ExecutionOptions { get; set; }
+    }
 }

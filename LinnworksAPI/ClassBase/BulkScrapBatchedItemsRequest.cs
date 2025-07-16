@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class BulkScrapBatchedItemsRequest
-	{
-		public Guid LocationId { get; set; }
+    {
+        public Guid LocationId { get; set; }
 
-		public List<ScrapItemExtended> ScrapItems { get; set; }
-	} 
+        public List<ScrapItemExtended> ScrapItems { get; set; }
+    }
 }

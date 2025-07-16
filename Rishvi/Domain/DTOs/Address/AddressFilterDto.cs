@@ -2,7 +2,7 @@ using Rishvi.Modules.Core.Filters;
 
 namespace Rishvi.DTOs.Address;
 
-public class AddressFilterDto: BaseFilterDto
+public class AddressFilterDto : BaseFilterDto
 {
     public AddressFilterDto()
     {

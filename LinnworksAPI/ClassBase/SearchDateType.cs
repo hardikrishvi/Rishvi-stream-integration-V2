@@ -1,18 +1,15 @@
-using System.Text;
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LinnworksAPI
-{ 
+{
     [JsonConverter(typeof(StringEnumConverter))]
-	public enum SearchDateType
-	{
-		ALLDATES,
-		RECEIVED,
-		PROCESSED,
-		PAYMENTRECEIVED,
-		CANCELLED,
-	}
+    public enum SearchDateType
+    {
+        ALLDATES,
+        RECEIVED,
+        PROCESSED,
+        PAYMENTRECEIVED,
+        CANCELLED,
+    }
 }

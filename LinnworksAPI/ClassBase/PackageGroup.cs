@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PackageGroup
-	{
+    {
         /// <summary>
         /// Package category ID 
         /// </summary>
@@ -25,5 +24,5 @@ namespace LinnworksAPI
         /// List of packaging types 
         /// </summary>
 		public List<PackageType> PackageTypes { get; set; }
-	} 
+    }
 }

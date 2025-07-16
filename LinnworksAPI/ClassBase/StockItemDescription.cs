@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemDescription
-	{
+    {
         /// <summary>
         /// Record row ID (generate random GUID) 
         /// </summary>
@@ -26,8 +24,8 @@ namespace LinnworksAPI
         /// </summary>
 		public String Description { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

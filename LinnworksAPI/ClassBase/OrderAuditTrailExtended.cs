@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderAuditTrailExtended
-	{
+    {
         /// <summary>
         /// Order id 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// List of OrderAuditTrail entities 
         /// </summary>
 		public List<OrderAuditTrail> AuditTrail { get; set; }
-	} 
+    }
 }

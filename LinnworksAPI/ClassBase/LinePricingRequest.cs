@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class LinePricingRequest
-	{
+    {
         /// <summary>
         /// Price per unit (default from stock item) 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Tax inclusive (default true) 
         /// </summary>
 		public Boolean TaxInclusive { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderItemOption
-	{
+    {
         /// <summary>
         /// Option ID 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// Value of the option 
         /// </summary>
 		public String Value { get; set; }
-	} 
+    }
 }

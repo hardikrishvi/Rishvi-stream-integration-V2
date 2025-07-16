@@ -1,12 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UserOrderView
-	{
-		public DateTime ModifiedDateTime { get; set; }
+    {
+        public DateTime ModifiedDateTime { get; set; }
 
         /// <summary>
         /// View ID 
@@ -28,6 +26,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean? AllowModify { get; set; }
 
-		public String JSONDetail { get; set; }
-	} 
+        public String JSONDetail { get; set; }
+    }
 }

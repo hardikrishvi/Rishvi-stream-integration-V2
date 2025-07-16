@@ -30,7 +30,7 @@ namespace Rishvi.Modules.Core.Helpers
 
         public static int ErrorLogInsert(string name, string description)
         {
-            string query = "Insert into Errorlog(ErrorLogID,Name,Description,CreatedAt,UpdatedAt)Values(newId(),'"+name+"','"+description+"',GetDate(),GetDate())";
+            string query = "Insert into Errorlog(ErrorLogID,Name,Description,CreatedAt,UpdatedAt)Values(newId(),'" + name + "','" + description + "',GetDate(),GetDate())";
             SqlConnection con = new SqlConnection(GetConnectionString("SqlHelperConnection"));
             SqlCommand cmd = new SqlCommand(query, con);
             cmd.CommandType = CommandType.Text;
@@ -41,10 +41,10 @@ namespace Rishvi.Modules.Core.Helpers
             return 0;
         }
 
-        public static int SystemLogInsert(string moduleName, string requestHeader, string requestJson, string responseJson,string status, string message, bool isError,string UserID)
+        public static int SystemLogInsert(string moduleName, string requestHeader, string requestJson, string responseJson, string status, string message, bool isError)
         {
             message = message == null ? "" : message;
-            string query = "Insert into Systemlog(SystemLogID, UserId,ModuleName,RequestHeader,RequestJson,ResponseJson,Status,Message,IsError,CreatedAt,UpdatedAt)Values(newId(),null,'" + moduleName + "','" + requestHeader + "','" + requestJson + "','" + responseJson + "','" + status + "','" + message.Replace("'"," ")+ "',"+ (isError ? '1':'0') + ",GetDate(),GetDate())";
+            string query = "Insert into Systemlog(SystemLogID, UserId,ModuleName,RequestHeader,RequestJson,ResponseJson,Status,Message,IsError,CreatedAt,UpdatedAt)Values(newId(),null,'" + moduleName + "','" + requestHeader + "','" + requestJson + "','" + responseJson + "','" + status + "','" + message.Replace("'", " ") + "'," + (isError ? '1' : '0') + ",GetDate(),GetDate())";
             SqlConnection con = new SqlConnection(GetConnectionString("SqlHelperConnection"));
             SqlCommand cmd = new SqlCommand(query, con);
             cmd.CommandType = CommandType.Text;

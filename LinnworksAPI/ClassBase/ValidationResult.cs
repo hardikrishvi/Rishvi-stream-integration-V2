@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ValidationResult
-	{
+    {
         /// <summary>
         /// Validation result 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// Additional information 
         /// </summary>
 		public String AdditionalInformation { get; set; }
-	} 
+    }
 }

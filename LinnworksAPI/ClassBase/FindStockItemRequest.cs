@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class FindStockItemRequest
-	{
-		public List<String> Codes { get; set; }
-	} 
+    {
+        public List<String> Codes { get; set; }
+    }
 }

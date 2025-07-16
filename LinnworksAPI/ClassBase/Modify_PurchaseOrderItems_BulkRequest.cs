@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Request that contains lists to delete, add and update purchase order items 
     /// </summary>
     public class Modify_PurchaseOrderItems_BulkRequest
-	{
+    {
         /// <summary>
         /// Purchase order id 
         /// </summary>
@@ -28,5 +27,5 @@ namespace LinnworksAPI
         /// Purchase order items to delete. PurchaseOrderItemId(s) 
         /// </summary>
 		public List<Guid> ItemsToDelete { get; set; }
-	} 
+    }
 }

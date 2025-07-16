@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderNote
-	{
+    {
         /// <summary>
         /// Order note ID 
         /// </summary>
@@ -36,6 +34,6 @@ namespace LinnworksAPI
         /// </summary>
 		public String CreatedBy { get; set; }
 
-		public Byte? NoteTypeId { get; set; }
-	} 
+        public Byte? NoteTypeId { get; set; }
+    }
 }

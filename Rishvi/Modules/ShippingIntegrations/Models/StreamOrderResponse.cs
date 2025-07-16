@@ -6,6 +6,10 @@
 
         public string AuthorizationToken { get; set; }
         public string ItemId { get; set; }
+
+        // ✅ New general error info
+        public bool IsError { get; set; }
+        public string ErrorMessage { get; set; }
     }
     public class Response
     {

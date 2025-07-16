@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemExtendedProperty
-	{
+    {
         /// <summary>
         /// Record row ID (generate random) 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Property type 
         /// </summary>
 		public String PropertyType { get; set; }
-	} 
+    }
 }

@@ -1,20 +1,17 @@
-using System.Text;
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LinnworksAPI
-{ 
+{
     [JsonConverter(typeof(StringEnumConverter))]
-	public enum TransferStatus
-	{
-		Draft,
-		Request,
-		Accepted,
-		Packing,
-		InTransit,
-		CheckingIn,
-		Delivered,
-	}
+    public enum TransferStatus
+    {
+        Draft,
+        Request,
+        Accepted,
+        Packing,
+        InTransit,
+        CheckingIn,
+        Delivered,
+    }
 }

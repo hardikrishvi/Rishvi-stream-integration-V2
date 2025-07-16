@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class CouponValidationResult
-	{
+    {
         /// <summary>
         /// Validation note 
         /// </summary>
@@ -40,5 +38,5 @@ namespace LinnworksAPI
         /// Discount type 
         /// </summary>
 		public String DiscountType { get; set; }
-	} 
+    }
 }

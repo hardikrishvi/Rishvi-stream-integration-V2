@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Import execution options 
     /// </summary>
     public class ExecutionOptionType
-	{
+    {
         /// <summary>
         /// Data type 
         /// </summary>
@@ -31,5 +29,5 @@ namespace LinnworksAPI
         /// If true, match by just fulfilment sku. 
         /// </summary>
 		public ExecutionOptionType FulfilmentCenterInventoryImport_OnlyMatchByFulfilmentSku { get; set; }
-	} 
+    }
 }

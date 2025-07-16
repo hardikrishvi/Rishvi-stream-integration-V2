@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Rishvi.Modules.CronJob;
+﻿using Rishvi.Modules.CronJob;
 
 namespace Rishvi.Modules.Core.Extensions
 {

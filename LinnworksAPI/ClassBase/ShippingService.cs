@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ShippingService
-	{
+    {
         /// <summary>
         /// Postal service ID 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Courier Friendly Name (e.g. FedEx (US) for ShipEngine) 
         /// </summary>
 		public String vendorFriendlyName { get; set; }
-	} 
+    }
 }

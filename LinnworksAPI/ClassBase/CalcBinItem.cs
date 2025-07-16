@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents order item in the bin 
     /// </summary>
     public class CalcBinItem
-	{
+    {
         /// <summary>
         /// Bin Item Id 
         /// </summary>
@@ -29,6 +27,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32? BoxId { get; set; }
 
-		public Int32 Quantity { get; set; }
-	} 
+        public Int32 Quantity { get; set; }
+    }
 }

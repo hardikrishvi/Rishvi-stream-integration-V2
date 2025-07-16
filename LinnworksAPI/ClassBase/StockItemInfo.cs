@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Basic stock item information 
     /// </summary>
     public class StockItemInfo
-	{
+    {
         /// <summary>
         /// Item SKU 
         /// </summary>
@@ -38,5 +37,5 @@ namespace LinnworksAPI
         /// Product identifiers 
         /// </summary>
 		public List<StockItemIdentifier> Identifiers { get; set; }
-	} 
+    }
 }

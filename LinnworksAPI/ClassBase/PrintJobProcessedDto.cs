@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PrintJobProcessedDto
-	{
+    {
         /// <summary>
         /// List of order ids that have been processed 
         /// </summary>
@@ -25,5 +24,5 @@ namespace LinnworksAPI
         /// Whether this request has errored 
         /// </summary>
 		public Boolean IsError { get; set; }
-	} 
+    }
 }

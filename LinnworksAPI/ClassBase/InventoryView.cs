@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class InventoryView
-	{
+    {
         /// <summary>
         /// View ID 
         /// </summary>
@@ -70,5 +69,5 @@ namespace LinnworksAPI
         /// View channels 
         /// </summary>
 		public List<InventoryChannel> Channels { get; set; }
-	} 
+    }
 }

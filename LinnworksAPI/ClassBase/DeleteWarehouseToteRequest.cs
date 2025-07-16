@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class DeleteWarehouseToteRequest
-	{
+    {
         /// <summary>
         /// List of warehouse tote ids to delete 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// Location id 
         /// </summary>
 		public Guid LocationId { get; set; }
-	} 
+    }
 }

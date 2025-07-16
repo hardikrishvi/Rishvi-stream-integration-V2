@@ -75,7 +75,7 @@ namespace Rishvi.Modules.Core.Helpers
         }
         public static string StreamApiBasePath
         {
-            
+
             get
             {
                 return Setting<string>("StreamSetting:ApiBasePath");

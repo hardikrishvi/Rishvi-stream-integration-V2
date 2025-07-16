@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Purchase order delivery record 
     /// </summary>
     public class PurchaseOrderDeliveredRecord
-	{
+    {
         /// <summary>
         /// Delivery record Id 
         /// </summary>
@@ -48,5 +46,5 @@ namespace LinnworksAPI
         /// Purchase item batch Id (Optional) 
         /// </summary>
 		public Int32? fkBatchInventoryId { get; set; }
-	} 
+    }
 }

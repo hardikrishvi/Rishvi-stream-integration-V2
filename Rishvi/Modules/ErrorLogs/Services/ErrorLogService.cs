@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Data;
+using System.Data.SqlClient;
+using Microsoft.Extensions.Options;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.DTOs;
 using Rishvi.Modules.ErrorLogs.Models;
-using System;
-using System.Data;
-using System.Data.SqlClient;
 namespace Rishvi.Modules.ErrorLogs.Services
 {
     public interface IErrorLogService

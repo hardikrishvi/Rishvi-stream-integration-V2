@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PurchaseOrderItemOpenOrder
-	{
+    {
         /// <summary>
         /// Bound id 
         /// </summary>
@@ -40,5 +38,5 @@ namespace LinnworksAPI
         /// Order the items was bount to PO 
         /// </summary>
 		public Int32 Order { get; set; }
-	} 
+    }
 }

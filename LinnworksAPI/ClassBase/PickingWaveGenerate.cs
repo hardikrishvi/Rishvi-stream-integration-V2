@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveGenerate
-	{
+    {
         /// <summary>
         /// Location Id 
         /// </summary>
@@ -30,5 +29,5 @@ namespace LinnworksAPI
         /// Pickwave group type 
         /// </summary>
 		public PickingWaveGroupType GroupType { get; set; }
-	} 
+    }
 }

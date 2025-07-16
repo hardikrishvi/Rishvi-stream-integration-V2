@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ChannelServiceLinks
-	{
+    {
         /// <summary>
         /// ChannelName/Source (e.g. EBAY) 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Channel site 
         /// </summary>
 		public String Site { get; set; }
-	} 
+    }
 }

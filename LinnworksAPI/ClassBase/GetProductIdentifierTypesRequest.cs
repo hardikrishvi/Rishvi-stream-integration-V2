@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetProductIdentifierTypesRequest
-	{
-		public Dictionary<String,String> Types { get; set; }
-	} 
+    {
+        public Dictionary<String, String> Types { get; set; }
+    }
 }

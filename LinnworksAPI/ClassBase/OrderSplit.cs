@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Split Order 
     /// </summary>
     public class OrderSplit
-	{
+    {
         /// <summary>
         /// Items 
         /// </summary>
@@ -18,5 +17,5 @@ namespace LinnworksAPI
         /// Postal Service 
         /// </summary>
 		public Guid PostalServiceId { get; set; }
-	} 
+    }
 }

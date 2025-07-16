@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetWarehouseTotesRequest
-	{
+    {
         /// <summary>
         /// Location Id of the TOTs 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// (Optional) Id of the TOT, if specified TotBarcode is ignored. If null and TotBarcode not specified then returns all tots in the warehouse 
         /// </summary>
 		public Int32? TotId { get; set; }
-	} 
+    }
 }

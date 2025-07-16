@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class AddImageToInventoryItemResponse
-	{
+    {
         /// <summary>
         /// pkStockItemId of an item 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Image Thumbnail URL 
         /// </summary>
 		public String ImageThumbnailUrl { get; set; }
-	} 
+    }
 }

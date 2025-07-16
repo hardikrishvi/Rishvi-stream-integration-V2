@@ -1,17 +1,14 @@
-using Rishvi.Modules.ShippingIntegrations.Models;
-using Task = sib_api_v3_sdk.Model.Task;
-
-
 using Microsoft.EntityFrameworkCore;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.ShippingIntegrations.Models;
 
 public class ApplicationDbContext : DbContext
 {
-    
+
     public ApplicationDbContext()
     {
-            
+
     }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -20,7 +17,7 @@ public class ApplicationDbContext : DbContext
 
 
     public DbSet<OrderRoot> OrderRoot { get; set; }
-    
+
     public DbSet<WebhookResp.Event> Events { get; set; }
     // public DbSet<WebhookOrder> Orders { get; set; }
     public DbSet<WebhookResponse.Run> Runs { get; set; }
@@ -28,12 +25,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<GeneralInfo> GeneralInfo { get; set; }
     public DbSet<ShippingInfo> ShippingInfo { get; set; }
     public DbSet<TaxInfo> TaxInfo { get; set; }
-    
+
     public DbSet<Rishvi.Models.Item> Item { get; set; }
     public DbSet<CustomerInfo> CustomerInfo { get; set; }
     public DbSet<TotalsInfo> TotalsInfo { get; set; }
     public DbSet<Fulfillment> Fulfillment { get; set; }
-    
+
     public DbSet<ClientAuth> ClientAuth { get; set; }
 
     public DbSet<Rishvi.Models.Authorization> Authorizations { get; set; }

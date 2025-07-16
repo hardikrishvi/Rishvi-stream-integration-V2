@@ -1,9 +1,9 @@
-﻿using LinnworksMacroHelpers.Classes;
-using LinnworksMacroHelpers.Classes.Email;
-using LinnworksMacroHelpers.Classes.Utility;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
+using LinnworksMacroHelpers.Classes;
+using LinnworksMacroHelpers.Classes.Email;
+using LinnworksMacroHelpers.Classes.Utility;
 
 namespace LinnworksMacroHelpers.Interfaces
 {

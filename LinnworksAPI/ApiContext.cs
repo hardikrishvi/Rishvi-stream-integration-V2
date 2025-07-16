@@ -8,7 +8,7 @@ namespace LinnworksAPI
         public Guid SessionId { get; private set; }
         public int RecursionCount { get; set; }
 
-        public ApiContext(Guid sessionId, string apiServer, int recursionCount) 
+        public ApiContext(Guid sessionId, string apiServer, int recursionCount)
             : this(sessionId, apiServer)
         {
             RecursionCount = recursionCount;

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class BatchInformation
-	{
+    {
         /// <summary>
         /// Stock item id 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// Stock item batch data 
         /// </summary>
 		public List<StockItemBatch> ItemBatchInformation { get; set; }
-	} 
+    }
 }

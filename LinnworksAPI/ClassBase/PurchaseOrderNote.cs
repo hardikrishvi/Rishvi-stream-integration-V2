@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Purchase order note class 
     /// </summary>
     public class PurchaseOrderNote
-	{
+    {
         /// <summary>
         /// Unique identifier for the purchase order note. Use this ID in Delete/Modify calls 
         /// </summary>
@@ -38,5 +36,5 @@ namespace LinnworksAPI
         /// Format the Note Time 
         /// </summary>
 		public String NoteTime { get; set; }
-	} 
+    }
 }

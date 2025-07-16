@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ConfigPaymentMethodMapping
-	{
+    {
         /// <summary>
         /// Readonly collection of Mapping as mapping should only be modified through the add and remove methods 
         /// </summary>
@@ -16,6 +15,6 @@ namespace LinnworksAPI
         /// </summary>
 		public List<ChannelPaymentMethod> ChannelServices { get; set; }
 
-		public Boolean IsChanged { get; set; }
-	} 
+        public Boolean IsChanged { get; set; }
+    }
 }

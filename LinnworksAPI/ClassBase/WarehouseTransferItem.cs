@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class WarehouseTransferItem
-	{
+    {
         /// <summary>
         /// Transfer ID 
         /// </summary>
@@ -80,5 +79,5 @@ namespace LinnworksAPI
         /// List of transfer notes 
         /// </summary>
 		public List<WarehouseTransferItemNote> ItemNotes { get; set; }
-	} 
+    }
 }

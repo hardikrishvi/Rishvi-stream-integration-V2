@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class VariationGroup
-	{
+    {
         /// <summary>
         /// Variation parent SKU 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// Variation parent title 
         /// </summary>
 		public String VariationGroupName { get; set; }
-	} 
+    }
 }

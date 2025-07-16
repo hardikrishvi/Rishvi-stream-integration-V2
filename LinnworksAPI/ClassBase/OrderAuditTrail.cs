@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderAuditTrail
-	{
+    {
         /// <summary>
         /// Date and time when audit record was added 
         /// </summary>
@@ -40,5 +38,5 @@ namespace LinnworksAPI
         /// Note type description 
         /// </summary>
 		public String TypeDescription { get; set; }
-	} 
+    }
 }

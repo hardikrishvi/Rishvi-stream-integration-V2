@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateAdditionalCostItem
-	{
+    {
         /// <summary>
         /// Additional cost line row id, uniquely identifying each cost line 
         /// </summary>
@@ -16,22 +14,22 @@ namespace LinnworksAPI
         /// </summary>
 		public Guid Id { get; set; }
 
-		public Int32 AdditionalCostTypeId { get; set; }
+        public Int32 AdditionalCostTypeId { get; set; }
 
-		public String Reference { get; set; }
+        public String Reference { get; set; }
 
-		public Decimal SubTotalLineCost { get; set; }
+        public Decimal SubTotalLineCost { get; set; }
 
-		public Decimal TaxRate { get; set; }
+        public Decimal TaxRate { get; set; }
 
-		public String Currency { get; set; }
+        public String Currency { get; set; }
 
-		public Decimal ConversionRate { get; set; }
+        public Decimal ConversionRate { get; set; }
 
-		public Boolean AllocationLocked { get; set; }
+        public Boolean AllocationLocked { get; set; }
 
-		public Boolean Print { get; set; }
+        public Boolean Print { get; set; }
 
-		public AllocationMethods AllocationMethod { get; set; }
-	} 
+        public AllocationMethods AllocationMethod { get; set; }
+    }
 }

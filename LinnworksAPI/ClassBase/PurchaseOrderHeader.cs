@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents purchase order header. 
     /// </summary>
     public class PurchaseOrderHeader
-	{
+    {
         /// <summary>
         /// Unique identifier for the purchase order. You have to use this ID for all updates to the PO 
         /// </summary>
@@ -135,5 +133,5 @@ namespace LinnworksAPI
         /// Total amount of the purchase order, converted to system currency 
         /// </summary>
 		public Decimal ConvertedGrandTotal { get; set; }
-	} 
+    }
 }

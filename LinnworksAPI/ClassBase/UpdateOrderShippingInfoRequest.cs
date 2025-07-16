@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateOrderShippingInfoRequest
-	{
+    {
         /// <summary>
         /// Postal service ID 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// If there is an adjustment to shipping cost was made 
         /// </summary>
 		public Boolean? ManualAdjust { get; set; }
-	} 
+    }
 }

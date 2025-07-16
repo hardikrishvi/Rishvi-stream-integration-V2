@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class DeleteScrapCategoriesRequest
-	{
-		public IEnumerable<Int32> CategoryIds { get; set; }
-	} 
+    {
+        public IEnumerable<Int32> CategoryIds { get; set; }
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PaymentMethod
-	{
+    {
         /// <summary>
         /// Payment method name 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// Payment method ID 
         /// </summary>
 		public Guid PaymentMethodId { get; set; }
-	} 
+    }
 }

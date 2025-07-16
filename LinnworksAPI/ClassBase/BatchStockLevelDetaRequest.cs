@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class BatchStockLevelDetaRequest
-	{
-		public List<BatchStockLevelDelta> StockLevelDeltas { get; set; }
+    {
+        public List<BatchStockLevelDelta> StockLevelDeltas { get; set; }
 
-		public Guid StockLocationId { get; set; }
-	} 
+        public Guid StockLocationId { get; set; }
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class TextFieldFilter
-	{
+    {
         /// <summary>
         /// Filter type 
         /// </summary>
@@ -16,6 +14,6 @@ namespace LinnworksAPI
         /// </summary>
 		public String Text { get; set; }
 
-		public FieldCode FieldCode { get; set; }
-	} 
+        public FieldCode FieldCode { get; set; }
+    }
 }

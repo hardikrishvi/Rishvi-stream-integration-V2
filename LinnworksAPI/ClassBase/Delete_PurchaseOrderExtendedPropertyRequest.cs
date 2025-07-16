@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class Delete_PurchaseOrderExtendedPropertyRequest
-	{
+    {
         /// <summary>
         /// Purchase order unique identifier 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// List of ids to delete 
         /// </summary>
 		public List<Int32> RowIds { get; set; }
-	} 
+    }
 }

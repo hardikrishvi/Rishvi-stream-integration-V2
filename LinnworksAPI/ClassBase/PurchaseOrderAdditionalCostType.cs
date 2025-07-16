@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Purchase order additional cost type. 
     /// </summary>
     public class PurchaseOrderAdditionalCostType
-	{
+    {
         /// <summary>
         /// Additional Cost type id 
         /// </summary>
@@ -38,5 +36,5 @@ namespace LinnworksAPI
         /// Indicate the method to calculate the allocation %  for each item 
         /// </summary>
 		public AllocationMethods AllocationMethod { get; set; }
-	} 
+    }
 }

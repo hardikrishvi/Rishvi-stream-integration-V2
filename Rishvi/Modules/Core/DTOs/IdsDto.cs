@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Rishvi.Modules.Core.DTOs
+﻿namespace Rishvi.Modules.Core.DTOs
 {
     public class IdsDto
     {

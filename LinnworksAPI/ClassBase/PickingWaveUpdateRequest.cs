@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveUpdateRequest
-	{
+    {
         /// <summary>
         /// Pickwave id 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// End date time of pickwave 
         /// </summary>
 		public DateTime? EndTime { get; set; }
-	} 
+    }
 }

@@ -10,7 +10,6 @@ using Rishvi.DTOs.Address;
 using Rishvi.DTOs.CustomerInfo;
 using Rishvi.DTOs.Fulfillment;
 using Rishvi.DTOs.GeneralInfo;
-using Rishvi.DTOs.Item;
 using Rishvi.DTOs.OrderRoot;
 using Rishvi.DTOs.ShippingInfo;
 using Rishvi.DTOs.TaxInfo;
@@ -44,12 +43,12 @@ namespace Rishvi.Domain.Mapper
             CreateMap<CustomerInfoDto, CustomerInfo>();
             CreateMap<FulfillmentDto, Fulfillment>();
             CreateMap<GeneralInfoDto, GeneralInfo>();
-          //  CreateMap<ItemDto, Item>();
-            CreateMap<OrderRootDto,OrderRoot>();
-            CreateMap<ShippingInfoDto,ShippingInfo>();
-            CreateMap<TaxInfoDto,TaxInfo>();
+            //  CreateMap<ItemDto, Item>();
+            CreateMap<OrderRootDto, OrderRoot>();
+            CreateMap<ShippingInfoDto, ShippingInfo>();
+            CreateMap<TaxInfoDto, TaxInfo>();
             CreateMap<TotalsInfoDto, TotalsInfo>();
-            
+
             CreateMap<SyncSettingsDto, SyncSettings>();
             CreateMap<StreamSettingsDto, StreamSettings>();
             CreateMap<LinnworksSettingsDto, LinnworksSettings>();

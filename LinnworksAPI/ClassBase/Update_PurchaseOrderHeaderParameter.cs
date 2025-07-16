@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Change purchase order status. You can change from PENDING to OPEN, from OPEN to DELIVERED, from PARTIAL to DELIVERED 
     /// </summary>
     public class Update_PurchaseOrderHeaderParameter
-	{
+    {
         /// <summary>
         /// Unique identifier for the purchase order. You have to use this ID for all updates to the PO 
         /// </summary>
@@ -70,5 +68,5 @@ namespace LinnworksAPI
         /// Use additional costs with Shipping flag to record shipping costs. This field remains available in the API for backward compatibility and acts pretty much like an additional cost item with type 
         /// </summary>
 		public Decimal? PostagePaid { get; set; }
-	} 
+    }
 }

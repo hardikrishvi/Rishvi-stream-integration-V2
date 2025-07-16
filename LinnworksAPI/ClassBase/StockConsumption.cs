@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockConsumption
-	{
+    {
         /// <summary>
         /// When stock was sold 
         /// </summary>
@@ -26,8 +24,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32 Shipped { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

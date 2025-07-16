@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ProcessedOrderWeb
-	{
+    {
         /// <summary>
         /// Order ID 
         /// </summary>
@@ -116,7 +114,7 @@ namespace LinnworksAPI
         /// </summary>
 		public String Vendor { get; set; }
 
-		public String BillingEmailAddress { get; set; }
+        public String BillingEmailAddress { get; set; }
 
         /// <summary>
         /// Order reference number 
@@ -312,5 +310,5 @@ namespace LinnworksAPI
         /// Order fulfilment location 
         /// </summary>
 		public String FulfilmentLocationName { get; set; }
-	} 
+    }
 }

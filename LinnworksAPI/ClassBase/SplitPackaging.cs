@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class SplitPackaging
-	{
+    {
         /// <summary>
         /// Bin split index 
         /// </summary>
@@ -50,5 +48,5 @@ namespace LinnworksAPI
         /// Item weight 
         /// </summary>
 		public Double Weight { get; set; }
-	} 
+    }
 }

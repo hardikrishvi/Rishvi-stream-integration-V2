@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemBatch
-	{
+    {
         /// <summary>
         /// Batch ID 
         /// </summary>
@@ -51,6 +50,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean IsDeleted { get; set; }
 
-		public IEnumerable<StockItemBatchInventory> Item { get; set; }
-	} 
+        public IEnumerable<StockItemBatchInventory> Item { get; set; }
+    }
 }

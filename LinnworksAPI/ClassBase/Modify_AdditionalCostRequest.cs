@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class Modify_AdditionalCostRequest
-	{
+    {
         /// <summary>
         /// list of additional cost items to add. Each item has Id which will be returned to you to match the item you are adding to array on your side 
         /// </summary>
@@ -25,5 +24,5 @@ namespace LinnworksAPI
         /// Purchase order id 
         /// </summary>
 		public Guid PurchaseId { get; set; }
-	} 
+    }
 }

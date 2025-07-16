@@ -1,5 +1,4 @@
 ﻿using LinnworksAPI;
-using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 using static Rishvi.Modules.ShippingIntegrations.Core.Helper.ServiceHelper;
 

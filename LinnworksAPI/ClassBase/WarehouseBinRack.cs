@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Warehouse binrack 
     /// </summary>
     public class WarehouseBinRack
-	{
+    {
         /// <summary>
         /// BinRack internal id 
         /// </summary>
@@ -119,7 +118,7 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32 UniqueSkus { get; set; }
 
-		public WarehouseBinRackItemsInfo ItemsInfo { get; set; }
+        public WarehouseBinRackItemsInfo ItemsInfo { get; set; }
 
         /// <summary>
         /// Binrack type 
@@ -130,5 +129,5 @@ namespace LinnworksAPI
         /// Indicates if the binrack is valid for the supplied stockitem. 
         /// </summary>
 		public Boolean? IsValidForStockItem { get; set; }
-	} 
+    }
 }

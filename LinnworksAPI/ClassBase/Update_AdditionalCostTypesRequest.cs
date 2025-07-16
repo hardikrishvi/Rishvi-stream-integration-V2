@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Update_AdditionalCostTypesRequest
-	{
+    {
         /// <summary>
         /// Additional Cost type id to update 
         /// </summary>
@@ -31,6 +29,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean? Print { get; set; }
 
-		public AllocationMethods? AllocationMethod { get; set; }
-	} 
+        public AllocationMethods? AllocationMethod { get; set; }
+    }
 }

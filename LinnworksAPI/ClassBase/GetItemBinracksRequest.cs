@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetItemBinracksRequest
-	{
+    {
         /// <summary>
         /// Stock item Id 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// If true, the response will also contain binracks that cannot be selected to pick from 
         /// </summary>
 		public Boolean IncludeNonPickLocations { get; set; }
-	} 
+    }
 }

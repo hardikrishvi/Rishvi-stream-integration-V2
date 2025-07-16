@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderRelation
-	{
+    {
         /// <summary>
         /// Parent order GUID 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Relation type 
         /// </summary>
 		public String Type { get; set; }
-	} 
+    }
 }

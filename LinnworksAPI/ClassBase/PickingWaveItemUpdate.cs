@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveItemUpdate
-	{
+    {
         /// <summary>
         /// Pickwave item row id 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// To Pick Quantity 
         /// </summary>
 		public Int32? ToPickQuantity { get; set; }
-	} 
+    }
 }

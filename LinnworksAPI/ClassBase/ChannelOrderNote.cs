@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ChannelOrderNote
-	{
+    {
         /// <summary>
         /// Order Note 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Declares if the note is an internal note 
         /// </summary>
 		public Boolean Internal { get; set; }
-	} 
+    }
 }

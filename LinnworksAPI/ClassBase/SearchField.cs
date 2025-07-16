@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents the list of fields to be included it the where clause for searching 
     /// </summary>
     public class SearchField
-	{
+    {
         /// <summary>
         /// Search field 
         /// </summary>
@@ -28,5 +26,5 @@ namespace LinnworksAPI
         /// If search is exact 
         /// </summary>
 		public Boolean ExactSearchOptional { get; set; }
-	} 
+    }
 }
