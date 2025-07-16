@@ -70,6 +70,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("UserConfig")]
         public UserConfigResponse UserConfig([FromBody] UserConfigRequest request)
         {
+            SqlHelper.SystemLogInsert("UserConfig", null, null, JsonConvert.SerializeObject(request), "UserConfigStart", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
                 // Authenticate the user
@@ -83,7 +84,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         ErrorMessage = $"Authorization failed for token {request.AuthorizationToken}"
                     };
                 }
-
+                SqlHelper.SystemLogInsert("UserConfigauthEntity", null, null, JsonConvert.SerializeObject(authEntity), "UserConfigStart", JsonConvert.SerializeObject(authEntity), false, "clientId");
                 // If config is not activated (Wizard Stage - integration steps)
                 if (!auth.IsConfigActive)
                 {
@@ -138,6 +139,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("UpdateConfig")]
         public UpdateConfigResponse UpdateConfig([FromBody] UpdateConfigRequest request)
         {
+            SqlHelper.SystemLogInsert("UpdateConfig", null, null, JsonConvert.SerializeObject(request), "UpdateConfig", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
                 // Authenticate the user and load the config file

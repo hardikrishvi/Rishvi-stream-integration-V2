@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Azure.Core;
+using Newtonsoft.Json;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
@@ -280,7 +281,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                 LinnworksUniqueIdentifier = new_auth.LinnworksUniqueIdentifier,
                 AccountName = new_auth.AccountName
             };
-
+            SqlHelper.SystemLogInsert("AddNewUser", null, null, JsonConvert.SerializeObject(output), "AuthorizeToken", JsonConvert.SerializeObject(output), false, "clientId");
             return output;
 
             //AuthorizationConfigClass output = new AuthorizationConfigClass();
