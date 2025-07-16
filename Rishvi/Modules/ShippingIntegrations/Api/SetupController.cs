@@ -31,7 +31,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
+               // EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
                 // Validate input fields
                 if (string.IsNullOrWhiteSpace(request.Email))
                     return new AddNewUserResponse("Invalid Email");

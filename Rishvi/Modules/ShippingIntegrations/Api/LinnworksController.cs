@@ -151,11 +151,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                       .ToList();
 
                     var pendingOrders = reportData.Where(f => !f.IsLinnOrderCreatedInStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
-                    EmailHelper.SendEmail("Pending Orders shared stream ", string.Join(",", pendingOrders.Select(x => x.LinnNumOrderId)));
+                  
                     foreach (var pendingOrder in pendingOrders)
                     {
                         string ab = JsonConvert.SerializeObject(pendingOrder);
-                        EmailHelper.SendEmail("Send Order to stream " + pendingOrder.LinnNumOrderId, ab);
+                      
                         await _tradingApiOAuthHelper.CreateLinnworksOrdersToStream(user, pendingOrder.LinnNumOrderId.ToString());
                     }
                 }
@@ -643,7 +643,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
 
             _unitOfWork.Context.SaveChanges();
-            EmailHelper.SendEmail("Req Json", data);
             try
             {
 

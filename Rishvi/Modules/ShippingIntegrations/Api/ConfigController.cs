@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
@@ -30,6 +31,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegistrationData request)
         {
+            SqlHelper.SystemLogInsert("DeleteOrder", null, null, JsonConvert.SerializeObject(request), "OrderDeleted", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
                 var transformedEmail = (request.Email);
