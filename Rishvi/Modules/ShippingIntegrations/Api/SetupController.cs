@@ -46,7 +46,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 // Create a new authorization configuration
                 AuthorizationConfigClass newConfig = _authorizationToken.CreateNew(
                     request.Email,
-                    "",
+                    "NULL",
                     request.LinnworksUniqueIdentifier,
                     request.AccountName
                 );

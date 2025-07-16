@@ -253,8 +253,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
         }
 
         public AuthorizationConfigClass CreateNew(string email, string SessionID,
-            string LinnworksUniqueIdentifier, string accountName, string clientid = null, string secret = null,
-            string state = null)
+            string LinnworksUniqueIdentifier, string accountName, string clientid = "null", string secret = "null",
+            string state = "null")
         {
             var new_auth = new Authorization()
             {
