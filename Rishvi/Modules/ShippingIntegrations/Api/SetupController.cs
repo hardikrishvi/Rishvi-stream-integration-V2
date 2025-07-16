@@ -1,5 +1,6 @@
 ﻿using LinnworksAPI;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
@@ -30,6 +31,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
                 // Validate input fields
                 if (string.IsNullOrWhiteSpace(request.Email))
                     return new AddNewUserResponse("Invalid Email");
