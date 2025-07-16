@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PurchaseOrderAudit
-	{
+    {
         /// <summary>
         /// Purchase audit trail ID 
         /// </summary>
@@ -50,5 +48,5 @@ namespace LinnworksAPI
         /// Time when purchase order audit record was created 
         /// </summary>
 		public String AuditTrailTime { get; set; }
-	} 
+    }
 }

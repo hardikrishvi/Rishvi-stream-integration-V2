@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ChannelRefundSubReason
-	{
+    {
         /// <summary>
         /// Tag 
         /// </summary>
@@ -15,5 +13,5 @@ namespace LinnworksAPI
         /// Display name 
         /// </summary>
 		public String DisplayName { get; set; }
-	} 
+    }
 }

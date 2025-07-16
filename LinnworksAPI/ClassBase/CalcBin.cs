@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents split packaging bin 
     /// </summary>
     public class CalcBin
-	{
+    {
         /// <summary>
         /// Bin Id 
         /// </summary>
@@ -83,5 +82,5 @@ namespace LinnworksAPI
         /// Object to data table mapping 
         /// </summary>
 		public SqlDataRecord DataRecordMetaData { get; set; }
-	} 
+    }
 }

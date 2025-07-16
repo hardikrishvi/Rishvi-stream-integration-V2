@@ -9,7 +9,7 @@ namespace Rishvi.Modules.ErrorLogs.Models.DTOs
             SortType = "DESC";
         }
         public string ModuleName { get; set; }
-        public string Status { get; set; }  
+        public string Status { get; set; }
         public bool? IsError { get; set; }
     }
 }

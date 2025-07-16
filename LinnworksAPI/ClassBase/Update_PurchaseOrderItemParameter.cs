@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Update purchase order item parameter 
     /// </summary>
     public class Update_PurchaseOrderItemParameter
-	{
+    {
         /// <summary>
         /// Purchase order item unique row identifier 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// Tax Rate (Optional) 
         /// </summary>
 		public Decimal? TaxRate { get; set; }
-	} 
+    }
 }

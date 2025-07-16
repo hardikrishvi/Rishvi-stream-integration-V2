@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetOrderItemBatchesByOrderIdsRequest
-	{
-		public List<Guid> pkOrderIds { get; set; }
-	} 
+    {
+        public List<Guid> pkOrderIds { get; set; }
+    }
 }

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetInventoryItemBatchInformationByIdsRequest
-	{
+    {
         /// <summary>
         /// A list of stock item ids 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// Defines whether we should only return available items 
         /// </summary>
 		public Boolean AvailableOnly { get; set; }
-	} 
+    }
 }

@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Stock Item header information 
     /// </summary>
     public class StockItemHeader
-	{
+    {
         /// <summary>
         /// SKU 
         /// </summary>
@@ -119,8 +117,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean SerialNumberScanRequired { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

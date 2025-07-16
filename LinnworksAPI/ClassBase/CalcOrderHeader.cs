@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents a single instance of an order and its header packaging information. Note that if the order contains split packaging fkPackagingTypeId will be Empty Guid 
     /// </summary>
     public class CalcOrderHeader
-	{
+    {
         /// <summary>
         /// Order id 
         /// </summary>
@@ -84,7 +83,7 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean ManualAdjust { get; set; }
 
-		public Boolean CanAutoSplit { get; set; }
+        public Boolean CanAutoSplit { get; set; }
 
         /// <summary>
         /// Was the packaging automatically split? Usually by the 3D Packaging method. 
@@ -125,5 +124,5 @@ namespace LinnworksAPI
         /// Dimension Calculation method 
         /// </summary>
 		public CalcMethod DimMethod { get; set; }
-	} 
+    }
 }

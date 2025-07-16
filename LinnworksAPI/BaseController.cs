@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LinnworksAPI
+﻿namespace LinnworksAPI
 {
     public abstract class BaseController : IBaseController
     {

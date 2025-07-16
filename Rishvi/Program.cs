@@ -1,19 +1,18 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Hangfire;
+using Microsoft.EntityFrameworkCore;
+using Rishvi;
+using Rishvi.Dependencies;
+using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
-using Rishvi;
-using SyncApiController.Services;
-using Rishvi.Modules.ShippingIntegrations.Models.Classes;
-using Rishvi_Vault;
-using Microsoft.EntityFrameworkCore;
-using Rishvi.Modules.Core.Aws;
-using Rishvi.Modules.ShippingIntegrations.Core.Helper;
-using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Api;
-using Hangfire;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
-using Rishvi.Dependencies;
+using Rishvi.Modules.ShippingIntegrations.Models.Classes;
+using SyncApiController.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class AddImageToInventoryItemRequest
-	{
+    {
         /// <summary>
         /// SKU number of an item 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Image URL 
         /// </summary>
 		public String ImageUrl { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ProcessOrderResult
-	{
+    {
         /// <summary>
         /// Order ID (pkOrderId) 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// There was ab error during processing 
         /// </summary>
 		public String Error { get; set; }
-	} 
+    }
 }

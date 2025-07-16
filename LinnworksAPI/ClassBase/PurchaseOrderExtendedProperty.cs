@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Purchase Order extended property item 
     /// </summary>
     public class PurchaseOrderExtendedProperty
-	{
+    {
         /// <summary>
         /// Extended Property item id 
         /// </summary>
@@ -38,5 +36,5 @@ namespace LinnworksAPI
         /// Property value (max 600) 
         /// </summary>
 		public String PropertyValue { get; set; }
-	} 
+    }
 }

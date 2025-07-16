@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rishvi.Modules.Core.Extensions
+﻿namespace Rishvi.Modules.Core.Extensions
 {
     public static class DateTimeExtensions
     {

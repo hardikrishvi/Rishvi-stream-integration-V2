@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PostSaleSubStatus
-	{
+    {
         /// <summary>
         /// For an individual refund line, this identifies the line's state on the channel. For the header, if all its lines have the same StatusTag, it will also have the same StatusTag. If not,
         /// it will determine an appropriate StatusTag based on those of its lines 
@@ -31,5 +30,5 @@ namespace LinnworksAPI
         /// Where certain fields need to be modified for the refund to be successfully actioned, this list is populated with a list of the field names, allowing them to be edited as necessary 
         /// </summary>
 		public List<String> EditableFields { get; set; }
-	} 
+    }
 }

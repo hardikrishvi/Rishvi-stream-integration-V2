@@ -9,7 +9,7 @@ public class AddressConfiguration : Rishvi.Core.Data.IEntityTypeConfiguration<Ad
 {
     public void Map(EntityTypeBuilder<Address> builder)
     {
-        
+
         // Primary Key
         builder.HasKey(x => x.Id);
 

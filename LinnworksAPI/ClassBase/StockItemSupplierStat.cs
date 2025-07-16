@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemSupplierStat
-	{
+    {
         /// <summary>
         /// If supplier information is default 
         /// </summary>
@@ -76,8 +74,8 @@ namespace LinnworksAPI
         /// </summary>
 		public String SupplierCurrency { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Search_Stock_ByKey
-	{
+    {
         /// <summary>
         /// Item ID 
         /// </summary>
@@ -15,5 +13,5 @@ namespace LinnworksAPI
         /// Location ID 
         /// </summary>
 		public Guid LocationId { get; set; }
-	} 
+    }
 }

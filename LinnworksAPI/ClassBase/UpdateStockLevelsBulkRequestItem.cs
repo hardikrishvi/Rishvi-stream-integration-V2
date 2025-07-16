@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateStockLevelsBulkRequestItem
-	{
+    {
         /// <summary>
         /// SKU - Optional if stock item id is provided 
         /// </summary>
@@ -55,5 +53,5 @@ namespace LinnworksAPI
         /// RowIndex - Optional, can be used to marry up request items with response items. 
         /// </summary>
 		public Int32 RowIndex { get; set; }
-	} 
+    }
 }

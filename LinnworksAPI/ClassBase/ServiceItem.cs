@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ServiceItem
-	{
+    {
         /// <summary>
         /// Order item record row ID 
         /// </summary>
@@ -40,5 +38,5 @@ namespace LinnworksAPI
         /// If automatic refunds allowed 
         /// </summary>
 		public Boolean AllowsAutomatedRefund { get; set; }
-	} 
+    }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Rishvi.Modules.Core.DTOs;
 
 namespace Rishvi.Modules.Core.Mappers
@@ -13,7 +12,7 @@ namespace Rishvi.Modules.Core.Mappers
 
             // For Nullable DateTime
             CreateMap<DateTime?, DateTimeDto>().ConvertUsing<NullableDateTimeToDtoConverter>();
-            
+
         }
     }
 

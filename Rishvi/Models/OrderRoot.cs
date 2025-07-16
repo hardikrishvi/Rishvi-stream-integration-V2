@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using Rishvi.Core.Data;
 using System.ComponentModel.DataAnnotations.Schema;
+using Rishvi.Core.Data;
 
 namespace Rishvi.Models;
 
@@ -8,7 +8,7 @@ namespace Rishvi.Models;
 public class OrderRoot : IModificationHistory
 {
     [Key]
-    public Guid OrderId { get; set; } 
+    public Guid OrderId { get; set; }
     public int NumOrderId { get; set; }
     public GeneralInfo GeneralInfo { get; set; }
     public ShippingInfo ShippingInfo { get; set; }
@@ -22,7 +22,7 @@ public class OrderRoot : IModificationHistory
     public List<Item> Items { get; set; }
     public bool? HasItems { get; set; }
     public int? TotalItemsSum { get; set; }
-    
+
     public string TempColumn { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

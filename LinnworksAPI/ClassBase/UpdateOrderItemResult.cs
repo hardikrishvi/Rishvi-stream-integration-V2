@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateOrderItemResult
-	{
+    {
         /// <summary>
         /// Order figures 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Order total weight 
         /// </summary>
 		public Double TotalWeight { get; set; }
-	} 
+    }
 }

@@ -1,21 +1,18 @@
-using System.Text;
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LinnworksAPI
-{ 
+{
     [JsonConverter(typeof(StringEnumConverter))]
-	public enum ConfigValueType
-	{
-		STRING,
-		INT,
-		DOUBLE,
-		BOOLEAN,
-		PASSWORD,
-		LIST,
-		URL,
-		BUTTON,
-	}
+    public enum ConfigValueType
+    {
+        STRING,
+        INT,
+        DOUBLE,
+        BOOLEAN,
+        PASSWORD,
+        LIST,
+        URL,
+        BUTTON,
+    }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -61,7 +60,7 @@ namespace Rishvi.Migrations
                         principalTable: "Orders",
                         principalColumn: "OrderId");
                 });
-            
+
             migrationBuilder.CreateIndex(
                 name: "IX_Item_ItemId1",
                 table: "Item",
@@ -72,17 +71,17 @@ namespace Rishvi.Migrations
                 table: "Item",
                 column: "OrderRootOrderId");
 
-            
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            
+
             migrationBuilder.DropTable(
                 name: "Item");
 
-            
+
         }
     }
 }

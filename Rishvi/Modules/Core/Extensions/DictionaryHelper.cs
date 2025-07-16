@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Rishvi.Modules.Core.Extensions
+﻿namespace Rishvi.Modules.Core.Extensions
 {
     public static class DictionaryHelper
     {

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class WarehouseTransferBinNote
-	{
+    {
         /// <summary>
         /// Transfer bin note ID 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// Bin ID 
         /// </summary>
 		public Guid PkBinId { get; set; }
-	} 
+    }
 }

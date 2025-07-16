@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Fulfilment Center Import and Export Settings 
     /// </summary>
     public class FulfilmentCenterImportExportSettings
-	{
+    {
         /// <summary>
         /// Stock location ID. 
         /// </summary>
@@ -43,5 +41,5 @@ namespace LinnworksAPI
         /// True if Inventory Import is enabled. 
         /// </summary>
 		public Boolean InventoryImportEnabled { get; set; }
-	} 
+    }
 }

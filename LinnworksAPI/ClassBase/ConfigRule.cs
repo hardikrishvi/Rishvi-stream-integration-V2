@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ConfigRule
-	{
-		public String FieldName { get; set; }
+    {
+        public String FieldName { get; set; }
 
-		public List<PropertyRule> Rules { get; set; }
-	} 
+        public List<PropertyRule> Rules { get; set; }
+    }
 }

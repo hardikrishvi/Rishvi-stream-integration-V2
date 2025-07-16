@@ -7,9 +7,6 @@ using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
 
-
-
-
 namespace Rishvi.Modules.ShippingIntegrations.Api
 {
     [Route("api/Config")]
@@ -41,11 +38,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     request.Password = _serviceHelper.HashPassword(request.Password);
 
                     _tradingApiOAuthHelper.RegisterSave(JsonConvert.SerializeObject(request), "", transformedEmail, request.AuthorizationToken);
-                    return Ok("ok");
+                    return Ok(new { message = "ok" });
                 }
                 else
                 {
-                    return Conflict("Email already registered.");
+                    return Conflict(new { message = "Email already registered." });
                 }
             }
             catch (Exception ex)
@@ -63,26 +60,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var transformedEmail = _serviceHelper.TransformEmail(value.Email);
                 var getData = _dbContext.IntegrationSettings
                     .FirstOrDefault(x => x.Email == transformedEmail);
-                //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
-                //if (!await AwsS3.S3FileIsExists("Authorization", fileName))
-                //{
-                //    return NotFound("Email not registered.");
-                //}
                 if (getData == null)
                 {
                     return NotFound("Email not registered.");
                 }
                 var res = _tradingApiOAuthHelper.GetRegistrationData(transformedEmail);
 
-                //var output = AwsS3.GetS3File("Authorization", fileName);
-                //var res = JsonConvert.DeserializeObject<RegistrationData>(output);
                 if (res.Password == _serviceHelper.HashPassword(value.Password))
                 {
-                    return Ok("ok");
+                    return Ok(new { message = "OK" }); 
                 }
                 else
                 {
-                    return Unauthorized("Incorrect Password.");
+                    return Unauthorized(new { message = "Incorrect Password." });
                 }
             }
             catch (Exception ex)
@@ -98,22 +88,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                //var transformedEmail = _serviceHelper.TransformEmail(email);
-                //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
-
                 var getData = _dbContext.IntegrationSettings
                     .FirstOrDefault(x => x.Email == email);
-
-                // Retrieve the file directly
-                //if (await AwsS3.S3FileIsExists("Authorization", fileName))
-                //{
-                //    var result = AwsS3.GetS3File("Authorization", fileName);
-                //    var output = JsonConvert.DeserializeObject<RegistrationData>(result);
-                //    // Ensure SyncModel is not null
-                //    output.Sync ??= new SyncModel();
-                //    return Ok(output);
-
-                //}
+                
                 if (getData != null)
                 {
                     var output = _tradingApiOAuthHelper.GetRegistrationData(email);
@@ -123,7 +100,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
                 else
                 {
-                    return NotFound("User not found.");
+                    return NotFound(new { message = "User not found" });
                 }
             }
             catch (Exception ex)
@@ -218,11 +195,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                     _dbContext.IntegrationSettings.Update(getData);
                     await _dbContext.SaveChangesAsync();
-                    return Ok("User data saved successfully.");
+                    return Ok(new { message = "User data saved successfully." });
                 }
                 else
                 {
-                    return NotFound("Email not registered.");
+                    return NotFound(new { message = "Email not registered." });
                 }
             }
             catch (Exception ex)

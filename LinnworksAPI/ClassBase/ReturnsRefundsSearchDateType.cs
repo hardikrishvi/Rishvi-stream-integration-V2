@@ -1,18 +1,15 @@
-using System.Text;
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LinnworksAPI
-{ 
+{
     [JsonConverter(typeof(StringEnumConverter))]
-	public enum ReturnsRefundsSearchDateType
-	{
-		ALLDATES,
-		RECEIVED,
-		PROCESSED,
-		BOOKED,
-		ACTIONED,
-	}
+    public enum ReturnsRefundsSearchDateType
+    {
+        ALLDATES,
+        RECEIVED,
+        PROCESSED,
+        BOOKED,
+        ACTIONED,
+    }
 }

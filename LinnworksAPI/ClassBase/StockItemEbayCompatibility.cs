@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemEbayCompatibility
-	{
+    {
         /// <summary>
         /// StockItem unique identifier (Optional if SKU is supplied) 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// Compatibility culture, one of US, UK, DE, AU, CA, FR, IT, ES 
         /// </summary>
 		public String Culture { get; set; }
-	} 
+    }
 }

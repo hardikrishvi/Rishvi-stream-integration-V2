@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Supplier
-	{
+    {
         /// <summary>
         /// Supplier Id 
         /// </summary>
@@ -80,5 +78,5 @@ namespace LinnworksAPI
         /// Currency used 
         /// </summary>
 		public String Currency { get; set; }
-	} 
+    }
 }

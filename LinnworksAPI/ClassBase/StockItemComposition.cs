@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemComposition
-	{
+    {
         /// <summary>
         /// Stock item ID of linked product 
         /// </summary>
@@ -36,18 +34,18 @@ namespace LinnworksAPI
         /// </summary>
 		public Byte InventoryTrackingType { get; set; }
 
-		public Double DimHeight { get; set; }
+        public Double DimHeight { get; set; }
 
-		public Double DimWidth { get; set; }
+        public Double DimWidth { get; set; }
 
-		public Double DimDepth { get; set; }
+        public Double DimDepth { get; set; }
 
-		public Double Weight { get; set; }
+        public Double Weight { get; set; }
 
-		public Guid PackageGroupId { get; set; }
+        public Guid PackageGroupId { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

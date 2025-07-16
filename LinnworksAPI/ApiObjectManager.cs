@@ -35,10 +35,10 @@ namespace LinnworksAPI
 
 
         public ApiObjectManager(ApiContext apiContext)
-        {                       
+        {
             this.apiContext = apiContext;
         }
-        
+
         public Guid GetSessionId()
         {
             return apiContext.SessionId;
@@ -259,6 +259,6 @@ namespace LinnworksAPI
             }
         }
 
- 
+
     }
 }

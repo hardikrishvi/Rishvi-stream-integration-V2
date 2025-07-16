@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemLabel
-	{
+    {
         /// <summary>
         /// Product SKU 
         /// </summary>
@@ -31,12 +29,12 @@ namespace LinnworksAPI
         /// </summary>
 		public String BatchNumber { get; set; }
 
-		public Int32 BatchInventoryId { get; set; }
+        public Int32 BatchInventoryId { get; set; }
 
-		public Guid LocationId { get; set; }
+        public Guid LocationId { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

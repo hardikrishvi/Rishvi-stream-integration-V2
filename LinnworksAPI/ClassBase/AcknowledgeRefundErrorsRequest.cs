@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class AcknowledgeRefundErrorsRequest
-	{
+    {
         /// <summary>
         /// The unique identifier for the refund header whose errors will be acknowledged 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// Ignores the RefundRowIds list and acknowledges all errors for the given refund header id 
         /// </summary>
 		public Boolean AcknowledgeAllErrors { get; set; }
-	} 
+    }
 }

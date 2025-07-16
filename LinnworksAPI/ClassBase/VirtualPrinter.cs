@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class VirtualPrinter
-	{
+    {
         /// <summary>
         /// Name used to identify the printer in linnworks 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Whether the printer is online or offline 
         /// </summary>
 		public PrinterStatus Status { get; set; }
-	} 
+    }
 }

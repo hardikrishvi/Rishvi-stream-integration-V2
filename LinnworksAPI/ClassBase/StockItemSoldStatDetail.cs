@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemSoldStatDetail
-	{
+    {
         /// <summary>
         /// Subsource (e.g EBAY1) 
         /// </summary>
@@ -35,5 +34,5 @@ namespace LinnworksAPI
         /// List of sold stock item information details 
         /// </summary>
 		public List<StockItemSoldStatFinalDetail> Detail { get; set; }
-	} 
+    }
 }

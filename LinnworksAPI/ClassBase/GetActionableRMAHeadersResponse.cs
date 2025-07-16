@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetActionableRMAHeadersResponse
-	{
+    {
         /// <summary>
         /// The page number returned 
         /// </summary>
@@ -25,5 +24,5 @@ namespace LinnworksAPI
         /// A collection of RMA headers matching the filter set by the request 
         /// </summary>
 		public List<OrderRMAHeader> RMAHeaders { get; set; }
-	} 
+    }
 }

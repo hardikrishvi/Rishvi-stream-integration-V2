@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class DeleteProductIdentifiersRequest
-	{
-		public IEnumerable<Int64> ProductIdentifierIds { get; set; }
-	} 
+    {
+        public IEnumerable<Int64> ProductIdentifierIds { get; set; }
+    }
 }

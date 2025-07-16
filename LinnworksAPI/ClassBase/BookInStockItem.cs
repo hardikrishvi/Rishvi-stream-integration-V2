@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Book in parameters used to update stock items 
     /// </summary>
     public class BookInStockItem
-	{
+    {
         /// <summary>
         /// Id of the stock item 
         /// </summary>
@@ -33,5 +31,5 @@ namespace LinnworksAPI
         /// Binrack of the item to be booked in. 
         /// </summary>
 		public String BinRack { get; set; }
-	} 
+    }
 }

@@ -1,12 +1,11 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class VerifiedRMAItem
-	{
-		public ReturnValidationErrorType ReturnValidationError { get; set; }
+    {
+        public ReturnValidationErrorType ReturnValidationError { get; set; }
 
         /// <summary>
         /// A unique identifier for the RMA line 
@@ -53,7 +52,7 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean Deleted { get; set; }
 
-		public Int32 ResendQuantity { get; set; }
+        public Int32 ResendQuantity { get; set; }
 
         /// <summary>
         /// In the case of an exchange or resend line, this is the identifier for the created order 
@@ -65,55 +64,55 @@ namespace LinnworksAPI
         /// </summary>
 		public String ValidationError { get; set; }
 
-		public String Error { get; set; }
+        public String Error { get; set; }
 
-		public List<RMAError> Errors { get; set; }
+        public List<RMAError> Errors { get; set; }
 
         /// <summary>
         /// Identifies any validation or submission information for this RMA item 
         /// </summary>
 		public String Info { get; set; }
 
-		public Guid ExchangeStockItemId { get; set; }
+        public Guid ExchangeStockItemId { get; set; }
 
-		public String ExchangeSKU { get; set; }
+        public String ExchangeSKU { get; set; }
 
-		public String ExchangeTitle { get; set; }
+        public String ExchangeTitle { get; set; }
 
-		public Int32 ExchangeQuantity { get; set; }
+        public Int32 ExchangeQuantity { get; set; }
 
-		public Guid DespatchLocationId { get; set; }
+        public Guid DespatchLocationId { get; set; }
 
-		public Decimal AdditionalCost { get; set; }
+        public Decimal AdditionalCost { get; set; }
 
-		public Guid OrderItemRowId { get; set; }
+        public Guid OrderItemRowId { get; set; }
 
-		public String ReturnItemSKU { get; set; }
+        public String ReturnItemSKU { get; set; }
 
-		public String ReturnItemTitle { get; set; }
+        public String ReturnItemTitle { get; set; }
 
-		public Int32? BatchInventoryId { get; set; }
+        public Int32? BatchInventoryId { get; set; }
 
-		public Guid ReturnLocation { get; set; }
+        public Guid ReturnLocation { get; set; }
 
-		public Int32 ReturnQuantity { get; set; }
+        public Int32 ReturnQuantity { get; set; }
 
-		public Decimal RefundAmount { get; set; }
+        public Decimal RefundAmount { get; set; }
 
-		public Guid? RefundRowId { get; set; }
+        public Guid? RefundRowId { get; set; }
 
-		public Int32 ScrapQuantity { get; set; }
+        public Int32 ScrapQuantity { get; set; }
 
-		public String ReasonCategory { get; set; }
+        public String ReasonCategory { get; set; }
 
-		public Boolean IsFreeText { get; set; }
+        public Boolean IsFreeText { get; set; }
 
-		public String Reason { get; set; }
+        public String Reason { get; set; }
 
-		public String ReasonTag { get; set; }
+        public String ReasonTag { get; set; }
 
-		public String SubReasonTag { get; set; }
+        public String SubReasonTag { get; set; }
 
-		public String BinrackOverride { get; set; }
-	} 
+        public String BinrackOverride { get; set; }
+    }
 }

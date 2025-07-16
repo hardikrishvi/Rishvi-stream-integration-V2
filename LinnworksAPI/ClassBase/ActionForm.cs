@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ActionForm
-	{
-		public String Caption { get; set; }
+    {
+        public String Caption { get; set; }
 
-		public List<ActionFormControl> Controls { get; set; }
-	} 
+        public List<ActionFormControl> Controls { get; set; }
+    }
 }

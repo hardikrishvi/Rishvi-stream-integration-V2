@@ -1,10 +1,8 @@
-﻿using Humanizer;
-
-namespace Rishvi.Modules.ShippingIntegrations.Models
+﻿namespace Rishvi.Modules.ShippingIntegrations.Models
 {
     public class RegisterModel
     {
-      
+
     }
     public class RegistrationData
     {

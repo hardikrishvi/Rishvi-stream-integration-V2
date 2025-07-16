@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ReturnInfo
-	{
+    {
         /// <summary>
         /// Return ID 
         /// </summary>
@@ -180,5 +178,5 @@ namespace LinnworksAPI
         /// Return date 
         /// </summary>
 		public DateTime ReturnDate { get; set; }
-	} 
+    }
 }

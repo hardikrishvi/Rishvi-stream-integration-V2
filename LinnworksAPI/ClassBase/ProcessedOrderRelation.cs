@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ProcessedOrderRelation
-	{
+    {
         /// <summary>
         /// Child order number 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Relation type 
         /// </summary>
 		public String RelationType { get; set; }
-	} 
+    }
 }

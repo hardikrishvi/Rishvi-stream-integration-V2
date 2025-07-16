@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents purchase order item. 
     /// </summary>
     public class PurchaseOrderItem
-	{
+    {
         /// <summary>
         /// Unique record identifier. Use this id to update quantity, cost, deliver item etc 
         /// </summary>
@@ -124,11 +123,11 @@ namespace LinnworksAPI
         /// </summary>
 		public String SupplierCode { get; set; }
 
-		public String SupplierBarcode { get; set; }
+        public String SupplierBarcode { get; set; }
 
         /// <summary>
         /// Sku group id assocaited with purchase item. Used for containerisation. 
         /// </summary>
 		public List<Int32> SkuGroupIds { get; set; }
-	} 
+    }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Hangfire;
+﻿using Hangfire;
 using Rishvi.Modules.Core.Extensions;
 
 namespace Rishvi.Modules.CronJob

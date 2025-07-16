@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rishvi.Modules.Core.DTOs
+﻿namespace Rishvi.Modules.Core.DTOs
 {
     public class IdNameDto
     {

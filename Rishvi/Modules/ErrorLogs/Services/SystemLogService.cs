@@ -9,9 +9,6 @@ using Rishvi.Modules.ErrorLogs.Filters;
 using Rishvi.Modules.ErrorLogs.ListOrders;
 using Rishvi.Modules.ErrorLogs.Models;
 using Rishvi.Modules.ErrorLogs.Models.DTOs;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 namespace Rishvi.Modules.ErrorLogs.Services
 {
     public interface ISystemLogService

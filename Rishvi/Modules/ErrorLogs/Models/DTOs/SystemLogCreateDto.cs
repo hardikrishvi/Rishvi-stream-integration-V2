@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-namespace Rishvi.Modules.ErrorLogs.Models.DTOs
+﻿namespace Rishvi.Modules.ErrorLogs.Models.DTOs
 {
     public class SystemLogCreateDto
     {

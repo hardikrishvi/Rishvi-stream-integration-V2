@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ShippingMethod
-	{
+    {
         /// <summary>
         /// Courier name 
         /// </summary>
@@ -15,5 +14,5 @@ namespace LinnworksAPI
         /// List of postal services 
         /// </summary>
 		public List<PostageService> PostalServices { get; set; }
-	} 
+    }
 }

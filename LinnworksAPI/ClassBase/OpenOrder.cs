@@ -1,15 +1,14 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// comment class 
     /// </summary>
     public class OpenOrder
-	{
-		public String ORDER_NOT_FOUND_ERROR { get; set; }
+    {
+        public String ORDER_NOT_FOUND_ERROR { get; set; }
 
         /// <summary>
         /// Linnworks order number 
@@ -36,25 +35,25 @@ namespace LinnworksAPI
         /// </summary>
 		public OrderTotalsInfo TotalsInfo { get; set; }
 
-		public OrderTaxInfo TaxInfo { get; set; }
+        public OrderTaxInfo TaxInfo { get; set; }
 
         /// <summary>
         /// Folder name of an order if any assigned 
         /// </summary>
 		public List<String> FolderName { get; set; }
 
-		public Boolean IsPostFilteredOut { get; set; }
+        public Boolean IsPostFilteredOut { get; set; }
 
-		public Boolean CanFulfil { get; set; }
+        public Boolean CanFulfil { get; set; }
 
-		public OrderFulfillmentState Fulfillment { get; set; }
+        public OrderFulfillmentState Fulfillment { get; set; }
 
-		public List<OrderItem> Items { get; set; }
+        public List<OrderItem> Items { get; set; }
 
-		public Boolean HasItems { get; set; }
+        public Boolean HasItems { get; set; }
 
-		public Int32 TotalItemsSum { get; set; }
+        public Int32 TotalItemsSum { get; set; }
 
-		public Guid OrderId { get; set; }
-	} 
+        public Guid OrderId { get; set; }
+    }
 }

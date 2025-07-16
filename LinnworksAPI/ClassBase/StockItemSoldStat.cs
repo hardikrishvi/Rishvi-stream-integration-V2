@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemSoldStat
-	{
+    {
         /// <summary>
         /// ChannelName/Source (e.g. EBAY) 
         /// </summary>
@@ -36,8 +35,8 @@ namespace LinnworksAPI
         /// </summary>
 		public List<StockItemSoldStatDetail> Detail { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

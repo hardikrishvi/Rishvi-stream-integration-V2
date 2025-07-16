@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickingWaveItemDetailed
-	{
+    {
         /// <summary>
         /// Sort order 
         /// </summary>
@@ -56,12 +55,12 @@ namespace LinnworksAPI
         /// </summary>
 		public List<PickingWaveItemTote> Totes { get; set; }
 
-		public Int32? BatchInventoryId { get; set; }
+        public Int32? BatchInventoryId { get; set; }
 
-		public Int32 OrderId { get; set; }
+        public Int32 OrderId { get; set; }
 
-		public Guid OrderItemRowId { get; set; }
+        public Guid OrderItemRowId { get; set; }
 
-		public Guid StockItemId { get; set; }
-	} 
+        public Guid StockItemId { get; set; }
+    }
 }

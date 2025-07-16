@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ShipStationConfig
-	{
+    {
         /// <summary>
         /// Config version (for legacy purposes) 
         /// </summary>
@@ -95,5 +94,5 @@ namespace LinnworksAPI
         /// A custom field allowing user to pass custom information about the order 
         /// </summary>
 		public String CustomOrderField3 { get; set; }
-	} 
+    }
 }

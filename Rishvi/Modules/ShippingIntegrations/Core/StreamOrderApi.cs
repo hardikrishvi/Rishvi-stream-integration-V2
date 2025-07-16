@@ -1,4 +1,4 @@
-﻿using Amazon.Runtime.Internal.Transform;
+﻿using System.Net;
 using Newtonsoft.Json;
 using RestSharp;
 using Rishvi.Modules.Core.Data;
@@ -7,7 +7,6 @@ using Rishvi.Modules.ErrorLogs.Services;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 using Rishvi_Vault;
-using System.Net;
 using Service = Rishvi.Modules.ShippingIntegrations.Models.Service;
 
 namespace Rishvi.Modules.ShippingIntegrations.Core
@@ -16,329 +15,398 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
     {
         private IErrorLogService _errorLogService;
         private SqlContext _context { get; }
-        //private readonly StreamApiSettings _streamApiSettings;
         public StreamOrderApi(IErrorLogService errorLogService, SqlContext context)
         {
             this._errorLogService = errorLogService;
             _context = context;
-            //_streamApiSettings = streamApiSettings.Value;
         }
-        //private string GetBaseUrl(string clientId)
-        //{
-        //    if (string.IsNullOrEmpty(clientId))
-        //        throw new ArgumentNullException(nameof(clientId));
-
-        //    return clientId.StartsWith("RIS") ? _streamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
-        //}
 
         public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId)
         {
-            string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-            //var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
-            var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
-            var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
-            var request = new RestRequest("/orders/orders/" + orderNo, Method.Get);
-            request.AddHeader("Accept", "application/json");
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("Stream-Nonce", uniqueCode);
-            request.AddHeader("Stream-Party", clientId);
-            request.AddHeader("Authorization", "bearer " + streamAuthToken);
-            RestResponse<StreamGetOrderResponse.Root> response = client.Execute<StreamGetOrderResponse.Root>(request); // Fix: Ensure client is properly instantiated
-            if (response.IsSuccessful)
+            try
             {
-                return JsonConvert.DeserializeObject<StreamGetOrderResponse.Root>(response.Content);
+                string uniqueCode = CodeHelper.GenerateUniqueCode(32);
+                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+
+                var client = new RestClient(baseUrl);
+                var request = new RestRequest($"/orders/orders/{orderNo}", Method.Get);
+                request.AddHeader("Accept", "application/json");
+                request.AddHeader("Content-Type", "application/json");
+                request.AddHeader("Stream-Nonce", uniqueCode);
+                request.AddHeader("Stream-Party", clientId);
+                request.AddHeader("Authorization", $"bearer {streamAuthToken}");
+
+                RestResponse<StreamGetOrderResponse.Root> response = client.Execute<StreamGetOrderResponse.Root>(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+                {
+                    return JsonConvert.DeserializeObject<StreamGetOrderResponse.Root>(response.Content);
+                }
+                else
+                {
+                    SqlHelper.SystemLogInsert(
+                        "GetOrder",
+                        $"OrderNo: {orderNo}, ClientId: {clientId}",
+                        streamAuthToken,
+                        response.Content?.Replace("'", "''"),
+                        "GetOrderFailed",
+                        response.ErrorMessage?.Replace("'", "''"),
+                        true
+                    );
+                }
             }
-            else
+            catch (Exception ex)
             {
-                string errorMessage = response.Content;
-                SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true,clientId);
+                SqlHelper.SystemLogInsert(
+                    "GetOrderException",
+                    $"OrderNo: {orderNo}, ClientId: {clientId}",
+                    streamAuthToken,
+                    null,
+                    "GetOrderError",
+                    ex.Message.Replace("'", "''"),
+                    true
+                );
             }
+
             return null;
         }
 
-        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid)
+
+        public static async Task<StreamOrderResponse> CreateOrderAsync(
+            GenerateLabelRequest request, string clientId, string authToken,
+            CourierService service, bool onlyCreate, string type, string streamorderid)
         {
-            StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
-            string errorMessage = string.Empty;
-            if (streamorderid == null)
+            try
             {
-                try
+                if (string.IsNullOrEmpty(streamorderid))
                 {
-                    string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                    var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
-                    var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
-                    var request = new RestRequest(AppSettings.CreateOrderUrl, Method.Post);
-                    request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type));
-                    request.AddHeader("Accept", "application/json");
-                    request.AddHeader("Content-Type", "application/json");
-                    request.AddHeader("Stream-Nonce", uniqueCode);
-                    request.AddHeader("Stream-Party", clientId);
-                    request.AddHeader("Authorization", "bearer " + streamAuthToken);
-                    RestResponse<StreamOrderResponse> response = client.Execute<StreamOrderResponse>(request);
-                    if (response.IsSuccessful)
-                    {
-                        streamOrderResponse = JsonConvert.DeserializeObject<StreamOrderResponse>(response.Content);
-                    }
-                    else
-                    {
-                        errorMessage = response.Content;
-                        try
-                        {
-                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
-                        }
-                        catch
-                        {
-
-                        }
-
-                    }
+                    return await CreateNewOrderAsync(request, clientId, authToken, service, type);
                 }
-                catch (WebException ex)
+                else
                 {
-                    string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                    if (ex.Response != null)
-                    {
-                        using (Stream responseStream = ex.Response.GetResponseStream())
-                        {
-                            if (responseStream != null)
-                            {
-
-                            }
-                        }
-                    }
+                    return HandleExistingOrder(request, clientId, authToken, streamorderid);
                 }
+            }
+            catch (Exception ex)
+            {
+                SqlHelper.SystemLogInsert("CreateOrderError", null,
+                    JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true);
+
+                return new StreamOrderResponse
+                {
+                    IsError = true,
+                    ErrorMessage = $"Exception: {ex.Message}"
+                };
+            }
+        }
+
+        private static async Task<StreamOrderResponse> CreateNewOrderAsync(
+            GenerateLabelRequest request, string clientId, string authToken,
+            CourierService service, string type)
+        {
+            var uniqueCode = CodeHelper.GenerateUniqueCode(32);
+            var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+
+            var client = new RestClient(baseUrl);
+            var reqBody = MappingStreamOrderRequest(request, service, type);
+
+            var requestObj = new RestRequest(AWSParameter.GetConnectionString(AppSettings.CreateOrderUrl), Method.Post)
+                .AddJsonBody(reqBody)
+                .AddHeader("Accept", "application/json")
+                .AddHeader("Content-Type", "application/json")
+                .AddHeader("Stream-Nonce", uniqueCode)
+                .AddHeader("Stream-Party", clientId)
+                .AddHeader("Authorization", $"bearer {authToken}");
+
+            var response = await client.ExecuteAsync<StreamOrderResponse>(requestObj);
+
+            if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+            {
+                return JsonConvert.DeserializeObject<StreamOrderResponse>(response.Content);
             }
             else
             {
-                StreamGetOrderResponse.Root streamOrder = GetOrder(streamAuthToken, streamorderid, clientId);
-                var changes = new Dictionary<string, string>() { };
-                //streamOrder.re.Addresses ??= new StreamGetOrderResponse.Addresses();
-                //StreamGetOrderResponse.Address address = streamOrder.StreamGetOrderResponse.Addresses.Address1 ?? new StreamGetOrderResponse.Address();
+                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(reqBody).Replace("'", "''"),
+                    response.Content?.Replace("'", "''"), "OrderCreated", response.ErrorMessage?.Replace("'", "''"), true);
 
-
-                if (streamOrder?.response?.order?.header?.customer?.address?.address1 !=
-                    generateLabelRequest.AddressLine1)
+                return new StreamOrderResponse
                 {
-                    changes.Add("address1", generateLabelRequest.AddressLine1);
-                }
-                if (streamOrder?.response?.order?.header?.customer?.address?.address2 !=
-                    generateLabelRequest.AddressLine2)
-                {
-                    changes.Add("address2", generateLabelRequest.AddressLine2);
-                }
-                if (streamOrder?.response?.order?.header?.customer?.address?.address3 !=
-                    generateLabelRequest.AddressLine3)
-                {
-                    changes.Add("address3", generateLabelRequest.AddressLine3);
-                }
-                if (streamOrder?.response?.order?.header?.customer?.address?.postcode !=
-                    generateLabelRequest.Postalcode)
-                {
-                    changes.Add("postcode", generateLabelRequest.Postalcode);
-                }
-                if (streamOrder?.response?.order?.header?.customer?.address?.name !=
-                    generateLabelRequest.Name)
-                {
-                    changes.Add("name", generateLabelRequest.Name);
-                }
-                if(streamOrder?.response?.order?.header?.customer?.contact?.email !=
-                    generateLabelRequest.Email)
-                {
-                    changes.Add("email", generateLabelRequest.Email);
-                }
-                if(streamOrder?.response?.order?.header?.customer?.contact?.tel1 !=
-                    generateLabelRequest.Phone)
-                {
-                    changes.Add("phone", generateLabelRequest.Phone);
-                }
-                if (streamOrder?.response?.order?.groups?.FirstOrDefault()?.driverNotes !=
-                    generateLabelRequest.DeliveryNote)
-                {
-                    changes.Add("deliveryNote", generateLabelRequest.DeliveryNote);
-                }
-                if(streamOrder?.response?.order?.header?.customerOrderNo != 
-                    generateLabelRequest.OrderReference)
-                {
-                    changes.Add("customerOrderNo", generateLabelRequest.OrderReference);
-                }
-                if(streamOrder?.response?.order?.groups?.FirstOrDefault().items.Count > 0)
-                {
-                    generateLabelRequest.Packages.Add(new Package()
-                    {
-                        Items = streamOrder.response.order.groups.FirstOrDefault().items.Select(i => new Item()
-                        {
-                            ProductCode = i.code,
-                            ItemName = i.description,
-                            Quantity = i.quantity,
-                            UnitWeight = i.weight
-                        }).ToList()
-                    });
-                }
-
-
-                if (changes.Count > 0)
-                {
-                    UpdateOrder(changes, clientId, streamAuthToken, streamorderid);
-                }
+                    IsError = true,
+                    ErrorMessage = $"Stream API error: {response.ErrorMessage ?? response.Content}"
+                };
             }
-            return Tuple.Create(streamOrderResponse, errorMessage);
         }
-        public static Tuple<StreamOrderResponse, string> UpdateOrder(Dictionary<string, string> changereq, string clientId, string streamAuthToken, string orderid)
+
+        private static StreamOrderResponse HandleExistingOrder(
+         GenerateLabelRequest request, string clientId, string authToken, string streamOrderId)
         {
-            StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
-            string errorMessage = string.Empty;
+            var streamOrder = GetOrder(authToken, streamOrderId, clientId);
+            var changes = PrepareOrderChanges(streamOrder, request);
+
+            if (changes.Any())
+            {
+                UpdateOrder(changes, clientId, authToken, streamOrderId);
+            }
+
+            var items = streamOrder?.response?.order?.groups?.FirstOrDefault()?.items;
+            if (items != null && items.Any())
+            {
+                request.Packages.Add(new Package
+                {
+                    Items = items.Select(i => new Item
+                    {
+                        ProductCode = i.code,
+                        ItemName = i.description,
+                        Quantity = i.quantity,
+                        UnitWeight = i.weight
+                    }).ToList()
+                });
+            }
+
+            return new StreamOrderResponse
+            {
+                response = new Response
+                {
+                    trackingId = streamOrder?.response?.order?.trackingId,
+                    consignmentNo = streamOrder?.response?.order?.header.consignmentNo,
+                    orderNo = streamOrder?.response?.order?.header.orderNo,
+                    customerOrderNo = streamOrder?.response?.order?.header.customerOrderNo,
+                    trackingURL = streamOrder?.response?.order?.trackingURL,
+                    valid = true,
+                    errors = new List<Error>()
+                    {
+                        new Error
+                        {
+                            code = "0",
+                            description = "Order updated successfully",
+                            severity = "info"
+                        }
+                    }
+                }
+            };
+        }
+
+        private static Dictionary<string, string> PrepareOrderChanges(StreamGetOrderResponse.Root streamOrder, GenerateLabelRequest request)
+        {
+            var changes = new Dictionary<string, string>();
+
+            if (streamOrder?.response?.order?.header?.customer?.address?.address1 != request.AddressLine1)
+                changes.Add("address1", request.AddressLine1);
+            if (streamOrder?.response?.order?.header?.customer?.address?.address2 != request.AddressLine2)
+                changes.Add("address2", request.AddressLine2);
+            if (streamOrder?.response?.order?.header?.customer?.address?.address3 != request.AddressLine3)
+                changes.Add("address3", request.AddressLine3);
+            if (streamOrder?.response?.order?.header?.customer?.address?.postcode != request.Postalcode)
+                changes.Add("postcode", request.Postalcode);
+            if (streamOrder?.response?.order?.header?.customer?.address?.name != request.Name)
+                changes.Add("name", request.Name);
+            if (streamOrder?.response?.order?.header?.customer?.contact?.email != request.Email)
+                changes.Add("email", request.Email);
+            if (streamOrder?.response?.order?.header?.customer?.contact?.tel1 != request.Phone)
+                changes.Add("phone", request.Phone);
+            if (streamOrder?.response?.order?.groups?.FirstOrDefault()?.driverNotes != request.DeliveryNote)
+                changes.Add("deliveryNote", request.DeliveryNote);
+            if (streamOrder?.response?.order?.header?.customerOrderNo != request.OrderReference)
+                changes.Add("customerOrderNo", request.OrderReference);
+            if (streamOrder?.response?.order?.groups?.FirstOrDefault()?.items?.Count > 0)
+            {
+                request.Packages.Add(new Package
+                {
+                    Items = streamOrder.response.order.groups.FirstOrDefault().items.Select(i => new Item
+                    {
+                        ProductCode = i.code,
+                        ItemName = i.description,
+                        Quantity = i.quantity,
+                        UnitWeight = i.weight
+                    }).ToList()
+                });
+            }
+            return changes;
+        }
+
+        public static StreamOrderResponse UpdateOrder(
+            Dictionary<string, string> changereq,
+            string clientId,
+            string streamAuthToken,
+            string orderId)
+        {
+            var result = new StreamOrderResponse();
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
                 var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
-                var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
-                var request = new RestRequest("/orders/orders/" + orderid, Method.Patch);
-                string finalreq = JsonConvert.SerializeObject(new StreamOrderUpdateReq.Root()
+
+                var client = new RestClient(baseUrl);
+                var request = new RestRequest($"/orders/orders/{orderId}", Method.Patch);
+
+                // Build payload object
+                var payload = new StreamOrderUpdateReq.Root
                 {
-                    header = new StreamOrderUpdateReq.Header()
+                    header = new StreamOrderUpdateReq.Header
                     {
-                        customer = new StreamOrderUpdateReq.Customer()
+                        customer = new StreamOrderUpdateReq.Customer
                         {
-                            account = (changereq.ContainsKey("accountname") || changereq.ContainsKey("accountnumber")) ? new StreamOrderUpdateReq.Account()
+                            account = (changereq.ContainsKey("accountname") || changereq.ContainsKey("accountnumber"))
+                                ? new StreamOrderUpdateReq.Account
+                                {
+                                    name = changereq.GetValueOrDefault("accountname"),
+                                    number = changereq.GetValueOrDefault("accountnumber")
+                                } : null,
+                            address = new StreamOrderUpdateReq.Address
                             {
-                                name = changereq.ContainsKey("accountname") ? changereq["accountname"] : null,
-                                number = changereq.ContainsKey("accountnumber") ? changereq["accountnumber"] : null
-                            } : null,
-                            address = new StreamOrderUpdateReq.Address()
-                            {
-                                address1 = changereq.ContainsKey("address1") ? changereq["address1"] : null,
-                                address2 = changereq.ContainsKey("address2") ? changereq["address2"] : null,
-                                address3 = changereq.ContainsKey("address3") ? changereq["address3"] : null,
-                                address4 = changereq.ContainsKey("address4") ? changereq["address4"] : null,
-                                address5 = changereq.ContainsKey("address5") ? changereq["address5"] : null,
-                                country = changereq.ContainsKey("country") ? changereq["country"] : null,
-                                externalAddressId = changereq.ContainsKey("externalAddressId") ? changereq["externalAddressId"] : null,
-                                locationNotes = changereq.ContainsKey("locationNotes") ? changereq["locationNotes"] : null,
-                                name = changereq.ContainsKey("name") ? changereq["name"] : null,
-                                nuts = changereq.ContainsKey("nuts") ? changereq["nuts"] : null,
-                                postcode = changereq.ContainsKey("postcode") ? changereq["postcode"] : null,
-                                vehicleType = changereq.ContainsKey("vehicleType") ? changereq["vehicleType"] : null
+                                address1 = changereq.GetValueOrDefault("address1"),
+                                address2 = changereq.GetValueOrDefault("address2"),
+                                address3 = changereq.GetValueOrDefault("address3"),
+                                address4 = changereq.GetValueOrDefault("address4"),
+                                address5 = changereq.GetValueOrDefault("address5"),
+                                country = changereq.GetValueOrDefault("country"),
+                                externalAddressId = changereq.GetValueOrDefault("externalAddressId"),
+                                locationNotes = changereq.GetValueOrDefault("locationNotes"),
+                                name = changereq.GetValueOrDefault("name"),
+                                nuts = changereq.GetValueOrDefault("nuts"),
+                                postcode = changereq.GetValueOrDefault("postcode"),
+                                vehicleType = changereq.GetValueOrDefault("vehicleType")
                             },
-                            contact = (changereq.ContainsKey("financialemail") || changereq.ContainsKey("operationsemail")
-                            || changereq.ContainsKey("secondaryemail")) ? new StreamOrderUpdateReq.Contact()
-                            {
-                                altemail = new List<StreamOrderUpdateReq.Altemail>() {
-                                                new StreamOrderUpdateReq.Altemail(){
-                                                financial =  changereq.ContainsKey("financialemail") ? changereq["financialemail"] : null,
-                                                operations =  changereq.ContainsKey("operationsemail") ? changereq["operationsemail"] : null,
-                                                secondary = changereq.ContainsKey("secondaryemail") ? changereq["secondaryemail"] : null
-                                    }
+                            contact = (changereq.ContainsKey("financialemail") ||
+                                       changereq.ContainsKey("operationsemail") ||
+                                       changereq.ContainsKey("secondaryemail"))
+                                ? new StreamOrderUpdateReq.Contact
+                                {
+                                    altemail = new List<StreamOrderUpdateReq.Altemail>
+                                    {
+                                new StreamOrderUpdateReq.Altemail
+                                {
+                                    financial = changereq.GetValueOrDefault("financialemail"),
+                                    operations = changereq.GetValueOrDefault("operationsemail"),
+                                    secondary = changereq.GetValueOrDefault("secondaryemail")
                                 }
-                            } : null,
-                            name = changereq.ContainsKey("name") ? changereq["name"] : null
-
+                                    }
+                                } : null,
+                            name = changereq.GetValueOrDefault("name")
                         },
-                        customerOrderNo = changereq.ContainsKey("customerOrderNo") ? changereq["customerOrderNo"] : null,
-                        driverLinks = (changereq.ContainsKey("driverlinkdescription") || changereq.ContainsKey("driverlink")) ? new List<StreamOrderUpdateReq.DriverLink>()
-                        {
-                            new StreamOrderUpdateReq.DriverLink()
+                        customerOrderNo = changereq.GetValueOrDefault("customerOrderNo"),
+                        driverLinks = (changereq.ContainsKey("driverlinkdescription") || changereq.ContainsKey("driverlink"))
+                            ? new List<StreamOrderUpdateReq.DriverLink>
                             {
-                                description = changereq.ContainsKey("driverlinkdescription") ? changereq["driverlinkdescription"] : null,
-                                link = changereq.ContainsKey("driverlink") ? changereq["driverlink"] : null,
-                            }
-                        } : null,
-                        driverNotes = changereq.ContainsKey("driverNotes") ? changereq["driverNotes"] : null,
-                        orderDate = changereq.ContainsKey("orderDate") ? changereq["orderDate"] : null,
-                        orderNotes = changereq.ContainsKey("orderNotes") ? changereq["orderNotes"] : null,
-                        partner = (changereq.ContainsKey("partnerid") || changereq.ContainsKey("partnername")) ?
-                        new StreamOrderUpdateReq.Partner()
+                        new StreamOrderUpdateReq.DriverLink
                         {
-                            id = changereq.ContainsKey("partnerid") ? changereq["partnerid"] : null,
-                            name = changereq.ContainsKey("partnername") ? changereq["partnername"] : null,
-                        } : null,
-                        routeInfo = changereq.ContainsKey("routeInfo") ? changereq["routeInfo"] : null,
-                        serviceLevel = changereq.ContainsKey("serviceLevel") ? changereq["serviceLevel"] : null,
+                            description = changereq.GetValueOrDefault("driverlinkdescription"),
+                            link = changereq.GetValueOrDefault("driverlink")
+                        }
+                            } : null,
+                        driverNotes = changereq.GetValueOrDefault("driverNotes"),
+                        orderDate = changereq.GetValueOrDefault("orderDate"),
+                        orderNotes = changereq.GetValueOrDefault("orderNotes"),
+                        partner = (changereq.ContainsKey("partnerid") || changereq.ContainsKey("partnername"))
+                            ? new StreamOrderUpdateReq.Partner
+                            {
+                                id = changereq.GetValueOrDefault("partnerid"),
+                                name = changereq.GetValueOrDefault("partnername")
+                            } : null,
+                        routeInfo = changereq.GetValueOrDefault("routeInfo"),
+                        serviceLevel = changereq.GetValueOrDefault("serviceLevel")
                     }
-                }, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                request.AddJsonBody(finalreq);
+                };
+
+                var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+                var finalPayload = JsonConvert.SerializeObject(payload, jsonSettings);
+
+                request.AddJsonBody(finalPayload);
                 request.AddHeader("Accept", "application/json");
                 request.AddHeader("Content-Type", "application/json");
                 request.AddHeader("Stream-Nonce", uniqueCode);
                 request.AddHeader("Stream-Party", clientId);
-                request.AddHeader("Authorization", "bearer " + streamAuthToken);
-                RestResponse<StreamOrderResponse> response = client.Execute<StreamOrderResponse>(request);
-                if (response.IsSuccessful)
+                request.AddHeader("Authorization", $"bearer {streamAuthToken}");
+
+                var response = client.Execute<StreamOrderResponse>(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
                 {
-                    streamOrderResponse = JsonConvert.DeserializeObject<StreamOrderResponse>(response.Content);
+                    result = JsonConvert.DeserializeObject<StreamOrderResponse>(response.Content);
                 }
                 else
                 {
-                    errorMessage = response.Content;
-                    SqlHelper.SystemLogInsert("UpdateOrder", null, finalreq, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderUpdated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
+                    SqlHelper.SystemLogInsert("UpdateOrder", null, finalPayload,
+                        response.Content?.Replace("'", "''"),
+                        "OrderUpdateFailed",
+                        response.ErrorMessage?.Replace("'", "''"),
+                        true);
 
+                    result.IsError = true;
+                    result.ErrorMessage = $"Stream update failed: {response.ErrorMessage ?? response.Content}";
                 }
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
-                string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                if (ex.Response != null)
-                {
-                    using (Stream responseStream = ex.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
+                SqlHelper.SystemLogInsert("UpdateOrderException", null, null, null,
+                    "OrderUpdateException", ex.Message.Replace("'", "''"), true);
 
-                        }
-                    }
-                }
+                result.IsError = true;
+                result.ErrorMessage = $"Exception: {ex.Message}";
             }
-            return Tuple.Create(streamOrderResponse, errorMessage);
+
+            return result;
         }
 
-        public static Tuple<StreamDeleteOrderResponse, string> DeleteOrder(string streamAuthToken, string orderNo, string clientId)
+
+        public static StreamDeleteOrderResponse DeleteOrder(
+             string streamAuthToken,
+             string orderNo,
+             string clientId)
         {
-            StreamDeleteOrderResponse streamOrderResponse = new StreamDeleteOrderResponse();
-            string errorMessage = string.Empty;
+            var result = new StreamDeleteOrderResponse();
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
                 var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
-                var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
-                var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.DeleteOrderUrl) + orderNo, Method.Delete);
-                //request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service));
+
+                var client = new RestClient(baseUrl);
+                var request = new RestRequest($"{AWSParameter.GetConnectionString(AppSettings.DeleteOrderUrl)}{orderNo}", Method.Delete);
+
                 request.AddHeader("Accept", "application/json");
                 request.AddHeader("Content-Type", "application/json");
                 request.AddHeader("Stream-Nonce", uniqueCode);
                 request.AddHeader("Stream-Party", clientId);
-                request.AddHeader("Authorization", "bearer " + streamAuthToken);
-                RestResponse<StreamDeleteOrderResponse> response = client.Execute<StreamDeleteOrderResponse>(request);
-                if (response.IsSuccessful)
+                request.AddHeader("Authorization", $"bearer {streamAuthToken}");
+
+                var response = client.Execute<StreamDeleteOrderResponse>(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
                 {
-                    //success order log
-                    streamOrderResponse = JsonConvert.DeserializeObject<StreamDeleteOrderResponse>(response.Content);
+                    result = JsonConvert.DeserializeObject<StreamDeleteOrderResponse>(response.Content);
                 }
                 else
                 {
-                    //failed order log
-                    errorMessage = response.Content;
-                    SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
+                    SqlHelper.SystemLogInsert(
+                        "DeleteOrder",
+                        $"OrderNo: {orderNo}, ClientId: {clientId}",
+                        streamAuthToken,
+                        response.Content?.Replace("'", "''"),
+                        "OrderDeleteFailed",
+                        response.ErrorMessage?.Replace("'", "''"),
+                        true
+                    );
                 }
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
-                string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                if (ex.Response != null)
-                {
-                    using (Stream responseStream = ex.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-
-                        }
-                    }
-                }
+                SqlHelper.SystemLogInsert(
+                    "DeleteOrderException",
+                    $"OrderNo: {orderNo}, ClientId: {clientId}",
+                    streamAuthToken,
+                    null,
+                    "DeleteOrderError",
+                    ex.Message.Replace("'", "''"),
+                    true
+                );
             }
-            return Tuple.Create(streamOrderResponse, errorMessage);
+
+            return result;
         }
 
-        public static Tuple<WebhookSubscribeResp.Root, string> WebhookSubscribe(string streamAuthToken, string authToken, string eventname, string event_type, string url_path, string http_method, string content_type, string auth_header, string clientId)
+        public static WebhookSubscribeResp.Root WebhookSubscribe(string streamAuthToken, string authToken, string eventname, string event_type, string url_path, string http_method, string content_type, string auth_header, string clientId)
         {
-            WebhookSubscribeResp.Root streamOrderResponse = new WebhookSubscribeResp.Root();
+            var streamOrderResponse = new WebhookSubscribeResp.Root();
             string errorMessage = string.Empty;
             try
             {
@@ -361,7 +429,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 request.AddHeader("Stream-Nonce", uniqueCode);
                 request.AddHeader("Stream-Party", clientId);
                 request.AddHeader("Authorization", "bearer " + streamAuthToken);
-                RestResponse<WebhookSubscribeResp.Root> response = client.Execute<WebhookSubscribeResp.Root>(request);
+                var response = client.Execute<WebhookSubscribeResp.Root>(request);
                 if (response.IsSuccessful)
                 {
                     //success order log
@@ -371,24 +439,30 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 {
                     //failed order log
                     errorMessage = response.Content;
-                    SqlHelper.SystemLogInsert("WebhookSubscribe", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "WebhookSubscribe", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
+                    SqlHelper.SystemLogInsert(
+                        "WebhookSubscribe",
+                        $"Event: {eventname}, ClientId: {clientId}",
+                        streamAuthToken,
+                        response.Content?.Replace("'", "''"),
+                        "WebhookSubscribeFailed",
+                        response.ErrorMessage?.Replace("'", "''"),
+                        true
+                    );
                 }
             }
             catch (WebException ex)
             {
-                string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                if (ex.Response != null)
-                {
-                    using (Stream responseStream = ex.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-
-                        }
-                    }
-                }
+                SqlHelper.SystemLogInsert(
+                   "WebhookSubscribeException",
+                   $"Event: {eventname}, ClientId: {clientId}",
+                   streamAuthToken,
+                   null,
+                   "WebhookSubscribeError",
+                   ex.Message.Replace("'", "''"),
+                   true
+               );
             }
-            return Tuple.Create(streamOrderResponse, errorMessage);
+            return streamOrderResponse;
         }
 
         public static string MappingStreamOrderRequest(GenerateLabelRequest generateLabelRequest, CourierService service, string type)
@@ -470,8 +544,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     streamOrderRequest.header.orderNo = generateLabelRequest.OrderReference;
                 }
                 streamOrderRequest.header.orderDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+                // Fix for CS0118: 'Service' is a namespace but is used like a type
+                // The issue occurs because the `Service` identifier conflicts with the `Rishvi.Modules.ShippingIntegrations.Models.Service` namespace.
+                // To resolve this, fully qualify the type `Service` with its namespace.
+
+                streamOrderRequest.header.services.Add(new Rishvi.Modules.ShippingIntegrations.Models.Service { code = service.ServiceCode });
                 streamOrderRequest.header.orderType = type;
-                streamOrderRequest.header.services.Add(new Service { code = service.ServiceCode });
+                //streamOrderRequest.header.services.Add(new Service { code = service.ServiceCode });
                 streamOrderRequest.header.customer.name = generateLabelRequest.Name;
                 streamOrderRequest.header.customer.address.name = generateLabelRequest.Name;
                 streamOrderRequest.header.customer.address.address1 = generateLabelRequest.AddressLine1;

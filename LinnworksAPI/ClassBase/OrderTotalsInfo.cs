@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderTotalsInfo
-	{
+    {
         /// <summary>
         /// Order subtotal 
         /// </summary>
@@ -65,5 +63,5 @@ namespace LinnworksAPI
         /// Currency conversion rate. Set at point of save by the currency 
         /// </summary>
 		public Double ConversionRate { get; set; }
-	} 
+    }
 }

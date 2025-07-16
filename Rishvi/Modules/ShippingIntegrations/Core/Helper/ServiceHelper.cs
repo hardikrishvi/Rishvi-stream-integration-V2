@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 using LinnworksAPI;
-using Microsoft.Extensions.Options;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 
@@ -36,7 +35,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
             _SyncPath = config["ServiceHelperSettings:SyncPath"] ?? GetSetting("SyncPath");
             _ImageURL = config["ServiceHelperSettings:ImageURL"] ?? GetSetting("ImageURL");
         }
-        
+
         private static string GetSetting([CallerMemberName] string name = null)
         {
             return System.Configuration.ConfigurationManager.AppSettings.Get(name) ?? string.Empty;
@@ -145,7 +144,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
 
         public async Task CreateWebhook(AuthorizationConfigClass user, WebhookSubscription webhook, string token)
         {
-             // Consider injecting via DI
+            // Consider injecting via DI
             await _tradingApiOAuthHelper.CreateStreamWebhook(
                 user,
                 webhook.Event,

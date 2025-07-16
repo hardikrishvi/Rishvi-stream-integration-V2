@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Job error item 
     /// </summary>
     public class JobError
-	{
+    {
         /// <summary>
         /// Unique job error id 
         /// </summary>
@@ -33,5 +31,5 @@ namespace LinnworksAPI
         /// Error string, max 255 characters 
         /// </summary>
 		public String ErrorText { get; set; }
-	} 
+    }
 }

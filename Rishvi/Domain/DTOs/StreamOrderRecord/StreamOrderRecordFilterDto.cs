@@ -9,7 +9,7 @@ public class StreamOrderRecordFilterDto : BaseFilterDto
         SortColumn = "CreatedAt";
         SortType = "DESC";
     }
-    
+
     public Guid Id { get; set; }
     public string JsonData { get; set; }
     public string AuthorizationToken { get; set; }

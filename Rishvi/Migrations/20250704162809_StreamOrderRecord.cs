@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,7 +10,7 @@ namespace Rishvi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            
+
 
             migrationBuilder.CreateTable(
                 name: "StreamOrderRecord",
@@ -35,20 +34,20 @@ namespace Rishvi.Migrations
                     table.PrimaryKey("PK_StreamOrderRecord", x => x.Id);
                 });
 
-            
 
-            
+
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            
+
 
             migrationBuilder.DropTable(
                 name: "StreamOrderRecord");
 
-            
+
         }
     }
 }

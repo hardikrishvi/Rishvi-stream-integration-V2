@@ -4,7 +4,7 @@ namespace Rishvi.Domain.DTOs.Event
 {
     public class EventFilterDto : BaseFilterDto
     {
-        public EventFilterDto() 
+        public EventFilterDto()
         {
             SortColumn = "CreatedAt";
             SortType = "desc";

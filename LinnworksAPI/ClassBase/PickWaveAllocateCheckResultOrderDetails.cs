@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Order details return, flat data for order lines that can be used to create pickwaves 
     /// </summary>
     public class PickWaveAllocateCheckResultOrderDetails
-	{
+    {
         /// <summary>
         /// Location the order resides in 
         /// </summary>
@@ -58,5 +56,5 @@ namespace LinnworksAPI
         /// (WMS only) Routing sequence of the binrack. 
         /// </summary>
 		public Int32 RoutingSequence { get; set; }
-	} 
+    }
 }

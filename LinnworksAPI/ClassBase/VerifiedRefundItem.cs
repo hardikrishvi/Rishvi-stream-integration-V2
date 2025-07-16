@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class VerifiedRefundItem
-	{
+    {
         /// <summary>
         /// The unique order item identifier 
         /// </summary>
@@ -41,5 +39,5 @@ namespace LinnworksAPI
         /// If a refund is linked to a cancellation request, this field denotes the amount of the item cancelled 
         /// </summary>
 		public Int32 CancelledQuantity { get; set; }
-	} 
+    }
 }

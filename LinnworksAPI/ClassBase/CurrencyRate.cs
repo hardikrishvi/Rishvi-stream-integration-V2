@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Class represents currency conversion rate to base currency 
     /// </summary>
     public class CurrencyRate
-	{
+    {
         /// <summary>
         /// Currency code 
         /// </summary>
@@ -23,5 +21,5 @@ namespace LinnworksAPI
         /// UTC time when the currency rate was updated 
         /// </summary>
 		public DateTime? AccurateAsOf { get; set; }
-	} 
+    }
 }

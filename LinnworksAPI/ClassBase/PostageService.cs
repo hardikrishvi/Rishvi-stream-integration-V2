@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PostageService
-	{
+    {
         /// <summary>
         /// Postal service ID 
         /// </summary>
@@ -21,8 +19,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean TrackingNumberRequired { get; set; }
 
-		public String Vendor { get; set; }
+        public String Vendor { get; set; }
 
-		public Guid? IntegratedServiceID { get; set; }
-	} 
+        public Guid? IntegratedServiceID { get; set; }
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class RefundItem
-	{
+    {
         /// <summary>
         /// For updating refund amounts 
         /// </summary>
@@ -50,5 +48,5 @@ namespace LinnworksAPI
         /// The secondary channel reason 
         /// </summary>
 		public String ChannelReasonSec { get; set; }
-	} 
+    }
 }

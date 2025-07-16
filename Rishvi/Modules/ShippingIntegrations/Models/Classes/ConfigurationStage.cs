@@ -2,31 +2,31 @@
 
 namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
 {
-    public class ConfigStage
+    public class ConfigurationStage
     {
         public string WizardStepDescription;
         public string WizardStepTitle;
         public List<ConfigItem> ConfigItems = new List<ConfigItem>();
 
-        public static ConfigStage LoadStage(string StageName)
+        public static ConfigurationStage LoadStage(string StageName)
         {
             string stageConfigFileName = AppSettings.WizardStagesConfigPath + "\\" + StageName + ".json";
             if (System.IO.File.Exists(stageConfigFileName))
             {
                 string json = System.IO.File.ReadAllText(stageConfigFileName);
-                ConfigStage config = Newtonsoft.Json.JsonConvert.DeserializeObject<ConfigStage>(json);
+                ConfigurationStage config = Newtonsoft.Json.JsonConvert.DeserializeObject<ConfigurationStage>(json);
                 return config;
             }
             else
             {
-                return new ConfigStage()
+                return new ConfigurationStage()
                 {
                     WizardStepDescription = "",
                     WizardStepTitle = "Unknown stage"
                 };
             }
         }
-        public static void Save(string StageName, ConfigStage stage)
+        public static void Save(string StageName, ConfigurationStage stage)
         {
             string stageConfigFileName = AppSettings.WizardStagesConfigPath + "\\" + StageName + ".json";
             string jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(stage);

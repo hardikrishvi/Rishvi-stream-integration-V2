@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -41,9 +40,9 @@ namespace Rishvi.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-             migrationBuilder.DropPrimaryKey(
-                name: "PK_Item",
-                table: "Item");
+            migrationBuilder.DropPrimaryKey(
+               name: "PK_Item",
+               table: "Item");
 
             migrationBuilder.DropColumn(
                 name: "Id",

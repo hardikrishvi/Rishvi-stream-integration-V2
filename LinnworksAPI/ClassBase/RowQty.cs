@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class RowQty
-	{
+    {
         /// <summary>
         /// Order item record row ID 
         /// </summary>
@@ -50,5 +48,5 @@ namespace LinnworksAPI
         /// Returned qty 
         /// </summary>
 		public Int32 NewQty { get; set; }
-	} 
+    }
 }

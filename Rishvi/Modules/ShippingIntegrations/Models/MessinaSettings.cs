@@ -9,27 +9,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         {
             _configuration = configuration;
         }
-        public static string HostName 
+        public static string HostName
         {
             get
             {
                 return Setting<string>("MessinaSettings:HostName");
             }
-        } 
+        }
         public static string TradingAPI_ServerURL
         {
             get
             {
                 return Setting<string>("MessinaSettings:TradingAPI_ServerURL");
             }
-        } 
+        }
         public static string DeveloperId
         {
             get
             {
                 return Setting<string>("MessinaSettings:DeveloperId");
             }
-        } 
+        }
         public static string ProdClientId
         {
             get
@@ -51,36 +51,36 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                 return Setting<string>("MessinaSettings:ProdClientSecret");
             }
         }
-        public static string TradingAPI_Version 
+        public static string TradingAPI_Version
         {
             get
             {
                 return Setting<string>("MessinaSettings:TradingAPI_Version");
             }
         }
-        public static string WebApiURL 
+        public static string WebApiURL
         {
             get
             {
                 return Setting<string>("MessinaSettings:WebApiURL");
             }
-        } 
+        }
 
-        public static string FtpHost 
+        public static string FtpHost
         {
             get
             {
                 return Setting<string>("MessinaSettings:FtpHost");
             }
-        } 
-        public static string FtpUsername 
+        }
+        public static string FtpUsername
         {
             get
             {
                 return Setting<string>("MessinaSettings:FtpUsername");
             }
         }
-        public static string FtpPassword 
+        public static string FtpPassword
         {
             get
             {

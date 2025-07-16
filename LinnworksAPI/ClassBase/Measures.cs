@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Measures
-	{
+    {
         /// <summary>
         /// Dimension measures 
         /// </summary>
@@ -15,5 +13,5 @@ namespace LinnworksAPI
         /// Weight measures 
         /// </summary>
 		public String Weight { get; set; }
-	} 
+    }
 }

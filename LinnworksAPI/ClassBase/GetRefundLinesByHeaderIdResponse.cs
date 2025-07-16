@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetRefundLinesByHeaderIdResponse
-	{
+    {
         /// <summary>
         /// The unique identifier for the loaded refund 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// Channel-specific information about refund requirements, e.g. accepted refund reasons 
         /// </summary>
 		public RefundOptions RefundOptions { get; set; }
-	} 
+    }
 }

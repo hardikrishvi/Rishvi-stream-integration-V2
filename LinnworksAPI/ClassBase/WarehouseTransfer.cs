@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class WarehouseTransfer
-	{
+    {
         /// <summary>
         /// Transfer ID 
         /// </summary>
@@ -105,5 +104,5 @@ namespace LinnworksAPI
         /// Which status is updated 
         /// </summary>
 		public UpdateStatus UpdateStatus { get; set; }
-	} 
+    }
 }

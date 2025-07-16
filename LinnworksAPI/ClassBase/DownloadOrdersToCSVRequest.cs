@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class DownloadOrdersToCSVRequest
-	{
+    {
         /// <summary>
         /// Search Term 
         /// </summary>
@@ -35,5 +34,5 @@ namespace LinnworksAPI
         /// Search Sorting 
         /// </summary>
 		public SearchSorting SearchSorting { get; set; }
-	} 
+    }
 }

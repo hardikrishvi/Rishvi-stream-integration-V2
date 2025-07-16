@@ -1,13 +1,13 @@
-﻿using Xunit;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc;
 using Rishvi.Modules.Core.Aws;
-using Rishvi.Modules.ShippingIntegrations.Core.Helper;
-using Rishvi.Modules.ShippingIntegrations.Api;
-using Rishvi.Modules.ShippingIntegrations.Models;
-using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.ShippingIntegrations.Api;
+using Rishvi.Modules.ShippingIntegrations.Core;
+using Rishvi.Modules.ShippingIntegrations.Core.Helper;
+using Rishvi.Modules.ShippingIntegrations.Models;
+using Xunit;
 
 namespace Test
 {

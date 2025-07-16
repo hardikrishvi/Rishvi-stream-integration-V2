@@ -24,7 +24,7 @@ public class ReportModelListDto
     public DateTime DownloadEbayOrderInSystem { get; set; }
     public DateTime DispatchEbayOrderInStream { get; set; }
     public DateTime DispatchEbayOrderFromStream { get; set; }
-    public DateTime CreateLinnOrderInStream { get;set; }
+    public DateTime CreateLinnOrderInStream { get; set; }
     public DateTime LastUpdateLinnOrderForStream { get; set; }
 
     public DateTime DispatchLinnOrderFromStream { get; set; }

@@ -12,5 +12,5 @@ public class ShippingInfoFilterDto : BaseFilterDto
     public Guid? ShippingId { get; set; }
     public string Vendor { get; set; }
     public Guid? PostalServiceId { get; set; }
-    
+
 }

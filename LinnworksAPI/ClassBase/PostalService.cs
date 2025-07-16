@@ -1,24 +1,22 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PostalService
-	{
-		public String PostalServiceName { get; set; }
+    {
+        public String PostalServiceName { get; set; }
 
-		public String PostalServiceTag { get; set; }
+        public String PostalServiceTag { get; set; }
 
-		public String ServiceCountry { get; set; }
+        public String ServiceCountry { get; set; }
 
-		public String PostalServiceCode { get; set; }
+        public String PostalServiceCode { get; set; }
 
-		public String Vendor { get; set; }
+        public String Vendor { get; set; }
 
-		public String PrintModule { get; set; }
+        public String PrintModule { get; set; }
 
-		public String PrintModuleTitle { get; set; }
+        public String PrintModuleTitle { get; set; }
 
         /// <summary>
         /// Postal service ID 
@@ -40,8 +38,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean IgnorePackagingGroup { get; set; }
 
-		public Int32 fkShippingAPIConfigId { get; set; }
+        public Int32 fkShippingAPIConfigId { get; set; }
 
-		public Guid? IntegratedServiceId { get; set; }
-	} 
+        public Guid? IntegratedServiceId { get; set; }
+    }
 }

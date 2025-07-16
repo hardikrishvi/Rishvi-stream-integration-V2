@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class AddScrapCategoriesRequest
-	{
-		public List<String> CategoryNames { get; set; }
-	} 
+    {
+        public List<String> CategoryNames { get; set; }
+    }
 }

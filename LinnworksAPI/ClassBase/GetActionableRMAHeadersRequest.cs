@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetActionableRMAHeadersRequest
-	{
+    {
         /// <summary>
         /// The page number to return for a given set of filters 
         /// </summary>
@@ -15,5 +13,5 @@ namespace LinnworksAPI
         /// A set of filters to restrict the RMA headers output by the call 
         /// </summary>
 		public ActionablePostSaleSearchFilters Filters { get; set; }
-	} 
+    }
 }

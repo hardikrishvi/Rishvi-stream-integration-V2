@@ -1,5 +1,3 @@
-using Rishvi.Models;
-
 namespace Rishvi.Domain.DTOs.IntegrationSettings;
 
 public class IntegrationSettingsDto

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateAdditionalInfoRequest
-	{
+    {
         /// <summary>
         /// Linnworks Order Id 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// A list of additional information to update or delete from the order item 
         /// </summary>
 		public List<OrderItemOptionUpdate> AdditionalInfo { get; set; }
-	} 
+    }
 }

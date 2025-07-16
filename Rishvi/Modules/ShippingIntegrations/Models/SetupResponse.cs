@@ -14,7 +14,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
     {
         public Boolean IsConfigActive;
         public string ConfigStatus;
-        public Classes.ConfigStage ConfigStage;
+        public Classes.ConfigurationStage ConfigStage;
         public UserConfigResponse(string error) : base(error) { }
         public UserConfigResponse() : base() { }
     }

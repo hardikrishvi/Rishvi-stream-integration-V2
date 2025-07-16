@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rishvi.Modules.Core.Authorization
+﻿namespace Rishvi.Modules.Core.Authorization
 {
     public class JwtSetting
     {

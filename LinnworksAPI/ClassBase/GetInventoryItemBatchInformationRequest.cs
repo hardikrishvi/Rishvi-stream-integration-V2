@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Used to get inventory item batch information 
     /// </summary>
     public class GetInventoryItemBatchInformationRequest
-	{
+    {
         /// <summary>
         /// The item id 
         /// </summary>
@@ -28,5 +26,5 @@ namespace LinnworksAPI
         /// Only return warehouse locations that can have orders assigned to them for picking 
         /// </summary>
 		public Boolean AssignableOnly { get; set; }
-	} 
+    }
 }

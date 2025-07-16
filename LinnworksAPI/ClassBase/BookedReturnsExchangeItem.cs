@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class BookedReturnsExchangeItem
-	{
+    {
         /// <summary>
         /// Order item record row ID 
         /// </summary>
@@ -155,5 +153,5 @@ namespace LinnworksAPI
         /// The batch inventory selected 
         /// </summary>
 		public StockItemBatchInventory BatchInventory { get; set; }
-	} 
+    }
 }

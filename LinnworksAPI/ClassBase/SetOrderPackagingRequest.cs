@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Request class for SetOrderPackaging method in Orders controller 
     /// </summary>
     public class SetOrderPackagingRequest
-	{
+    {
         /// <summary>
         /// Packaging group Id 
         /// </summary>
@@ -53,5 +51,5 @@ namespace LinnworksAPI
         /// Total Width 
         /// </summary>
 		public Decimal TotalWidth { get; set; }
-	} 
+    }
 }

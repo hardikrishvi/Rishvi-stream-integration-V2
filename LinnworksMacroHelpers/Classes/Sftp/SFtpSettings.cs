@@ -1,5 +1,5 @@
-﻿using LinnworksMacroHelpers.Helpers;
-using System;
+﻿using System;
+using LinnworksMacroHelpers.Helpers;
 
 namespace LinnworksMacroHelpers.Classes
 {

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemSoldStatFinalDetail
-	{
+    {
         /// <summary>
         /// When stock was sold 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Profit margin 
         /// </summary>
 		public Double ProfitMargin { get; set; }
-	} 
+    }
 }

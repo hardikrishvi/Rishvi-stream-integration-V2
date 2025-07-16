@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class BookedReturnsExchangeOrder
-	{
+    {
         /// <summary>
         /// Order ID (unique order identifier) 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// Return date time 
         /// </summary>
 		public DateTime ReturnDate { get; set; }
-	} 
+    }
 }

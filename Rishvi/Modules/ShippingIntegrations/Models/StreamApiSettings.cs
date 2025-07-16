@@ -16,7 +16,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             {
                 return Setting<string>("StreamApiSettings:DemoUrl");
             }
-        } 
+        }
         public static string ProductionUrl { get; set; } = null!;
 
         private static T Setting<T>(string name)

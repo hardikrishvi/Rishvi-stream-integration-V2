@@ -16,6 +16,6 @@ namespace Rishvi.Models
         public string event_link { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        
+
     }
 }

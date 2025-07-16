@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdateRefundRequest
-	{
+    {
         /// <summary>
         /// The identifier for the refund header to update 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// A list of refund lines to update within the given refund 
         /// </summary>
 		public List<UpdatedRefundLine> RefundLines { get; set; }
-	} 
+    }
 }

@@ -1,7 +1,5 @@
 ﻿using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Data.Seed;
-using Rishvi.Modules.ErrorLogs.Data.Permissions;
-using System.Linq;
 namespace Rishvi.Modules.ErrorLogs.Data.Seed
 {
     public class SystemLogPermissionsSeed : BaseSeed
@@ -13,7 +11,7 @@ namespace Rishvi.Modules.ErrorLogs.Data.Seed
         public override void Seed()
         {
         }
-         private void CreateSystemPermissions()
+        private void CreateSystemPermissions()
         {
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -30,18 +29,18 @@ namespace Rishvi.Migrations.ApplicationDb
                     table.PrimaryKey("PK_ClientAuth", x => x.Id);
                 });
 
-          
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-           
+
 
             migrationBuilder.DropTable(
                 name: "ClientAuth");
 
-            
+
         }
     }
 }

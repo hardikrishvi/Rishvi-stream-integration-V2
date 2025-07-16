@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class ActionRMABookingResponse
-	{
+    {
         /// <summary>
         /// If a refund was created as part of accepting the return/exchange booking, this identifies the created header 
         /// </summary>
@@ -21,12 +20,12 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean SuccessfullyActioned { get; set; }
 
-		public Int32? RMAHeaderId { get; set; }
+        public Int32? RMAHeaderId { get; set; }
 
-		public List<VerifiedRMAItem> Items { get; set; }
+        public List<VerifiedRMAItem> Items { get; set; }
 
-		public List<String> Errors { get; set; }
+        public List<String> Errors { get; set; }
 
-		public List<String> Info { get; set; }
-	} 
+        public List<String> Info { get; set; }
+    }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace Rishvi.Modules.Core.Data
+﻿namespace Rishvi.Modules.Core.Data
 {
     public interface IUnitOfWork : IDisposable
     {

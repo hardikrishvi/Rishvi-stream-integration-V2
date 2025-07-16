@@ -4,7 +4,7 @@ namespace Rishvi.DTOs.OrderRoot;
 
 public class OrderRootListDto
 {
-    public Guid OrderId { get; set; } 
+    public Guid OrderId { get; set; }
     public int? NumOrderId { get; set; }
     public Models.GeneralInfo GeneralInfo { get; set; }
     public Models.ShippingInfo ShippingInfo { get; set; }

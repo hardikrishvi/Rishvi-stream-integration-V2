@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Purchase order payment statement 
     /// </summary>
     public class PurchaseOrderPaymentStatement
-	{
+    {
         /// <summary>
         /// Unique record id 
         /// </summary>
@@ -49,5 +47,5 @@ namespace LinnworksAPI
         /// Relation to additional cost line. If no value is set then the payment statement relates to PO supplier 
         /// </summary>
 		public Int32? fkPurchaseAdditionalCostItemId { get; set; }
-	} 
+    }
 }

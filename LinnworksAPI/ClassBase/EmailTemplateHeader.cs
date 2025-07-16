@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Represent a simple version of EmailTemplate, with genering information 
     /// </summary>
     public class EmailTemplateHeader
-	{
+    {
         /// <summary>
         /// Row Id 
         /// </summary>
@@ -63,5 +61,5 @@ namespace LinnworksAPI
         /// Indicates whether the email is a HTML email 
         /// </summary>
 		public Boolean HTML { get; set; }
-	} 
+    }
 }

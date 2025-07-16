@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ActionRMABookingRequest
-	{
+    {
         /// <summary>
         /// The unique identifier for the RMA header to action 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// When actioning an RMA beyond the initial approval, the channel may require additional information, which can be passed via this field. Not required 
         /// </summary>
 		public ActionForm Request { get; set; }
-	} 
+    }
 }

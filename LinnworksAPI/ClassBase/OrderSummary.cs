@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderSummary
-	{
+    {
         /// <summary>
         /// Order ID (pkOrderId) 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// Order location ID 
         /// </summary>
 		public Guid FulfillmentLocationId { get; set; }
-	} 
+    }
 }

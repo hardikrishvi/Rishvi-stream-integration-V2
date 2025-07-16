@@ -1,5 +1,4 @@
-﻿using System;
-namespace Rishvi.Modules.ErrorLogs.Models.DTOs
+﻿namespace Rishvi.Modules.ErrorLogs.Models.DTOs
 {
     public class SystemLogListDto
     {

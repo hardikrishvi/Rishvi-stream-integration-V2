@@ -3,6 +3,6 @@
     public interface IUploadSettings
     {
         string FullPath { get; set; }
-        string Encoding {get;set;}
+        string Encoding { get; set; }
     }
 }

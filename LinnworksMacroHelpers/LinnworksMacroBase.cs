@@ -1,6 +1,6 @@
-﻿using LinnworksMacroHelpers.Classes;
+﻿using System;
+using LinnworksMacroHelpers.Classes;
 using LinnworksMacroHelpers.Interfaces;
-using System;
 
 namespace LinnworksMacroHelpers
 {

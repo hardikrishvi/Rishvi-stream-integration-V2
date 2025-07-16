@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class Add_AdditionalCostTypesRequest
-	{
+    {
         /// <summary>
         /// Additional cost name 
         /// </summary>
@@ -26,6 +24,6 @@ namespace LinnworksAPI
         /// </summary>
 		public Boolean Print { get; set; }
 
-		public AllocationMethods AllocationMethod { get; set; }
-	} 
+        public AllocationMethods AllocationMethod { get; set; }
+    }
 }

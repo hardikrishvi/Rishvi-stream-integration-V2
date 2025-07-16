@@ -1,7 +1,7 @@
 
 namespace Rishvi.Domain.DTOs.LinnworksSettings;
 
-public class LinnworksSettingsDto 
+public class LinnworksSettingsDto
 {
 
 

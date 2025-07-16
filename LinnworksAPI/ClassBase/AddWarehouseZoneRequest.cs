@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class AddWarehouseZoneRequest
-	{
+    {
         /// <summary>
         /// Zone type Id 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Stock location interger id 
         /// </summary>
 		public Int32 StockLocationIntId { get; set; }
-	} 
+    }
 }

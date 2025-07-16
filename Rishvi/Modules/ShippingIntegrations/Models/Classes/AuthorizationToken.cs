@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json;
-using Rishvi.Models;
-using Rishvi.Modules.Core.Aws;
+﻿using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
-using Rishvi.Modules.Core.Helpers;
-using SkiaSharp;
-using System.IO;
-using ThirdParty.Json.LitJson;
 
 namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
 {

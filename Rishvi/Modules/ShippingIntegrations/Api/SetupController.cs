@@ -1,11 +1,8 @@
-﻿using LinnworksAPI;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
-using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
-using Rishvi.Modules.ShippingIntegrations.Models.BaseClasses;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
@@ -112,7 +109,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     // Active configuration stage (completed integration)
                     return new UserConfigResponse()
                     {
-                        ConfigStage = Models.ConfigStageClasses.UserConfigStage.GetUserConfigStage(auth),
+                        ConfigStage = Models.ConfigStageClasses.UserConfigStageBuilder.Build(auth),
                         IsConfigActive = true, // MUST SET THIS TO TRUE for the config to be treated as completed
                         ConfigStatus = "CONFIG"
                     };

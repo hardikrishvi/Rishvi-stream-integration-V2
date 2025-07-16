@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class CreateRefundRequest
-	{
+    {
         /// <summary>
         /// Determines whether the refund was initiated on the channel, or within Linnworks 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// A collection of line-level refunds detailing the refund as a whole 
         /// </summary>
 		public List<NewRefundLine> RefundLines { get; set; }
-	} 
+    }
 }

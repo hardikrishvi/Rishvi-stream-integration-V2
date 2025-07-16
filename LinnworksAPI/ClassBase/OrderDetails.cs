@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderDetails
-	{
+    {
         /// <summary>
         /// Order ID (pkOrderId) 
         /// </summary>
@@ -80,5 +79,5 @@ namespace LinnworksAPI
         /// Buyer's tax number. 
         /// </summary>
 		public String TaxId { get; set; }
-	} 
+    }
 }

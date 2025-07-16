@@ -1,5 +1,4 @@
 ﻿using Rishvi.Modules.Core.Data;
-using System;
 namespace Rishvi.Modules.ErrorLogs.Models
 {
     public class ErrorLog : IModificationHistory

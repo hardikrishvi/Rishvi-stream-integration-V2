@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class PickWaveAllocateCheckResultError
-	{
+    {
         /// <summary>
         /// Error message 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// Order item row id, if null or guid empty then top level order error. 
         /// </summary>
 		public Guid? OrderItemRowId { get; set; }
-	} 
+    }
 }

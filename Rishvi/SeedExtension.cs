@@ -1,9 +1,7 @@
-﻿using Rishvi.Modules.Core.Data.Seed;
+﻿using Microsoft.EntityFrameworkCore;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.Core.Data.Seed;
 using Rishvi.Modules.Core.Helpers;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Rishvi.Modules.Core.DTOs;
 
 namespace Rishvi
 {

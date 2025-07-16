@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class CountryRegion
-	{
+    {
         /// <summary>
         /// Region row ID 
         /// </summary>
@@ -31,7 +29,7 @@ namespace LinnworksAPI
         /// </summary>
 		public Guid fkCountryId { get; set; }
 
-		public CountryRegionReplaceWith ReplaceWith { get; set; }
+        public CountryRegionReplaceWith ReplaceWith { get; set; }
 
         /// <summary>
         /// If this region is home region 
@@ -42,5 +40,5 @@ namespace LinnworksAPI
         /// Quantity of tags 
         /// </summary>
 		public Int32 TagsCount { get; set; }
-	} 
+    }
 }

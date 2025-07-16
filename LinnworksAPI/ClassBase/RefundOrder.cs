@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class RefundOrder
-	{
+    {
         /// <summary>
         /// Order ID (unique order identifier) 
         /// </summary>
@@ -26,7 +24,7 @@ namespace LinnworksAPI
         /// </summary>
 		public String Source { get; set; }
 
-		public String SubSource { get; set; }
+        public String SubSource { get; set; }
 
         /// <summary>
         /// Refund amount 
@@ -63,10 +61,10 @@ namespace LinnworksAPI
         /// </summary>
 		public DateTime RefundDate { get; set; }
 
-		public Double SubTotal { get; set; }
+        public Double SubTotal { get; set; }
 
-		public Double Total { get; set; }
+        public Double Total { get; set; }
 
-		public Double TaxRate { get; set; }
-	} 
+        public Double TaxRate { get; set; }
+    }
 }

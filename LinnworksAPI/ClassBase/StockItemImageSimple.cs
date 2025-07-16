@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Simple stock item image record 
     /// </summary>
     public class StockItemImageSimple
-	{
+    {
         /// <summary>
         /// Unique id of image 
         /// </summary>
@@ -34,8 +32,8 @@ namespace LinnworksAPI
         /// </summary>
 		public String RawChecksum { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

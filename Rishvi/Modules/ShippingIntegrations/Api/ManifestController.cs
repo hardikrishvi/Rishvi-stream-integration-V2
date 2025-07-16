@@ -9,7 +9,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IAuthorizationToken _authorizationToken;
         public ManifestController(IAuthorizationToken authorizationToken)
         {
-            _authorizationToken = authorizationToken;       
+            _authorizationToken = authorizationToken;
         }
 
         [HttpPost, Route("CreateManifest")]

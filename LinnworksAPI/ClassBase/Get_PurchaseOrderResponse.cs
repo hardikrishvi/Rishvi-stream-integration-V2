@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Single purchase order class. 
     /// </summary>
     public class Get_PurchaseOrderResponse
-	{
+    {
         /// <summary>
         /// Purchase order header 
         /// </summary>
@@ -24,7 +23,7 @@ namespace LinnworksAPI
         /// </summary>
 		public List<PurchaseOrderAdditionalCost> AdditionalCosts { get; set; }
 
-		public Int32 NoteCount { get; set; }
+        public Int32 NoteCount { get; set; }
 
         /// <summary>
         /// Purchase order payment statements 
@@ -35,5 +34,5 @@ namespace LinnworksAPI
         /// Purchase order delivered records 
         /// </summary>
 		public List<PurchaseOrderDeliveredRecord> DeliveredRecords { get; set; }
-	} 
+    }
 }

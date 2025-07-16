@@ -1,6 +1,4 @@
-﻿using Hangfire;
-
-namespace Rishvi
+﻿namespace Rishvi
 {
     public static class ApplicationBuilderExtension
     {

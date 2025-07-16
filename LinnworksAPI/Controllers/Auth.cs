@@ -1,15 +1,11 @@
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Text;
 using System;
-using System.IO;
 
 namespace LinnworksAPI
 {
     public class AuthController : BaseController, IAuthController
     {
         public AuthController(ApiContext apiContext) : base(apiContext)
-        {                       
+        {
         }
 
         /// <summary>
@@ -17,12 +13,12 @@ namespace LinnworksAPI
         /// </summary>
         /// <param name="request"></param>
         public BaseSession AuthorizeByApplication(AuthorizeByApplicationRequest request)
-		{
-			var response = GetResponse("Auth/AuthorizeByApplication", "request=" + System.Net.WebUtility.UrlEncode(JsonFormatter.ConvertToJson(request)) + "");
+        {
+            var response = GetResponse("Auth/AuthorizeByApplication", "request=" + System.Net.WebUtility.UrlEncode(JsonFormatter.ConvertToJson(request)) + "");
             return JsonFormatter.ConvertFromJson<BaseSession>(response);
-		}
+        }
 
-		/// <summary>
+        /// <summary>
         /// Returns current application subscription profile information for a given application for a specific user. 
         /// You can use this method to get the current application subscription after AuthorizedByApplication returned a session. 
         /// The session will contain Id, this is the UserId you need to supply in the call.
@@ -32,16 +28,16 @@ namespace LinnworksAPI
         /// <param name="applicationSecret">Your application secret key</param>
         /// <param name="userId">User Id (Id field of the session)</param>
         /// <returns>Class that represents the application subscription profile</returns>
-        public ApplicationProfileResponse GetApplicationProfileBySecretKey(Guid applicationId,Guid applicationSecret,Guid userId)
-		{
-			var response = GetResponse("Auth/GetApplicationProfileBySecretKey", "applicationId=" + applicationId + "&applicationSecret=" + applicationSecret + "&userId=" + userId + "");
+        public ApplicationProfileResponse GetApplicationProfileBySecretKey(Guid applicationId, Guid applicationSecret, Guid userId)
+        {
+            var response = GetResponse("Auth/GetApplicationProfileBySecretKey", "applicationId=" + applicationId + "&applicationSecret=" + applicationSecret + "&userId=" + userId + "");
             return JsonFormatter.ConvertFromJson<ApplicationProfileResponse>(response);
-		}
+        }
 
-		public DateTime GetServerUTCTime()
-		{
-			var response = GetResponse("Auth/GetServerUTCTime", "");
+        public DateTime GetServerUTCTime()
+        {
+            var response = GetResponse("Auth/GetServerUTCTime", "");
             return JsonFormatter.ConvertFromJson<DateTime>(response);
-		} 
+        }
     }
 }

@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class AssignStockToOrdersRequest
-	{
-		public List<Guid> OrderIds { get; set; }
+    {
+        public List<Guid> OrderIds { get; set; }
 
-		public BatchAssignmentMode BatchAssignmentMode { get; set; }
-	} 
+        public BatchAssignmentMode BatchAssignmentMode { get; set; }
+    }
 }

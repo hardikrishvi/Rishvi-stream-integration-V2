@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace Rishvi.Modules.ShippingIntegrations.Models
+﻿namespace Rishvi.Modules.ShippingIntegrations.Models
 {
     public static class Services
     {

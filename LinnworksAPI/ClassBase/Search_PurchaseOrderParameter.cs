@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Search Purchase order class 
     /// </summary>
     public class Search_PurchaseOrderParameter
-	{
+    {
         /// <summary>
         /// Purchase order date range from (optional) 
         /// </summary>
@@ -51,5 +50,5 @@ namespace LinnworksAPI
         /// Current Supplier 
         /// </summary>
 		public List<Guid> Supplier { get; set; }
-	} 
+    }
 }

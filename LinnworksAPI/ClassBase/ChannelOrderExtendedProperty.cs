@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ChannelOrderExtendedProperty
-	{
+    {
         /// <summary>
         /// Extended property name 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// Extended property type 
         /// </summary>
 		public String Type { get; set; }
-	} 
+    }
 }

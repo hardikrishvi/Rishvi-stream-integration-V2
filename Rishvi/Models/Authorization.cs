@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 using Rishvi.Core.Data;
 
 namespace Rishvi.Models

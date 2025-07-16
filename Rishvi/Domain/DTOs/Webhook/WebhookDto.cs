@@ -1,14 +1,13 @@
 ﻿using Rishvi.Domain.DTOs.Event;
 using Rishvi.Domain.DTOs.Run;
 using Rishvi.Domain.DTOs.Subscription;
-using Rishvi.Models;
 
 namespace Rishvi.Domain.DTOs.Webhook
 {
     public class WebhookDto
     {
         public WebhookDto()
-        { 
+        {
             subscription = new SubscriptionDto();
             @event = new EventDto();
             run = new RunDto();

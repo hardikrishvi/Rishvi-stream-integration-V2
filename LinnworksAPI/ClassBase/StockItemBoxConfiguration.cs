@@ -1,20 +1,18 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Stock item box configuration, dimennsions 
     /// </summary>
     public class StockItemBoxConfiguration
-	{
+    {
         /// <summary>
         /// Unique box id. 
         /// </summary>
 		public Int32 BoxId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
+        public Int32 StockItemIntId { get; set; }
 
         /// <summary>
         /// Box name max 16 characters 
@@ -60,5 +58,5 @@ namespace LinnworksAPI
         /// IsDeleted flag. 
         /// </summary>
 		public Boolean LogicalDelete { get; set; }
-	} 
+    }
 }

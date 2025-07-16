@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class RefundInfo
-	{
+    {
         /// <summary>
         /// Refund record ID 
         /// </summary>
@@ -61,7 +59,7 @@ namespace LinnworksAPI
         /// </summary>
 		public Double? Cost { get; set; }
 
-		public PostSaleStatusType RefundStatus { get; set; }
+        public PostSaleStatusType RefundStatus { get; set; }
 
         /// <summary>
         /// Status of refund 
@@ -73,20 +71,20 @@ namespace LinnworksAPI
         /// </summary>
 		public Guid? fkOrderItemRowId { get; set; }
 
-		public Boolean ShouldSerializeChannelReason { get; set; }
+        public Boolean ShouldSerializeChannelReason { get; set; }
 
         /// <summary>
         /// Channel refund reason 
         /// </summary>
 		public String ChannelReason { get; set; }
 
-		public Boolean ShouldSerializeChannelReasonSec { get; set; }
+        public Boolean ShouldSerializeChannelReasonSec { get; set; }
 
         /// <summary>
         /// Secondary channel reason for a refund 
         /// </summary>
 		public String ChannelReasonSec { get; set; }
 
-		public Boolean IsNew { get; set; }
-	} 
+        public Boolean IsNew { get; set; }
+    }
 }

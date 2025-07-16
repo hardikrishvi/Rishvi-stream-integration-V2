@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class ReturnOrderHeader
-	{
+    {
         /// <summary>
         /// Order ID 
         /// </summary>
@@ -60,5 +58,5 @@ namespace LinnworksAPI
         /// Link to order refund 
         /// </summary>
 		public String RefundLink { get; set; }
-	} 
+    }
 }

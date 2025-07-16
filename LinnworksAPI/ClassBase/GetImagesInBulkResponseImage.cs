@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Image response item. 
     /// </summary>
     public class GetImagesInBulkResponseImage
-	{
+    {
         /// <summary>
         /// SKU 
         /// </summary>
@@ -53,5 +51,5 @@ namespace LinnworksAPI
         /// Thumbnail image path 
         /// </summary>
 		public String FullSourceThumbnail { get; set; }
-	} 
+    }
 }

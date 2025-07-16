@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Rishvi.Modules.Core.Filters
+﻿namespace Rishvi.Modules.Core.Filters
 {
     public abstract class BaseFilterDto
     {

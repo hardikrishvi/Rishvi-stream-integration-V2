@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdatePickedItemDeltaRequestItem
-	{
+    {
         /// <summary>
         /// Picking wave row id 
         /// </summary>
@@ -25,5 +23,5 @@ namespace LinnworksAPI
         /// Picked quantity delta 
         /// </summary>
 		public Int32 PickedQuantityDelta { get; set; }
-	} 
+    }
 }

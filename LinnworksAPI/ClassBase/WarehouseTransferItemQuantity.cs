@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class WarehouseTransferItemQuantity
-	{
+    {
         /// <summary>
         /// Stock item ID (unique identifier) 
         /// </summary>
@@ -20,5 +18,5 @@ namespace LinnworksAPI
         /// Transfer item ID (unique identifier) 
         /// </summary>
 		public Guid pkTransferItemId { get; set; }
-	} 
+    }
 }

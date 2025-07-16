@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Order General Info class 
     /// </summary>
     public class OrderGeneralInfo
-	{
+    {
         /// <summary>
         /// Order Status (0 = UNPAID, 1 = PAID,2 = RETURN,3 = PENDING,4 = RESEND) 
         /// </summary>
@@ -114,7 +113,7 @@ namespace LinnworksAPI
         /// </summary>
 		public ScheduledDelivery ScheduledDelivery { get; set; }
 
-		public Boolean HasScheduledDelivery { get; set; }
+        public Boolean HasScheduledDelivery { get; set; }
 
         /// <summary>
         /// Order location ID 
@@ -131,6 +130,6 @@ namespace LinnworksAPI
         /// </summary>
 		public List<Int32> PickwaveIds { get; set; }
 
-		public StockAllocationType? StockAllocationType { get; set; }
-	} 
+        public StockAllocationType? StockAllocationType { get; set; }
+    }
 }

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class MultiOptionResponse
-	{
+    {
         /// <summary>
         /// Evaluation field 
         /// </summary>
@@ -21,6 +20,6 @@ namespace LinnworksAPI
         /// </summary>
 		public List<String> Options { get; set; }
 
-		public List<OptionBase> KeyedOptions { get; set; }
-	} 
+        public List<OptionBase> KeyedOptions { get; set; }
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdatePaymentStatementItem
-	{
+    {
         /// <summary>
         /// Payment Statement line row id, uniquely identifying each cost line 
         /// </summary>
@@ -16,18 +14,18 @@ namespace LinnworksAPI
         /// </summary>
 		public Guid Id { get; set; }
 
-		public String Reference { get; set; }
+        public String Reference { get; set; }
 
-		public Decimal ConversionRate { get; set; }
+        public Decimal ConversionRate { get; set; }
 
-		public String Currency { get; set; }
+        public String Currency { get; set; }
 
-		public Int32? fkPurchaseAdditionalCostItemId { get; set; }
+        public Int32? fkPurchaseAdditionalCostItemId { get; set; }
 
-		public Decimal LineCost { get; set; }
+        public Decimal LineCost { get; set; }
 
-		public DateTime? PaymentDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
 
-		public DateTime CreationDate { get; set; }
-	} 
+        public DateTime CreationDate { get; set; }
+    }
 }

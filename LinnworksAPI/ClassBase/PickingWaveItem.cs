@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Pickwave order item 
     /// </summary>
     public class PickingWaveItem
-	{
+    {
         /// <summary>
         /// Pickwave item row id 
         /// </summary>
@@ -29,24 +27,24 @@ namespace LinnworksAPI
         /// </summary>
 		public String TotBarcode { get; set; }
 
-		public Int32 SortOrder { get; set; }
+        public Int32 SortOrder { get; set; }
 
-		public Int32 ToPickQuantity { get; set; }
+        public Int32 ToPickQuantity { get; set; }
 
-		public Int32? TOTId { get; set; }
+        public Int32? TOTId { get; set; }
 
-		public String TrayTag { get; set; }
+        public String TrayTag { get; set; }
 
-		public String PickingTag { get; set; }
+        public String PickingTag { get; set; }
 
-		public PickingWaveItemState ItemState { get; set; }
+        public PickingWaveItemState ItemState { get; set; }
 
-		public Int32? BatchInventoryId { get; set; }
+        public Int32? BatchInventoryId { get; set; }
 
-		public Int32 OrderId { get; set; }
+        public Int32 OrderId { get; set; }
 
-		public Guid OrderItemRowId { get; set; }
+        public Guid OrderItemRowId { get; set; }
 
-		public Guid StockItemId { get; set; }
-	} 
+        public Guid StockItemId { get; set; }
+    }
 }

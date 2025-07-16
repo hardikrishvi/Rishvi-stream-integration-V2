@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Rishvi.Modules.Core.Extensions;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Rishvi.Modules.Core.Data
 {
@@ -50,7 +45,7 @@ namespace Rishvi.Modules.Core.Data
         }
 
         public void Add(TEntity entity)
-        
+
         {
             _dbSet.Add(entity);
         }

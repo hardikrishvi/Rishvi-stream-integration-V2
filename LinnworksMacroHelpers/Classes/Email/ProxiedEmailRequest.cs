@@ -1,15 +1,14 @@
-﻿using LinnworksMacroHelpers.Interfaces;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using LinnworksMacroHelpers.Interfaces;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LinnworksMacroHelpers.Classes.Email
 {
     public sealed class ProxiedEmailRequest
-    {       
+    {
 
         /// <summary>
         /// Email settings

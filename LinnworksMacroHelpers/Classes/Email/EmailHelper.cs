@@ -1,6 +1,6 @@
-﻿using LinnworksMacroHelpers.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using LinnworksMacroHelpers.Interfaces;
 
 namespace LinnworksMacroHelpers.Classes.Email
 {

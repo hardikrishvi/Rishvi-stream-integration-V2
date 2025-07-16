@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class UpdatePickingWaveItemWithNewBinrackRequest
-	{
+    {
         /// <summary>
         /// Pickwave id 
         /// </summary>
@@ -25,5 +24,5 @@ namespace LinnworksAPI
         /// Dictates how the returned pickwave should be sorted 
         /// </summary>
 		public ItemUpdateSortType SortType { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class BatchPickingWaveStockItems
-	{
+    {
         /// <summary>
         /// Pickwave Row Id 
         /// </summary>
@@ -45,5 +43,5 @@ namespace LinnworksAPI
         /// User Id to whom the pickwave was/is allocated. If unallocated this will be null 
         /// </summary>
 		public Int32? UserId { get; set; }
-	} 
+    }
 }

@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Bin Rack 
     /// </summary>
     public class BinRackStockItem
-	{
+    {
         /// <summary>
         /// Unique id for the binrack 
         /// </summary>
@@ -89,8 +87,8 @@ namespace LinnworksAPI
         /// </summary>
 		public DateTime? SellBy { get; set; }
 
-		public String BinrackTypeName { get; set; }
+        public String BinrackTypeName { get; set; }
 
-		public Guid LocationId { get; set; }
-	} 
+        public Guid LocationId { get; set; }
+    }
 }

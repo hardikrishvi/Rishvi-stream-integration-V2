@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
-using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetWarehouseZonesByLocationResponse
-	{
+    {
         /// <summary>
         /// Warehouse Zones 
         /// </summary>
@@ -35,5 +33,5 @@ namespace LinnworksAPI
         /// Zone to zones hierarchy 
         /// </summary>
 		public List<WarehouseZoneToZone> ZonesToZonesHierarchy { get; set; }
-	} 
+    }
 }

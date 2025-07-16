@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemBatchInventory
-	{
+    {
         /// <summary>
         /// Stock item batch record ID 
         /// </summary>
@@ -85,5 +83,5 @@ namespace LinnworksAPI
         /// Warehouse binrack type unique id. 
         /// </summary>
 		public Int32? WarehouseBinrackTypeId { get; set; }
-	} 
+    }
 }

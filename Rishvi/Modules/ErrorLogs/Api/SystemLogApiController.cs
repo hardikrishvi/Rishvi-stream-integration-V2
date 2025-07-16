@@ -4,8 +4,6 @@ using Rishvi.Modules.Core.DTOs;
 using Rishvi.Modules.ErrorLogs.Data.Permissions;
 using Rishvi.Modules.ErrorLogs.Models.DTOs;
 using Rishvi.Modules.ErrorLogs.Services;
-using System;
-using System.Threading.Tasks;
 namespace Rishvi.Modules.ErrorLogs.Api
 {
     [ApiExplorerSettings(IgnoreApi = true)]

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemReturn
-	{
+    {
         /// <summary>
         /// What year it was returned 
         /// </summary>
@@ -26,8 +24,8 @@ namespace LinnworksAPI
         /// </summary>
 		public Int32 Quantity { get; set; }
 
-		public Guid StockItemId { get; set; }
+        public Guid StockItemId { get; set; }
 
-		public Int32 StockItemIntId { get; set; }
-	} 
+        public Int32 StockItemIntId { get; set; }
+    }
 }

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class AddRollingStockTakeRequest
-	{
+    {
         /// <summary>
         /// Location Id 
         /// </summary>
@@ -20,5 +19,5 @@ namespace LinnworksAPI
         /// List of stock take items. Maximum 1000 items in a stock take session 
         /// </summary>
 		public List<StockTakeItem> Items { get; set; }
-	} 
+    }
 }

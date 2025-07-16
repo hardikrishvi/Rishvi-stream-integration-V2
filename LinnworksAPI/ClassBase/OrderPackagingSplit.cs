@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderPackagingSplit
-	{
+    {
         /// <summary>
         /// Bin ID 
         /// </summary>
@@ -55,5 +54,5 @@ namespace LinnworksAPI
         /// Tracking number 
         /// </summary>
 		public String TrackingNumbers { get; set; }
-	} 
+    }
 }

@@ -18,7 +18,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
         }
 
-        public static Guid ApplicationSecret 
+        public static Guid ApplicationSecret
         {
             get
             {

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class StockItemPricingRule
-	{
+    {
         /// <summary>
         /// Record row ID (optional) 
         /// </summary>
@@ -30,5 +28,5 @@ namespace LinnworksAPI
         /// Value/Price level 
         /// </summary>
 		public Double Value { get; set; }
-	} 
+    }
 }

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetInventoryItemsCompositionByIdsRequest
-	{
-		public List<Guid> InventoryItemIds { get; set; }
-	} 
+    {
+        public List<Guid> InventoryItemIds { get; set; }
+    }
 }

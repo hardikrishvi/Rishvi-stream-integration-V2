@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Rishvi.Modules.Core.Api
 {
@@ -18,7 +16,7 @@ namespace Rishvi.Modules.Core.Api
             //linnworkUserToken = _httpContextAccessor.HttpContext.Request.Cookies["linnworkUserToken"] != null ? _httpContextAccessor.HttpContext.Request.Cookies["linnworkUserToken"] : string.Empty;
             //linnworkServerUrl = _httpContextAccessor.HttpContext.Request.Cookies["linnworkServerUrl"] != null ? _httpContextAccessor.HttpContext.Request.Cookies["linnworkServerUrl"] : string.Empty;
         }
-       
+
         protected ActionResult Result(dynamic entity)
         {
             var existStatuCode = HasProperty(entity, "StatusCode");
@@ -26,14 +24,14 @@ namespace Rishvi.Modules.Core.Api
             if (existStatuCode)
             {
                 if (entity != null)
-            {
-                if (entity.StatusCode == HttpStatusCode.NotFound)
-                    return NotFound(entity);
-                else if (entity.StatusCode == HttpStatusCode.Unauthorized)
-                    return Unauthorized(entity);
-                else if (entity.StatusCode == HttpStatusCode.InternalServerError)
-                    return StatusCode(500, entity);
-            }
+                {
+                    if (entity.StatusCode == HttpStatusCode.NotFound)
+                        return NotFound(entity);
+                    else if (entity.StatusCode == HttpStatusCode.Unauthorized)
+                        return Unauthorized(entity);
+                    else if (entity.StatusCode == HttpStatusCode.InternalServerError)
+                        return StatusCode(500, entity);
+                }
             }
             return entity == null ? NotFound() : (ActionResult)Ok(entity);
         }

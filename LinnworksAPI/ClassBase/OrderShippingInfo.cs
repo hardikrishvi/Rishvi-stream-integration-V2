@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderShippingInfo
-	{
+    {
         /// <summary>
         /// Courier name (e.g. Royal Mail) 
         /// </summary>
@@ -70,5 +68,5 @@ namespace LinnworksAPI
         /// If there is an adjustment to shipping cost was made 
         /// </summary>
 		public Boolean ManualAdjust { get; set; }
-	} 
+    }
 }

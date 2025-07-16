@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class OrderFolder
-	{
+    {
         /// <summary>
         /// Folder ID 
         /// </summary>
@@ -15,5 +13,5 @@ namespace LinnworksAPI
         /// Folder name 
         /// </summary>
 		public String FolderName { get; set; }
-	} 
+    }
 }

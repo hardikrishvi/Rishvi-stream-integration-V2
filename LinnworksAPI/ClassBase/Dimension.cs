@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     /// <summary>
     /// Dimension 
     /// </summary>
     public class Dimension
-	{
+    {
         /// <summary>
         /// Width 
         /// </summary>
@@ -23,5 +21,5 @@ namespace LinnworksAPI
         /// Height 
         /// </summary>
 		public Decimal Height { get; set; }
-	} 
+    }
 }

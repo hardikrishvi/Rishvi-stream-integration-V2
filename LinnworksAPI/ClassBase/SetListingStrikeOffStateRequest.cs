@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace LinnworksAPI
-{ 
+{
     public class SetListingStrikeOffStateRequest
-	{
+    {
         /// <summary>
         /// Listing audit details 
         /// </summary>
@@ -30,5 +29,5 @@ namespace LinnworksAPI
         /// Status of listings search 
         /// </summary>
 		public ListingStatus ListingsStatus { get; set; }
-	} 
+    }
 }

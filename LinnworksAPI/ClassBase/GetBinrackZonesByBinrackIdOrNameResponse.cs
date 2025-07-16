@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
-using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class GetBinrackZonesByBinrackIdOrNameResponse
-	{
+    {
         /// <summary>
         /// Warehouse Zones 
         /// </summary>
@@ -15,5 +13,5 @@ namespace LinnworksAPI
         /// Warehosue binrack to zones. 
         /// </summary>
 		public List<WarehouseBinrackToZone> BinrackToZones { get; set; }
-	} 
+    }
 }

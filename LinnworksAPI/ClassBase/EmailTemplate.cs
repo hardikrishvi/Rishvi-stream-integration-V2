@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Text;
 using System;
 
 namespace LinnworksAPI
-{ 
+{
     public class EmailTemplate
-	{
+    {
         /// <summary>
         /// Row id 
         /// </summary>
@@ -70,5 +68,5 @@ namespace LinnworksAPI
         /// Text to be shown to the customer when he want to preview an order 
         /// </summary>
 		public String PromptPreviewReferenceNumber { get; set; }
-	} 
+    }
 }
