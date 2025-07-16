@@ -29,6 +29,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("AddNewUser")]
         public async Task<AddNewUserResponse> AddNewUser([FromBody] AddNewUserRequest request)
         {
+            SqlHelper.SystemLogInsert("AddNewUser", null, null, JsonConvert.SerializeObject(request), "AddNewUser", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
                // EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
