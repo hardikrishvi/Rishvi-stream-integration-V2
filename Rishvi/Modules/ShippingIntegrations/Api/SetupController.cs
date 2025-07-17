@@ -77,7 +77,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("UserConfig", null, null, JsonConvert.SerializeObject(request), "UserConfigStart", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
-                var obj = new LinnworksBaseStream(request.AuthorizationToken);
+              //  var obj = new LinnworksBaseStream(request.AuthorizationToken);
                 // Authenticate the user
                 AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
                 var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
