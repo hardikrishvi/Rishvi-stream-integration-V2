@@ -162,28 +162,6 @@
                                 SortOrder=12,
                                 ValueType = Classes.ConfigValueType.STRING
                             },
-                             new Classes.ConfigItem() {
-                                ConfigItemId = "POSTCODE",
-                                Description="Postal Code",
-                                GroupName="Sender Address",
-                                MustBeSpecified = true,
-                                Name="Postal Code",
-                                ReadOnly= false,
-                                SelectedValue="",
-                                SortOrder=12,
-                                ValueType = Classes.ConfigValueType.STRING
-                            },
-                              new Classes.ConfigItem() {
-                                ConfigItemId = "POSTCODE",
-                                Description="Postal Code",
-                                GroupName="Sender Address",
-                                MustBeSpecified = true,
-                                Name="Postal Code",
-                                ReadOnly= false,
-                                SelectedValue="",
-                                SortOrder=12,
-                                ValueType = Classes.ConfigValueType.STRING
-                            },
                                 new Classes.ConfigItem() {
                                 ConfigItemId = "AutoOrderSync",
                                 Description="Auto Order Sync",
