@@ -44,7 +44,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
         public string LinnRefreshToken { get; set; }
 
         public string fulfiilmentLocation { get; set; }
-
+        public bool AutoOrderSync { get; set; } = false;
+        public bool AutoOrderDespatchSync { get; set; } = false;
         public bool PartyFileCreated { get; set; }
 
         public void Save()

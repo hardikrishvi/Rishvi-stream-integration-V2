@@ -34,7 +34,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("AddNewUser", null, null, JsonConvert.SerializeObject(request), "AddNewUser", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
-               // EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
+
+              
+                // EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
                 // Validate input fields
                 if (string.IsNullOrWhiteSpace(request.Email))
                     return new AddNewUserResponse("Invalid Email");
@@ -75,6 +77,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("UserConfig", null, null, JsonConvert.SerializeObject(request), "UserConfigStart", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
+                var obj = new LinnworksBaseStream(request.AuthorizationToken);
                 // Authenticate the user
                 AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
                 var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
@@ -178,6 +181,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     auth.PostCode = GetConfigValue(request, "POSTCODE");
                     auth.ClientId = GetConfigValue(request, "ClientId");
                     auth.ClientSecret = GetConfigValue(request, "ClientSecret");
+                    auth.AutoOrderSync =  Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
+                    auth.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
+
 
                     // Mark config as active and update status
                     auth.ConfigStatus = "CONFIG";
@@ -196,6 +202,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.PostCode = GetConfigValue(request, "POSTCODE");
                     authEntity.ClientId = GetConfigValue(request, "ClientId");
                     authEntity.ClientSecret = GetConfigValue(request, "ClientSecret");
+                   
+                    authEntity.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
+                    authEntity.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
                     authEntity.ConfigStatus = "CONFIG";
                     authEntity.IsConfigActive = true;
                     _authorizationRepository.Update(authEntity);

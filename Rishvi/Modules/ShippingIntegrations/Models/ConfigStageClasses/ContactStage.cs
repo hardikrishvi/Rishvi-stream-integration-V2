@@ -162,28 +162,72 @@
                                 SortOrder=12,
                                 ValueType = Classes.ConfigValueType.STRING
                             },
-                            new Classes.ConfigItem() {
-                                ConfigItemId = "LABELREFERENCE",
-                                Description="Label Reference",
-                                GroupName="Label Reference",
+                             new Classes.ConfigItem() {
+                                ConfigItemId = "POSTCODE",
+                                Description="Postal Code",
+                                GroupName="Sender Address",
                                 MustBeSpecified = true,
-                                Name="Label Reference",
+                                Name="Postal Code",
+                                ReadOnly= false,
+                                SelectedValue="",
+                                SortOrder=12,
+                                ValueType = Classes.ConfigValueType.STRING
+                            },
+                              new Classes.ConfigItem() {
+                                ConfigItemId = "POSTCODE",
+                                Description="Postal Code",
+                                GroupName="Sender Address",
+                                MustBeSpecified = true,
+                                Name="Postal Code",
+                                ReadOnly= false,
+                                SelectedValue="",
+                                SortOrder=12,
+                                ValueType = Classes.ConfigValueType.STRING
+                            },
+                                new Classes.ConfigItem() {
+                                ConfigItemId = "AutoOrderSync",
+                                Description="Auto Order Sync",
+                                GroupName="Auto Order Sync",
+                                MustBeSpecified = true,
+                                Name="Auto Order Sync",
                                 ReadOnly= false,
                                 SelectedValue="",
                                 SortOrder=13,
-                                ValueType = Classes.ConfigValueType.LIST,
-                                ListValues = new List<Classes.ConfigItemListItem>()
-                                {
-                                    new Classes.ConfigItemListItem() {
-                                        Display = "Linnworks Order Id",
-                                        Value = "LinnworksOrderId"
-                                    },
-                                    new Classes.ConfigItemListItem() {
-                                        Display = "Channel Referance",
-                                        Value = "ChannelReferance"
-                                    }
-                                }
+                                ValueType = Classes.ConfigValueType.BOOLEAN
                             },
+                              new Classes.ConfigItem() {
+                                ConfigItemId = "AutoOrderDespatchSync",
+                                Description="Auto Order Despatch Sync",
+                                GroupName="Auto Order Despatch Sync",
+                                MustBeSpecified = true,
+                                Name="Auto Order Despatch Sync",
+                                ReadOnly= false,
+                                SelectedValue="",
+                                SortOrder=14,
+                                ValueType = Classes.ConfigValueType.BOOLEAN
+                            },
+                                new Classes.ConfigItem() {
+                                    ConfigItemId = "LABELREFERENCE",
+                                    Description="Label Reference",
+                                    GroupName="Label Reference",
+                                    MustBeSpecified = true,
+                                    Name="Label Reference",
+                                    ReadOnly= false,
+                                    SelectedValue="",
+                                    SortOrder=15,
+                                    ValueType = Classes.ConfigValueType.LIST,
+                                    ListValues = new List<Classes.ConfigItemListItem>()
+                                    {
+                                        new Classes.ConfigItemListItem() {
+                                            Display = "Linnworks Order Id",
+                                            Value = "LinnworksOrderId"
+                                        },
+                                        new Classes.ConfigItemListItem() {
+                                            Display = "Channel Referance",
+                                            Value = "ChannelReferance"
+                                        }
+                                    }
+                             },
                     }
                 };
             }
