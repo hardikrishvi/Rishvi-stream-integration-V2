@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Rishvi.Models;
+using Rishvi.Modules.Core.Authorization;
 using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.BaseClasses;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
+using System.Security.Cryptography;
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
 {
@@ -101,32 +103,36 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     // Handle specific config stage
                     if (auth.ConfigStatus == "ContactStage")
                     {
-                        return new UserConfigResponse()
+                        var ret = new UserConfigResponse()
                         {
                             ConfigStage = Models.ConfigStageClasses.ContactStage.GetContactStage,
                             ConfigStatus = "ContactStage"
                         };
+                        SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(ret), "UserConfigsucc", JsonConvert.SerializeObject(ret), false, "clientId");
+                        return ret; 
                     }
-
+                    SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(authEntity), "UserConfigsucc", auth.ConfigStatus, false, "clientId");
                     // Return error for unhandled config stages
                     return new UserConfigResponse($"Config stage is not handled: {auth.ConfigStatus}");
                 }
                 else
                 {
                     // Active configuration stage (completed integration)
-                    return new UserConfigResponse()
+                    var dta = new UserConfigResponse()
                     {
                         ConfigStage = Models.ConfigStageClasses.UserConfigStage.GetUserConfigStage(auth),
                         IsConfigActive = true, // MUST SET THIS TO TRUE for the config to be treated as completed
                         ConfigStatus = "CONFIG"
                     };
+                    SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(dta), "UserConfigsucc", auth.ConfigStatus, false, "clientId");
+                    return dta;
                 }
             }
             catch (Exception ex)
             {
                 // Log the error (replace with proper logging framework)
                 Console.WriteLine($"An error occurred: {ex.Message}");
-
+                SqlHelper.SystemLogInsert("UserConfig error", null, null, "JsonConvert.SerializeObject(dta)", "UserConfigsucc", ex.Message, true, "clientId");
                 // Return error response
                 return new UserConfigResponse()
                 {
@@ -190,7 +196,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.PostCode = GetConfigValue(request, "POSTCODE");
                     authEntity.ClientId = GetConfigValue(request, "ClientId");
                     authEntity.ClientSecret = GetConfigValue(request, "ClientSecret");
+                    authEntity.ConfigStatus = "CONFIG";
+                    authEntity.IsConfigActive = true;
                     _authorizationRepository.Update(authEntity);
+                  
                     _unitOfWork.Commit();
 
                     return new UpdateConfigResponse();
