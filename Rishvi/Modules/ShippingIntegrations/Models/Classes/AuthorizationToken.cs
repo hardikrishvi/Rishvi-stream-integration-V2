@@ -92,7 +92,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                 LinnworksServer = get_auth.LinnworksServer ?? "",
                 LinnRefreshToken = get_auth.LinnRefreshToken ?? "",
                 fulfiilmentLocation = get_auth.fulfiilmentLocation ?? "",
-                PartyFileCreated = get_auth.PartyFileCreated ?? false
+                PartyFileCreated = get_auth.PartyFileCreated ?? false,
+                AutoOrderSync = get_auth.AutoOrderSync,
+                AutoOrderDespatchSync = get_auth.AutoOrderDespatchSync,
+                UseDefaultLocation = get_auth.UseDefaultLocation,
+                DefaultLocation = get_auth.DefaultLocation ?? "",
+                LinnDays = get_auth.LinnDays,
+                LinnPage = get_auth.LinnPage,
+                SendChangeToStream = get_auth.SendChangeToStream,
+                HandsOnDate = get_auth.HandsOnDate
             };
 
 

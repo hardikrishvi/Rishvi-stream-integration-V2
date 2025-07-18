@@ -229,7 +229,7 @@
                         },
                         new Classes.ConfigItem()
                         {
-                            ConfigItemId = "LinnHour",
+                            ConfigItemId = "LinnDays",
                             Description = "Order Sync Days determine how far back Linnworks will go to retrieve and sync orders from linnworks to stream Default days is 1",
                             GroupName = "Account Configuration",
                             MustBeSpecified = true,

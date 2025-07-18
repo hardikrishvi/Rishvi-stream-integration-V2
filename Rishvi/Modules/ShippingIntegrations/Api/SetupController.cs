@@ -186,7 +186,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     auth.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
                     auth.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
                     auth.DefaultLocation = GetConfigValue(request, "DefaultLocation");
-                    auth.LinnHour = Convert.ToInt32(GetConfigValue(request, "LinnHour"));
+                    auth.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
                     auth.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
                     auth.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
 
@@ -212,7 +212,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
                     authEntity.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
                     authEntity.DefaultLocation = GetConfigValue(request, "DefaultLocation");
-                    authEntity.LinnHour = Convert.ToInt32(GetConfigValue(request, "LinnHour"));
+                    authEntity.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
                     authEntity.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
                     authEntity.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
                     authEntity.ConfigStatus = "CONFIG";
