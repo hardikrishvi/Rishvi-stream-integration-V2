@@ -182,10 +182,10 @@
                         new Classes.ConfigItem()
                         {
                             ConfigItemId = "AutoOrderSync",
-                            Description = "Auto Order Sync",
-                            GroupName = "Auto Order Sync",
+                            Description = "Automatically syncs new and updated orders from stream",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
-                            Name = "Auto Order Sync",
+                            Name = "Order Sync",
                             ReadOnly = false,
                             SelectedValue = "",
                             SortOrder = 13,
@@ -194,10 +194,10 @@
                         new Classes.ConfigItem()
                         {
                             ConfigItemId = "AutoOrderDespatchSync",
-                            Description = "Auto Order Despatch Sync",
-                            GroupName = "Auto Order Despatch Sync",
+                            Description = "Triggers automatic order dispatch syncing with stream system",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
-                            Name = "Auto Order Despatch Sync",
+                            Name = "Dispatch Sync",
                             ReadOnly = false,
                             SelectedValue = "",
                             SortOrder = 14,
@@ -207,7 +207,7 @@
                         {
                             ConfigItemId = "UseDefaultLocation",
                             Description = "Use Default Location",
-                            GroupName = "Use Default Location",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
                             Name = "Use Default Location",
                             ReadOnly = false,
@@ -219,7 +219,7 @@
                         {
                             ConfigItemId = "DefaultLocation",
                             Description = "Default Location",
-                            GroupName = "Default Location",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
                             Name = "Default Location",
                             ReadOnly = false,
@@ -231,11 +231,11 @@
                         {
                             ConfigItemId = "LinnHour",
                             Description = "Order Sync Days determine how far back Linnworks will go to retrieve and sync orders from linnworks to stream Default days is 1",
-                            GroupName = "Linn Hour",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
                             Name = "Order Sync Days",
                             ReadOnly = false,
-                            SelectedValue = "2400",
+                            SelectedValue = "1",
                             SortOrder = 17,
                             ValueType = Classes.ConfigValueType.INT
                         },
@@ -243,7 +243,7 @@
                         {
                             ConfigItemId = "SendChangeToStream",
                             Description = "Send Change To Stream",
-                            GroupName = "Send Change To Stream",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
                             Name = "Send Change To Stream",
                             ReadOnly = false,
@@ -255,7 +255,7 @@
                         {
                             ConfigItemId = "HandsOnDate",
                             Description = "If enabled, the system will automatically push the current date as the Hands-on Date to Stream",
-                            GroupName = "Hands On Date",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
                             Name = "Hands On Date",
                             ReadOnly = false,
@@ -267,7 +267,7 @@
                         {
                             ConfigItemId = "LABELREFERENCE",
                             Description = "Label Reference",
-                            GroupName = "Label Reference",
+                            GroupName = "Account Configuration",
                             MustBeSpecified = true,
                             Name = "Label Reference",
                             ReadOnly = false,

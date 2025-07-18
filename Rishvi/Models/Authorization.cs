@@ -48,7 +48,7 @@ namespace Rishvi.Models
         public bool AutoOrderDespatchSync { get; set; } = false;
         public bool UseDefaultLocation { get; set; } = false;
         public string? DefaultLocation { get; set; } = "";
-        public int LinnHour { get; set; } = 24000;
+        public int LinnHour { get; set; } = 24;
         public int LinnPage { get; set; } = 20;
         public bool SendChangeToStream { get; set; } = true;
         public bool HandsOnDate { get; set; } = false;
