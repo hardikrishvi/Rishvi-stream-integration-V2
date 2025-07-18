@@ -176,6 +176,90 @@
                         SortOrder = 12,
                         ValueType = Classes.ConfigValueType.STRING
                     },
+                new Classes.ConfigItem()
+                {
+                        ConfigItemId = "AutoOrderSync",
+                        Description = "Automatically syncs new and updated orders from stream",
+                        GroupName = "Account Configuration",
+                        MustBeSpecified = true,
+                        Name = "Order Sync",
+                        ReadOnly = false,
+                        SelectedValue = authConfig.AutoOrderSync.ToString(),
+                        SortOrder = 13,
+                        ValueType = Classes.ConfigValueType.BOOLEAN
+                },
+                new Classes.ConfigItem()
+                {
+                        ConfigItemId = "AutoOrderDespatchSync",
+                        Description = "Triggers automatic order dispatch syncing with stream system",
+                        GroupName = "Account Configuration",
+                        MustBeSpecified = true,
+                        Name = "Dispatch Sync",
+                        ReadOnly = false,
+                        SelectedValue = authConfig.AutoOrderDespatchSync.ToString(),
+                        SortOrder = 14,
+                        ValueType = Classes.ConfigValueType.BOOLEAN
+                },
+                new Classes.ConfigItem()
+                {
+                        ConfigItemId = "UseDefaultLocation",
+                        Description = "Use Default Location",
+                        GroupName = "Account Configuration",
+                        MustBeSpecified = true,
+                        Name = "Use Default Location",
+                        ReadOnly = false,
+                        SelectedValue = authConfig.UseDefaultLocation.ToString(),
+                        SortOrder = 15,
+                        ValueType = Classes.ConfigValueType.BOOLEAN
+                },
+                new Classes.ConfigItem()
+                {
+                        ConfigItemId = "DefaultLocation",
+                        Description = "Default Location",
+                        GroupName = "Account Configuration",
+                        MustBeSpecified = true,
+                        Name = "Default Location",
+                        ReadOnly = false,
+                        SelectedValue = authConfig.DefaultLocation.ToString(),
+                        SortOrder = 16,
+                        ValueType = Classes.ConfigValueType.STRING
+                },
+                new Classes.ConfigItem()
+                {
+                    ConfigItemId = "LinnHour",
+                    Description = "Order Sync Days determine how far back Linnworks will go to retrieve and sync orders from linnworks to stream Default days is 1",
+                    GroupName = "Account Configuration",
+                    MustBeSpecified = true,
+                    Name = "Order Sync Days",
+                    ReadOnly = false,
+                    SelectedValue = authConfig.LinnHour.ToString(),
+                    SortOrder = 17,
+                    ValueType = Classes.ConfigValueType.INT
+                },
+                new Classes.ConfigItem()
+                {
+                    ConfigItemId = "SendChangeToStream",
+                    Description = "Send Change To Stream",
+                    GroupName = "Account Configuration",
+                    MustBeSpecified = true,
+                    Name = "Send Change To Stream",
+                    ReadOnly = false,
+                    SelectedValue = authConfig.SendChangeToStream.ToString(),
+                    SortOrder = 18,
+                    ValueType = Classes.ConfigValueType.BOOLEAN
+                },
+                new Classes.ConfigItem()
+                {
+                    ConfigItemId = "HandsOnDate",
+                    Description = "If enabled, the system will automatically push the current date as the Hands-on Date to Stream",
+                    GroupName = "Account Configuration",
+                    MustBeSpecified = true,
+                    Name = "Hands On Date",
+                    ReadOnly = false,
+                    SelectedValue = authConfig.HandsOnDate.ToString(),
+                    SortOrder = 19,
+                    ValueType = Classes.ConfigValueType.BOOLEAN
+                },
                     new Classes.ConfigItem()
                     {
                         ConfigItemId = "LABELREFERENCE",

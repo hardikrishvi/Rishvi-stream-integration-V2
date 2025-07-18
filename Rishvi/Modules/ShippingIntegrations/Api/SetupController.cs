@@ -108,7 +108,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
                         var ret = new UserConfigResponse()
                         {
-                            ConfigStage = Models.ConfigStageClasses.ContactStage.GetContactStage,
+                            //ConfigStage = Models.ConfigStageClasses.ContactStage.GetContactStage,
+                            ConfigStage = Models.ConfigStageClasses.UserConfigStage.GetUserConfigStage(auth),
                             ConfigStatus = "ContactStage"
                         };
                         SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(ret), "UserConfigsucc", JsonConvert.SerializeObject(ret), false, "clientId");
