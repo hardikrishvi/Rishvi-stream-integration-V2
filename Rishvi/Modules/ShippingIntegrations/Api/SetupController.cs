@@ -233,7 +233,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     //auth.Save();
 
                     authEntity.AccountName = GetConfigValue(request, "NAME");
+                    authEntity.CompanyName = GetConfigValue(request, "COMPANY");
                     authEntity.AddressLine1 = GetConfigValue(request, "ADDRESS1");
+                    authEntity.AddressLine2 = GetConfigValue(request, "ADDRESS2");
+                    authEntity.AddressLine3 = GetConfigValue(request, "ADDRESS3");
+                    authEntity.City = GetConfigValue(request, "CITY");
+                    authEntity.County = GetConfigValue(request, "REGION");
+                    authEntity.CountryCode = GetConfigValue(request, "COUNTRY");
+                    authEntity.ContactPhoneNo = GetConfigValue(request, "TELEPHONE");
+                    authEntity.PostCode = GetConfigValue(request, "POSTCODE");
+                    authEntity.ClientId = GetConfigValue(request, "ClientId");
+                    authEntity.ClientSecret = GetConfigValue(request, "ClientSecret");
+                    authEntity.LabelReference = GetConfigValue(request, "LABELREFERENCE");
+                    authEntity.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
+                    authEntity.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
+                    authEntity.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
+                    authEntity.DefaultLocation = GetConfigValue(request, "DefaultLocation");
+                    authEntity.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
+                    authEntity.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
+                    authEntity.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
                     _authorizationRepository.Update(authEntity);
                     _unitOfWork.Commit();
 
