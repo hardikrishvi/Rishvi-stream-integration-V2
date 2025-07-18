@@ -71,12 +71,11 @@ namespace Rishvi.Modules.Core.Data
 
         public void Delete(TEntity entity)
         {
-            TEntity existing = _dbSet.Find(entity);
-            if (existing != null)
-            {
-                _dbSet.Remove(existing);
-            }
+            
+                _dbSet.Remove(entity);
+            
         }
+
 
         public IQueryable<TEntity> Get()
         {
