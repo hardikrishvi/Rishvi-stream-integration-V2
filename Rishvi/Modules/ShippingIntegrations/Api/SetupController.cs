@@ -285,6 +285,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("ConfigDelete")]
         public ConfigDeleteResponse ConfigDelete([FromBody] ConfigDeleteRequest request)
         {
+            SqlHelper.SystemLogInsert("ConfigDelete", null, null, JsonConvert.SerializeObject(request), "ConfigDelete Request",null, false, "clientId");
             try
             {
                 // Load and authenticate the configuration using the authorization token
@@ -302,6 +303,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
+                SqlHelper.SystemLogInsert("ConfigDelete", null, null, JsonConvert.SerializeObject(request), "ConfigDelete Error", ex.ToString(), false, "clientId");
                 // Handle and return errors gracefully
                 return new ConfigDeleteResponse($"Delete Config error: {ex.Message}");
             }
