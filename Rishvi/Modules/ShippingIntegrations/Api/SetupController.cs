@@ -189,6 +189,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     auth.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
                     auth.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
                     auth.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
+                    auth.LabelReference = GetConfigValue(request, "LabelReference");
 
                     // Mark config as active and update status
                     auth.ConfigStatus = "CONFIG";
@@ -207,7 +208,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.PostCode = GetConfigValue(request, "POSTCODE");
                     authEntity.ClientId = GetConfigValue(request, "ClientId");
                     authEntity.ClientSecret = GetConfigValue(request, "ClientSecret");
-                   
+                    authEntity.LabelReference = GetConfigValue(request, "LabelReference");
                     authEntity.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
                     authEntity.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
                     authEntity.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
