@@ -187,6 +187,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     auth.DefaultLocation = GetConfigValue(request, "DefaultLocation");
                     auth.LinnHour = Convert.ToInt32(GetConfigValue(request, "LinnHour"));
                     auth.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
+                    auth.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
 
                     // Mark config as active and update status
                     auth.ConfigStatus = "CONFIG";
@@ -212,6 +213,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.DefaultLocation = GetConfigValue(request, "DefaultLocation");
                     authEntity.LinnHour = Convert.ToInt32(GetConfigValue(request, "LinnHour"));
                     authEntity.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
+                    authEntity.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
                     authEntity.ConfigStatus = "CONFIG";
                     authEntity.IsConfigActive = true;
                     _authorizationRepository.Update(authEntity);

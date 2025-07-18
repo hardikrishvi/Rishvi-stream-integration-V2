@@ -253,6 +253,18 @@
                         },
                         new Classes.ConfigItem()
                         {
+                            ConfigItemId = "HandsOnDate",
+                            Description = "If enabled, the system will automatically push the current date as the Hands-on Date to Stream",
+                            GroupName = "Hands On Date",
+                            MustBeSpecified = true,
+                            Name = "Hands On Date",
+                            ReadOnly = false,
+                            SelectedValue = "",
+                            SortOrder = 19,
+                            ValueType = Classes.ConfigValueType.BOOLEAN
+                        },
+                        new Classes.ConfigItem()
+                        {
                             ConfigItemId = "LABELREFERENCE",
                             Description = "Label Reference",
                             GroupName = "Label Reference",
@@ -260,7 +272,7 @@
                             Name = "Label Reference",
                             ReadOnly = false,
                             SelectedValue = "",
-                            SortOrder = 29,
+                            SortOrder = 20,
                             ValueType = Classes.ConfigValueType.LIST,
                             ListValues = new List<Classes.ConfigItemListItem>()
                             {

@@ -51,6 +51,7 @@ namespace Rishvi.Models
         public int LinnHour { get; set; } = 24000;
         public int LinnPage { get; set; } = 20;
         public bool SendChangeToStream { get; set; } = true;
+        public bool HandsOnDate { get; set; } = false;
         public DateTime  CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
