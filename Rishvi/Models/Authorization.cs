@@ -8,21 +8,21 @@ namespace Rishvi.Models
     {
         [Key]
         public int Id { get; set; }
-        public DateTime? IntegratedDateTime { get; set; }
-        public bool? IsConfigActive { get; set; }
-        public string? ConfigStatus { get; set; }
-        public string? AddressLine1 { get; set; }
-        public string? CompanyName { get; set; }
-        public string? AddressLine2 { get; set; }
-        public string? AddressLine3 { get; set; }
-        public string? City { get; set; }
-        public string? ContactName { get; set; }
-        public string? ContactPhoneNo { get; set; }
-        public string? CountryCode { get; set; }
-        public string? County { get; set; }
-        public string? PostCode { get; set; }
-        public string? SessionID { get; set; }
-        public string? LabelReference { get; set; }
+        public DateTime? IntegratedDateTime { get; set; } = DateTime.UtcNow;
+        public bool? IsConfigActive { get; set; } = false;
+        public string? ConfigStatus { get; set; } = "";
+        public string? AddressLine1 { get; set; } = "";
+        public string? CompanyName { get; set; } = "";
+        public string? AddressLine2 { get; set; } = "";
+        public string? AddressLine3 { get; set; } = "";
+        public string? City { get; set; } = "";
+        public string? ContactName { get; set; } = "";
+        public string? ContactPhoneNo { get; set; } = "";
+        public string? CountryCode { get; set; } = "GB";
+        public string? County { get; set; } = "";
+        public string? PostCode { get; set; } = "";
+        public string? SessionID { get; set; } = "";
+        public string? LabelReference { get; set; } = "";
         public string? Email { get; set; }
         public string? LinnworksUniqueIdentifier { get; set; }
         public string? AuthorizationToken { get; set; }
@@ -46,6 +46,11 @@ namespace Rishvi.Models
         public bool? PartyFileCreated { get; set; }
         public bool AutoOrderSync { get; set; } = false;
         public bool AutoOrderDespatchSync { get; set; } = false;
+        public bool UseDefaultLocation { get; set; } = false;
+        public string? DefaultLocation { get; set; } = "";
+        public int LinnHour { get; set; } = 24000;
+        public int LinnPage { get; set; } = 20;
+        public bool SendChangeToStream { get; set; } = true;
         public DateTime  CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

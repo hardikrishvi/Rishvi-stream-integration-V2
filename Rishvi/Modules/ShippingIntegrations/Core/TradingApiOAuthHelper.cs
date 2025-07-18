@@ -2046,58 +2046,58 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         {
             var registrationData = new RegistrationData();
             var integrationSettings = _IntegrationSettings.Get(x => x.Email == email).FirstOrDefault();
-            registrationData.Name = integrationSettings?.Name ?? string.Empty;
-            registrationData.Email = integrationSettings?.Email ?? string.Empty;
-            registrationData.Password = integrationSettings?.Password ?? string.Empty;
-            registrationData.AuthorizationToken = integrationSettings?.AuthorizationToken ?? string.Empty;
-            registrationData.LinnworksSyncToken = integrationSettings?.LinnworksSyncToken ?? string.Empty;
+            //remove    registrationData.Name = integrationSettings?.Name ?? string.Empty;
+            //remove   registrationData.Email = integrationSettings?.Email ?? string.Empty;
+            //remove   registrationData.Password = integrationSettings?.Password ?? string.Empty;
+            //remove   registrationData.AuthorizationToken = integrationSettings?.AuthorizationToken ?? string.Empty;
+            //remove   registrationData.LinnworksSyncToken = integrationSettings?.LinnworksSyncToken ?? string.Empty;
             registrationData.Linnworks = new LinnworksModel
             {
                 //Id = integrationSettings?.Linnworks?.Id ?? Guid.Empty,
-                DownloadOrderFromEbay = integrationSettings?.Linnworks?.DownloadOrderFromStream ?? false,
-                DownloadOrderFromStream = integrationSettings?.Linnworks?.DownloadOrderFromEbay ?? false,
-                PrintLabelFromStream = integrationSettings?.Linnworks?.PrintLabelFromStream ?? false,
-                PrintLabelFromLinnworks = integrationSettings?.Linnworks?.PrintLabelFromLinnworks ?? false,
-                DispatchOrderFromStream = integrationSettings?.Linnworks?.DispatchOrderFromStream ?? false,
-                DispatchOrderFromEbay = integrationSettings?.Linnworks?.DispatchOrderFromEbay ?? false,
-                SendChangeToEbay = integrationSettings?.Linnworks?.SendChangeToEbay ?? false,
+                //remove  DownloadOrderFromEbay = integrationSettings?.Linnworks?.DownloadOrderFromStream ?? false, 
+                //remove  DownloadOrderFromStream = integrationSettings?.Linnworks?.DownloadOrderFromEbay ?? false, 
+                //remove  PrintLabelFromStream = integrationSettings?.Linnworks?.PrintLabelFromStream ?? false,
+                //remove   PrintLabelFromLinnworks = integrationSettings?.Linnworks?.PrintLabelFromLinnworks ?? false,
+                //remove    DispatchOrderFromStream = integrationSettings?.Linnworks?.DispatchOrderFromStream ?? false,
+                //remove  DispatchOrderFromEbay = integrationSettings?.Linnworks?.DispatchOrderFromEbay ?? false,
+                //remove  SendChangeToEbay = integrationSettings?.Linnworks?.SendChangeToEbay ?? false,
                 SendChangeToStream = integrationSettings?.Linnworks?.SendChangeToStream ?? false,
             };
             registrationData.Stream = new StreamModel
             {
                 //Id = integrationSettings?.Stream?.Id ?? Guid.Empty,
-                GetTrackingDetails = integrationSettings?.Stream?.GetTrackingDetails ?? false,
-                EnableWebhook = integrationSettings?.Stream?.EnableWebhook ?? false,
-                SendChangeFromLinnworksToStream = integrationSettings?.Stream?.SendChangeFromLinnworksToStream ?? false,
-                SendChangesFromEbayToStream = integrationSettings?.Stream?.SendChangesFromEbayToStream ?? false,
-                CreateProductToStream = integrationSettings?.Stream?.CreateProductToStream ?? false,
-                DownloadProductFromStreamToLinnworks = integrationSettings?.Stream?.DownloadProductFromStreamToLinnworks ?? false,
-                GetDepotListFromStream = integrationSettings?.Stream?.GetDepotListFromStream ?? false,
-                GetRoutePlanFromStream = integrationSettings?.Stream?.GetRoutePlanFromStream ?? false,
+                //remove     GetTrackingDetails = integrationSettings?.Stream?.GetTrackingDetails ?? false,
+                //remove   EnableWebhook = integrationSettings?.Stream?.EnableWebhook ?? false,
+                //remove  SendChangeFromLinnworksToStream = integrationSettings?.Stream?.SendChangeFromLinnworksToStream ?? false,
+                //remove  SendChangesFromEbayToStream = integrationSettings?.Stream?.SendChangesFromEbayToStream ?? false,
+                //remove CreateProductToStream = integrationSettings?.Stream?.CreateProductToStream ?? false,
+                //remove DownloadProductFromStreamToLinnworks = integrationSettings?.Stream?.DownloadProductFromStreamToLinnworks ?? false,
+                //remove   GetDepotListFromStream = integrationSettings?.Stream?.GetDepotListFromStream ?? false,
+                //remove    GetRoutePlanFromStream = integrationSettings?.Stream?.GetRoutePlanFromStream ?? false,
             };
             registrationData.Ebay = new EbayModel
             {
                 //Id = integrationSettings?.Ebay?.Id ?? Guid.Empty,
-                DownloadOrderFromEbay = integrationSettings?.Ebay?.DownloadOrderFromEbay ?? false,
-                SendOrderToStream = integrationSettings?.Ebay?.SendOrderToStream ?? false,
-                UpdateInformationFromEbayToStream = integrationSettings?.Ebay?.UpdateInformationFromEbayToStream ?? false,
-                DispatchOrderFromEbay = integrationSettings?.Ebay?.DispatchOrderFromEbay ?? false,
-                UpdateTrackingDetailsFromStream = integrationSettings?.Ebay?.UpdateTrackingDetailsFromStream ?? false,
+                //DownloadOrderFromEbay = integrationSettings?.Ebay?.DownloadOrderFromEbay ?? false,
+                //SendOrderToStream = integrationSettings?.Ebay?.SendOrderToStream ?? false,
+                //UpdateInformationFromEbayToStream = integrationSettings?.Ebay?.UpdateInformationFromEbayToStream ?? false,
+                //DispatchOrderFromEbay = integrationSettings?.Ebay?.DispatchOrderFromEbay ?? false,
+                //UpdateTrackingDetailsFromStream = integrationSettings?.Ebay?.UpdateTrackingDetailsFromStream ?? false,
             };
             registrationData.Sync = new SyncModel
             {
-                SyncEbayOrder = integrationSettings?.Sync?.SyncEbayOrder ?? false,
-                SyncLinnworksOrder = integrationSettings?.Sync?.SyncLinnworksOrder ?? false,
-                CreateEbayOrderToStream = integrationSettings?.Sync?.CreateEbayOrderToStream ?? false,
-                CreateLinnworksOrderToStream = integrationSettings?.Sync?.CreateLinnworksOrderToStream ?? false,
-                DispatchEbayOrderFromStream = integrationSettings?.Sync?.DispatchEbayOrderFromStream ?? false,
-                DispatchLinnworksOrderFromStream = integrationSettings?.Sync?.DispatchLinnworksOrderFromStream ?? false,
-                UpdateLinnworksOrderToStream = integrationSettings?.Sync?.UpdateLinnworksOrderToStream ?? false,
+                //remove   SyncEbayOrder = integrationSettings?.Sync?.SyncEbayOrder ?? false,
+                //remove    SyncLinnworksOrder = integrationSettings?.Sync?.SyncLinnworksOrder ?? false,
+                //remove   CreateEbayOrderToStream = integrationSettings?.Sync?.CreateEbayOrderToStream ?? false,
+                //remove   CreateLinnworksOrderToStream = integrationSettings?.Sync?.CreateLinnworksOrderToStream ?? false,
+                //remove   DispatchEbayOrderFromStream = integrationSettings?.Sync?.DispatchEbayOrderFromStream ?? false,
+                //remove   DispatchLinnworksOrderFromStream = integrationSettings?.Sync?.DispatchLinnworksOrderFromStream ?? false,
+                //remove   UpdateLinnworksOrderToStream = integrationSettings?.Sync?.UpdateLinnworksOrderToStream ?? false,
             };
             registrationData.LastSyncOnDate = integrationSettings?.LastSyncOnDate ?? DateTime.MinValue;
             registrationData.LastSyncOn = integrationSettings?.LastSyncOn ?? DateTime.MinValue.ToString();
-            registrationData.ebaypage = integrationSettings?.ebaypage ?? 1;
-            registrationData.ebayhour = integrationSettings?.ebayhour ?? 0;
+            //remove  registrationData.ebaypage = integrationSettings?.ebaypage ?? 1;
+            //remove   registrationData.ebayhour = integrationSettings?.ebayhour ?? 0;
             registrationData.linnhour = integrationSettings?.linnhour ?? 0;
             registrationData.linnpage = integrationSettings?.linnpage ?? 1;
             return registrationData;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rishvi.Modules.Core.Data;
 
@@ -11,9 +12,11 @@ using Rishvi.Modules.Core.Data;
 namespace Rishvi.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    partial class SqlContextModelSnapshot : ModelSnapshot
+    [Migration("20250718092225_change_auth")]
+    partial class change_auth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,12 +186,6 @@ namespace Rishvi.Migrations
                     b.Property<string>("LabelReference")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LinnHour")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LinnPage")
-                        .HasColumnType("int");
-
                     b.Property<string>("LinnRefreshToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -206,9 +203,6 @@ namespace Rishvi.Migrations
 
                     b.Property<string>("PostCode")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("SendChangeToStream")
-                        .HasColumnType("bit");
 
                     b.Property<string>("SessionID")
                         .HasColumnType("nvarchar(max)");

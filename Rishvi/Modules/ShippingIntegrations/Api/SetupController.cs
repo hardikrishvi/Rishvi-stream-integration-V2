@@ -182,8 +182,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     auth.ClientId = GetConfigValue(request, "ClientId");
                     auth.ClientSecret = GetConfigValue(request, "ClientSecret");
                     auth.AutoOrderSync =  Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
-                    auth.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
-
+                    auth.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
+                    auth.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
+                    auth.DefaultLocation = GetConfigValue(request, "DefaultLocation");
+                    auth.LinnHour = Convert.ToInt32(GetConfigValue(request, "LinnHour"));
+                    auth.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
 
                     // Mark config as active and update status
                     auth.ConfigStatus = "CONFIG";
@@ -204,7 +207,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.ClientSecret = GetConfigValue(request, "ClientSecret");
                    
                     authEntity.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
-                    authEntity.AutoOrderSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
+                    authEntity.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
+                    authEntity.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
+                    authEntity.DefaultLocation = GetConfigValue(request, "DefaultLocation");
+                    authEntity.LinnHour = Convert.ToInt32(GetConfigValue(request, "LinnHour"));
+                    authEntity.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
                     authEntity.ConfigStatus = "CONFIG";
                     authEntity.IsConfigActive = true;
                     _authorizationRepository.Update(authEntity);
