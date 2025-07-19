@@ -29,6 +29,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
 
             context = new LinnworksAPI.ApiContext(authorized.Token, authorized.Server);
             Api = new LinnworksAPI.ApiObjectManager(context);
+            ProxyFactory = new LinnworksAPI.FTPProxyFactory();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using LinnworksAPI;
+using LinnworksMacroHelpers.Classes;
 using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
+using System.Text;
 using System.Text.RegularExpressions;
 using static Rishvi.Modules.ShippingIntegrations.Core.Helper.ServiceHelper;
 
@@ -75,6 +77,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
 
                 var obj = new LinnworksBaseStream(linntoken);
+
+                var email = obj.authorized.Email;
+
+                ProxiedWebRequest request = new ProxiedWebRequest();
+                request.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations";
+                request.Method = "POST";
+                request.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+                var upload = obj.ProxyFactory.WebRequest(request);
+
+                var data = Encoding.UTF8.GetString(upload.RawResponse);
+
+                ProxiedWebRequest requestb = new ProxiedWebRequest();
+                requestb.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices";
+                requestb.Method = "POST";
+                requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+                var uploadb = obj.ProxyFactory.WebRequest(requestb);
+
+                var datab = Encoding.UTF8.GetString(uploadb.RawResponse);
+
 
 
                 if (!String.IsNullOrEmpty(orderids))
