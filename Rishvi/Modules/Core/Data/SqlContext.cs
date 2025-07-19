@@ -43,7 +43,7 @@ namespace Rishvi.Modules.Core.Data
         public DbSet<Ebay> Ebay { get; set; }
         public DbSet<ReportModel> ReportModel { get; set; }
         public DbSet<StreamOrderRecord> StreamOrderRecord { get; set; }
-
+        public DbSet<PostalServices> PostalServices { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<ReportModel>().HasKey(x => x._id);

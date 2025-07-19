@@ -100,7 +100,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                 LinnDays = get_auth.LinnDays,
                 LinnPage = get_auth.LinnPage,
                 SendChangeToStream = get_auth.SendChangeToStream,
-                HandsOnDate = get_auth.HandsOnDate
+                HandsOnDate = get_auth.HandsOnDate,
+                ShippingApiConfigId = get_auth.ShippingApiConfigId,
             };
 
 

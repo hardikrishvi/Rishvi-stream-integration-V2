@@ -53,6 +53,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
         public int LinnPage { get; set; } = 20;
         public bool SendChangeToStream { get; set; } = true;
         public bool HandsOnDate { get; set; } = false;
+        public int ShippingApiConfigId { get; set; } = 0;
         public void Save()
         {
             var jsonData = JsonConvert.SerializeObject(this);

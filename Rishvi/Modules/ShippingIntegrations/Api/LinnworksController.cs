@@ -4,7 +4,9 @@ using LinnworksMacroHelpers.Classes;
 using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Rishvi.Domain.DTOs.Event;
 using Rishvi.Domain.DTOs.Run;
 using Rishvi.Domain.DTOs.Subscription;
@@ -18,6 +20,7 @@ using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using static Rishvi.Modules.ShippingIntegrations.Core.Helper.ServiceHelper;
 
@@ -79,7 +82,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var obj = new LinnworksBaseStream(linntoken);
 
                 var email = obj.authorized.Email;
+                if (user.ShippingApiConfigId == 0)
+                {
 
+                }
                 ProxiedWebRequest request = new ProxiedWebRequest();
                 request.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations";
                 request.Method = "POST";
@@ -87,6 +93,29 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var upload = obj.ProxyFactory.WebRequest(request);
 
                 var data = Encoding.UTF8.GetString(upload.RawResponse);
+
+                string accountId = user.AccountName;
+
+                // Parse the JSON
+                using JsonDocument doc = JsonDocument.Parse(data);
+                var root = doc.RootElement.EnumerateArray();
+
+
+                // Filter result
+                var result = root
+                    .FirstOrDefault(x =>
+                        x.GetProperty("Vendor").GetString() == "Stream Shipping" &&
+                        x.GetProperty("AccountId").GetString() == accountId
+                    );
+                int pkShippingAPIConfigId = result.GetProperty("pkShippingAPIConfigId").GetInt16();
+
+                var get_auth = _dbSqlCContext.Authorizations
+                    .Where(x => x.ClientId == user.ClientId && x.AuthorizationToken == token)
+                    .FirstOrDefault();
+
+                get_auth.ShippingApiConfigId = pkShippingAPIConfigId;
+                _dbSqlCContext.Update(get_auth);
+                _unitOfWork.Commit();
 
                 ProxiedWebRequest requestb = new ProxiedWebRequest();
                 requestb.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices";
@@ -96,6 +125,44 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 var datab = Encoding.UTF8.GetString(uploadb.RawResponse);
 
+                using var doc1 = JsonDocument.Parse(data);
+                var root1 = doc1.RootElement;
+
+                if (root1.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in root1.EnumerateArray())
+                    {
+                        if (item.TryGetProperty("Services", out var configIdElement) &&
+                            configIdElement.GetInt16() == pkShippingAPIConfigId)
+                        {
+                            string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
+                                ? nameEl.GetString() : null;
+
+                            string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
+                                ? idEl.GetString() : null;
+
+                            var get_service = _dbSqlCContext.PostalServices
+                                .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == linntoken)
+                                .FirstOrDefault();
+                            if (get_service == null)
+                            {
+                                // Create new entity
+                                var postalService = new PostalServices
+                                {
+                                    AuthorizationToken = linntoken, // use your existing token variable
+                                    PostalServiceId = serviceId,
+                                    PostalServiceName = serviceName,
+                                    CreatedAt = DateTime.UtcNow,
+                                    UpdatedAt = DateTime.UtcNow
+                                };
+
+                                // Add to DbContext
+                                _dbSqlCContext.PostalServices.Add(postalService);
+                            }
+                        }
+                    }
+                }
+                _unitOfWork.Commit();
 
 
                 if (!String.IsNullOrEmpty(orderids))
@@ -119,8 +186,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
 
                         var orderexists = _dbSqlCContext.ReportModel
-              .Where(x => x.LinnNumOrderId == _order.NumOrderId.ToString())
-              .ToList().Count;
+                          .Where(x => x.LinnNumOrderId == _order.NumOrderId.ToString())
+                          .ToList().Count;
 
                         if (orderexists == 0)
                         {
@@ -172,11 +239,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                       .ToList();
 
                     var pendingOrders = reportData.Where(f => !f.IsLinnOrderCreatedInStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
-                  
+
                     foreach (var pendingOrder in pendingOrders)
                     {
                         string ab = JsonConvert.SerializeObject(pendingOrder);
-                      
+
                         await _tradingApiOAuthHelper.CreateLinnworksOrdersToStream(user, pendingOrder.LinnNumOrderId.ToString());
                     }
                 }
@@ -768,26 +835,26 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                             if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                             {
                                                 await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
-                                    {"Stream_runloadid",Stream_runloadid },
-                                    {"Stream_runstatus",Stream_runstatus },
-                                    {"Stream_rundescription",Stream_rundescription },
-                                    {"Stream_orderid",Stream_orderid },
-                                    {"Stream_driverName",Stream_driverName },
-                                    {"Stream_driver",Stream_driver},
-                                    {"Stream_vehicle",Stream_vehicle },
-                                    {"Stream_vehicleName",Stream_vehicleName },
-                                    {"Stream_status",Stream_status },
-                                    {"Stream_driverNotes",Stream_driverNotes },
-                                    {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
-                                    {"Stream_vehicleType",Stream_vehicleType },
-                                    {"Stream_dispatched",Stream_dispatched },
-                                    {"Stream_departed",Stream_departed },
-                                    {"Stream_completed",Stream_completed},
-                                    {"Stream_startActualDateTime", Stream_startActualDateTime},
-                                    {"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
-                                    {"Stream_endActualDateTime",Stream_endActualDateTime },
-                                    { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
-                                });
+                                                    {"Stream_runloadid",Stream_runloadid },
+                                                    {"Stream_runstatus",Stream_runstatus },
+                                                    {"Stream_rundescription",Stream_rundescription },
+                                                    {"Stream_orderid",Stream_orderid },
+                                                    {"Stream_driverName",Stream_driverName },
+                                                    {"Stream_driver",Stream_driver},
+                                                    {"Stream_vehicle",Stream_vehicle },
+                                                    {"Stream_vehicleName",Stream_vehicleName },
+                                                    {"Stream_status",Stream_status },
+                                                    {"Stream_driverNotes",Stream_driverNotes },
+                                                    {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
+                                                    {"Stream_vehicleType",Stream_vehicleType },
+                                                    {"Stream_dispatched",Stream_dispatched },
+                                                    {"Stream_departed",Stream_departed },
+                                                    {"Stream_completed",Stream_completed},
+                                                    {"Stream_startActualDateTime", Stream_startActualDateTime},
+                                                    {"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
+                                                    {"Stream_endActualDateTime",Stream_endActualDateTime },
+                                                    { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
+                                                });
                                                 if (gr.estimateArrivalDateTime != "0")
                                                 {
                                                     await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
@@ -810,11 +877,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
     DateTimeKind.Utc);
                                                     await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
                                                    // DateTime.Parse(gr.planned.fromDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).Date);
-                                                   DateTime.SpecifyKind(DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")),DateTimeKind.Local));
+                                                   DateTime.SpecifyKind(DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")), DateTimeKind.Local));
                                                     //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
 
                                                 }
-                                                
+
 
 
                                                 var alldata = _reportsController.GetReportData(new ReportModelReq() { email = Email }).Result;
