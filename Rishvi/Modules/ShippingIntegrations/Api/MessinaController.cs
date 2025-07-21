@@ -56,7 +56,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var helper = new MessianApiOAuthHelper();
                 string newToken = Guid.NewGuid().ToString();
                 var SessionID = helper.GetSessionID(newToken);
-                AuthorizationConfigClass newConfig = _authorizationToken.CreateNew(email, SessionID, newToken, accountname, "", "", token);
+                Rishvi.Models.Authorization newConfig = _authorizationToken.CreateNew(email, SessionID, newToken, accountname, "", "", token);
                 var AuthorizeUrl = "https://signin.ebay.com/ws/eBayISAPI.dll?SignIn&runame={RU_NAME}&SessID={SESSION_ID}";
                 return new ContentResult
                 {

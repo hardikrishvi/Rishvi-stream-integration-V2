@@ -11,6 +11,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
         string TransformEmail(string email);
         FieldsFilter CreateFilters(int linnhour);
         Task ManageIdentifier(string linntoken, string identifier);
-        Task CreateWebhook(AuthorizationConfigClass user, WebhookSubscription webhook, string token);
+        Task CreateWebhook(Rishvi.Models.Authorization user, WebhookSubscription webhook, string token);
     }
 }

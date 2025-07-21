@@ -48,7 +48,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
         }
 
-        public async Task<EbayAuthentication> GenerateToken(AuthorizationConfigClass _User, string SessionID)
+        public async Task<EbayAuthentication> GenerateToken(Rishvi.Models.Authorization _User, string SessionID)
         {
             string error = "";
             string strReq = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -80,9 +80,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                     _User.IsConfigActive = true;
                     _User.IntegratedDateTime = DateTime.UtcNow;
                     _User.access_token = root["eBayAuthToken"].InnerText;
-                    _User.ExpirationTime = root["HardExpirationTime"].InnerText;
+                    _User.ExpirationTime = DateTime.Parse(root["HardExpirationTime"].InnerText);
                     _User.token_type = "User Access Token";
-                    _User.Save();
+                   // _User.Save();
                     return EbayAuthenticationApiResponse;
                 }
             }
@@ -127,7 +127,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         }
 
 
-        public async Task PriceUpdate(AuthorizationConfigClass _User, List<string> ItemId, List<string> price)
+        public async Task PriceUpdate(Rishvi.Models.Authorization _User, List<string> ItemId, List<string> price)
         {
             StringBuilder xmlQuery = new StringBuilder();
             xmlQuery.AppendJoin("\n", new string[] {
@@ -258,7 +258,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
         }
 
-        public void ReadCsvAndBatchProcessAsync(string csvFilePath, int batchSize, AuthorizationConfigClass user)
+        public void ReadCsvAndBatchProcessAsync(string csvFilePath, int batchSize, Rishvi.Models.Authorization user)
         {
             var records = new List<CsvRecord>();
             using (var reader = new StreamReader(csvFilePath))
@@ -273,7 +273,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             ProcessInBatchesAsync(records, batchSize, user);
         }
 
-        public void ProcessInBatchesAsync(List<CsvRecord> records, int batchSize, AuthorizationConfigClass user)
+        public void ProcessInBatchesAsync(List<CsvRecord> records, int batchSize, Rishvi.Models.Authorization user)
         {
             var batch = new List<CsvRecord>();
 
@@ -294,7 +294,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                 }
             }
         }
-        public async Task ProcessBatchAsync(List<CsvRecord> batch, AuthorizationConfigClass user)
+        public async Task ProcessBatchAsync(List<CsvRecord> batch, Rishvi.Models.Authorization user)
         {
 
             await new MessianApiOAuthHelper().PriceUpdate(user, batch.Select(d => d.ItemId).ToList(), batch.Select(d => d.StartPrice).ToList());

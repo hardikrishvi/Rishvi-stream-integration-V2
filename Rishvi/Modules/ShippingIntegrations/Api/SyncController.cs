@@ -1,4 +1,7 @@
-﻿using Hangfire;
+﻿using System.Text.Json;
+using System.Text;
+using Hangfire;
+using LinnworksMacroHelpers.Classes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +15,7 @@ using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using YamlDotNet.Core.Tokens;
+using ZXing.Aztec.Internal;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -93,7 +97,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     //}
                     if (service == "SyncLinnworksOrder")
                     {
-                        await _linnworksController.GetLinnOrderForStream(AuthorizationToken, LinnworksSyncToken, value.orderids, 500, 10);
+                        //await _linnworksController.GetLinnOrderForStream(AuthorizationToken, LinnworksSyncToken, value.orderids, 500, 10);
                     }
                     else if (service == "CreateLinnworksOrderToStream")
                     {
@@ -116,69 +120,105 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         }
 
         // run service
+        //[HttpGet, Route("StartService")]
+        //[AllowAnonymous]
+        //public async Task<bool> StartService()
+        //{
+        //    string Email = "";
+        //    try
+        //    {
+        //        //var listuser = await AwsS3.ListFilesInS3Folder("Authorization/Users");
+        //        // var listuser = _integrationSettingsRepository.Get().ToList();
+        //        //var listuser = _dbSqlCContext.IntegrationSettings.ToList();
+
+        //        var listuser = _dbSqlCContext.IntegrationSettings.Include(o => o.Sync).Include(o => o.Linnworks).Include(o => o.Stream).Include(o => o.Ebay).ToList();
+
+        //        foreach (var res in listuser)
+        //        {
+        //            Email = res.Email;
+
+        //            //var userdata = AwsS3.GetS3File("Authorization", _user.Replace("Authorization/", ""));
+        //            //var res = JsonConvert.DeserializeObject<IntegrationSettings>(_user);
+        //            //var id = 
+        //            //  res.Sync = _dbSqlCContext.SyncSettings.Where(x => x.Id == res.SyncId).FirstOrDefault();
+        //            if (res.Sync == null)
+        //            {
+        //                res.Sync = new SyncSettings();
+        //            }
+
+        //            //if (res.Sync.SyncEbayOrder)
+        //            //{
+        //            //    await _ebayController.GetOrders(res.AuthorizationToken, "", res.ebayhour, res.ebaypage);
+        //            //}
+        //            if (res.Sync.SyncLinnworksOrder)
+        //            {
+        //                await _linnworksController.GetLinnOrderForStream(res.AuthorizationToken, res.LinnworksSyncToken, "", res.linnhour, res.linnpage);
+        //            }
+        //            //if (res.Sync.CreateEbayOrderToStream)
+        //            //{
+        //            //    await _streamController.CreateEbayOrdersToStream(res.AuthorizationToken, "");
+        //            //}
+        //            if (res.Sync.CreateLinnworksOrderToStream)
+        //            {
+        //                await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
+        //            }
+              
+        //            //if (res.Sync.DispatchEbayOrderFromStream)
+        //            //{
+        //            //    await _ebayController.DispatchOrderFromStream(res.AuthorizationToken, "");
+        //            //}
+                  
+
+        //            res.LastSyncOn = DateTime.UtcNow.ToString("dd/MM/yyyy hh:mm:ss");
+        //            res.LastSyncOnDate = DateTime.Now;
+        //            //await _configController.Save(res);
+        //            _integrationSettingsRepository.Update(res);
+        //            _unitOfWork.Commit();
+
+                   
+        //        }
+
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        SqlHelper.SystemLogInsert("sync Method", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, Email);
+        //        // Log the exception for debugging
+        //        Console.WriteLine($"An error occurred: {ex.Message}");
+        //        return false; // Indicate failure
+        //    }
+        //}
+
         [HttpGet, Route("StartService")]
         [AllowAnonymous]
         public async Task<bool> StartService()
         {
-            string Email = "";
             try
             {
-                //var listuser = await AwsS3.ListFilesInS3Folder("Authorization/Users");
-                // var listuser = _integrationSettingsRepository.Get().ToList();
-                //var listuser = _dbSqlCContext.IntegrationSettings.ToList();
+                var listuser = _dbSqlCContext.Authorizations.ToList();
 
-                var listuser = _dbSqlCContext.IntegrationSettings.Include(o => o.Sync).Include(o => o.Linnworks).Include(o => o.Stream).Include(o => o.Ebay).ToList();
+                var uniqueEmailUsers = listuser
+                    .GroupBy(x => x.Email)
+                    .Select(g => g.Last())
+                    .ToList();
 
-                foreach (var res in listuser)
+                foreach (var res in uniqueEmailUsers)
                 {
-                    Email = res.Email;
-
-                    //var userdata = AwsS3.GetS3File("Authorization", _user.Replace("Authorization/", ""));
-                    //var res = JsonConvert.DeserializeObject<IntegrationSettings>(_user);
-                    //var id = 
-                    //  res.Sync = _dbSqlCContext.SyncSettings.Where(x => x.Id == res.SyncId).FirstOrDefault();
-                    if (res.Sync == null)
+                    if (res.AutoOrderSync)
                     {
-                        res.Sync = new SyncSettings();
-                    }
-
-                    //if (res.Sync.SyncEbayOrder)
-                    //{
-                    //    await _ebayController.GetOrders(res.AuthorizationToken, "", res.ebayhour, res.ebaypage);
-                    //}
-                    if (res.Sync.SyncLinnworksOrder)
-                    {
-                        await _linnworksController.GetLinnOrderForStream(res.AuthorizationToken, res.LinnworksSyncToken, "", res.linnhour, res.linnpage);
-                    }
-                    //if (res.Sync.CreateEbayOrderToStream)
-                    //{
-                    //    await _streamController.CreateEbayOrdersToStream(res.AuthorizationToken, "");
-                    //}
-                    if (res.Sync.CreateLinnworksOrderToStream)
-                    {
+                        await _linnworksController.GetLinnOrderForStream(res, "");
                         await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
                     }
-              
-                    //if (res.Sync.DispatchEbayOrderFromStream)
-                    //{
-                    //    await _ebayController.DispatchOrderFromStream(res.AuthorizationToken, "");
-                    //}
-                  
-
-                    res.LastSyncOn = DateTime.UtcNow.ToString("dd/MM/yyyy hh:mm:ss");
-                    res.LastSyncOnDate = DateTime.Now;
-                    //await _configController.Save(res);
-                    _integrationSettingsRepository.Update(res);
+                    res.UpdatedAt = DateTime.UtcNow;
+                    _dbSqlCContext.Update(res);
                     _unitOfWork.Commit();
-
-                   
                 }
 
                 return true;
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("sync Method", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, Email);
+                SqlHelper.SystemLogInsert("sync Method", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, "All");
                 // Log the exception for debugging
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return false; // Indicate failure
@@ -190,14 +230,109 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         public IActionResult SetupRecurringJob()
         {
             RecurringJob.AddOrUpdate<SyncController>(
-     "Order-sync-linn-to-stream",
-     x => x.StartService(),
-     "*/10 * * * *"  // Every 30 minutes
- );
+             "Order-sync-linn-to-stream",
+             x => x.StartService(),
+             "*/10 * * * *"  // Every 30 minutes
+             );
 
             return Ok("Recurring job setup complete.");
         }
 
+        [HttpPost, Route("PostalService")]
+        public async Task<IActionResult> PostalService()
+        {
+            try
+            {
+                var list_user = _dbSqlCContext.Authorizations.ToList();
+                foreach (var user in list_user)
+                {
+                    var obj = new LinnworksBaseStream(user.LinnworksToken);
+
+                    ProxiedWebRequest request = new ProxiedWebRequest();
+                    request.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations";
+                    request.Method = "POST";
+                    request.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+                    var upload = obj.ProxyFactory.WebRequest(request);
+
+                    var data = Encoding.UTF8.GetString(upload.RawResponse);
+
+                    string accountId = user.AccountName;
+
+                    // Parse the JSON
+                    using JsonDocument doc = JsonDocument.Parse(data);
+                    var root = doc.RootElement.EnumerateArray();
+
+
+                    // Filter result
+                    var result = root
+                        .FirstOrDefault(x =>
+                            x.GetProperty("Vendor").GetString() == "Stream Shipping" &&
+                            x.GetProperty("AccountId").GetString() == accountId
+                        );
+                    int pkShippingAPIConfigId = result.GetProperty("pkShippingAPIConfigId").GetInt16();
+
+                    //Update the Authorization with the ShippingApiConfigId
+                    user.ShippingApiConfigId = pkShippingAPIConfigId;
+                    _dbSqlCContext.Update(user);
+                    _unitOfWork.Commit();
+
+                    ProxiedWebRequest requestb = new ProxiedWebRequest();
+                    requestb.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices";
+                    requestb.Method = "POST";
+                    requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+                    var uploadb = obj.ProxyFactory.WebRequest(requestb);
+
+                    using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
+                    var root1 = doc1.RootElement;
+
+                    if (root1.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var item in root1.EnumerateArray())
+                        {
+                            if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
+                                configIdElement.GetInt16() == pkShippingAPIConfigId)
+                            {
+                                string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
+                                    ? nameEl.GetString() : null;
+
+                                string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
+                                    ? idEl.GetString() : null;
+
+                                var get_service = _dbSqlCContext.PostalServices
+                                    .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == user.AuthorizationToken)
+                                    .FirstOrDefault();
+                                if (get_service == null)
+                                {
+                                    // Create new entity
+                                    var postalService = new PostalServices
+                                    {
+                                        AuthorizationToken = user.AuthorizationToken, // use your existing token variable
+                                        PostalServiceId = serviceId,
+                                        PostalServiceName = serviceName,
+                                        CreatedAt = DateTime.UtcNow,
+                                        UpdatedAt = DateTime.UtcNow
+                                    };
+
+                                    // Add to DbContext
+                                    _dbSqlCContext.PostalServices.Add(postalService);
+                                }
+                            }
+                        }
+                    }
+                    _unitOfWork.Commit();
+
+                }
+                return Ok("Postal service processed successfully.");
+            }
+            catch (Exception ex)
+            {
+                SqlHelper.SystemLogInsert("Postal Service Method", null, null, null, "Postal Service", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, "All");
+
+                // Log the exception for debugging purposes
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
         [HttpGet, Route("StartOtherService")]
         [AllowAnonymous]

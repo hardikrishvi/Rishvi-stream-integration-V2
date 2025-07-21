@@ -32,7 +32,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // lets authenticate the user and make sure we have their config details
-                AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
@@ -126,7 +126,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // lets authenticate the user and make sure we have their config details
-                AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
@@ -302,7 +302,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 SqlHelper.SystemLogInsert("DeleteOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "CancelLabelStart", null, false,"");
 
-                AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
                     return new CancelLabelResponse("Authorization failed for token " + request.AuthorizationToken);

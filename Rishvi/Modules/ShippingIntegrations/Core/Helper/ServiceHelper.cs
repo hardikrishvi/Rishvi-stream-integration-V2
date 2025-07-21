@@ -143,7 +143,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
             }
         }
 
-        public async Task CreateWebhook(AuthorizationConfigClass user, WebhookSubscription webhook, string token)
+        public async Task CreateWebhook(Rishvi.Models.Authorization user, WebhookSubscription webhook, string token)
         {
              // Consider injecting via DI
             await _tradingApiOAuthHelper.CreateStreamWebhook(

@@ -2,7 +2,7 @@
 {
     public static class UserConfigStage
     {
-        public static Classes.ConfigStage GetUserConfigStage(Classes.AuthorizationConfigClass authConfig)
+        public static Classes.ConfigStage GetUserConfigStage(Rishvi.Models.Authorization authConfig)
         {
             return new Classes.ConfigStage()
             {

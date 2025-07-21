@@ -67,12 +67,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         }
 
         [HttpPost, Route("GetLinnOrderForStream")]
-        public async Task<IActionResult> GetLinnOrderForStream(string token, string linntoken, string orderids, int linnhour, int linnpage)
+        public async Task<IActionResult> GetLinnOrderForStream(Authorization res, string orderids)
         {
             try
             {
-                var user = _authToken.Load(token);
-                linntoken = string.IsNullOrEmpty(linntoken) ? user.LinnworksToken : linntoken;
+                //var user = _authToken.Load(token);
+                var linntoken = res.LinnworksToken;
 
                 if (String.IsNullOrEmpty(linntoken))
                 {
@@ -82,88 +82,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var obj = new LinnworksBaseStream(linntoken);
 
                 var email = obj.authorized.Email;
-                if (user.ShippingApiConfigId == 0)
-                {
-
-                }
-                ProxiedWebRequest request = new ProxiedWebRequest();
-                request.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations";
-                request.Method = "POST";
-                request.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
-                var upload = obj.ProxyFactory.WebRequest(request);
-
-                var data = Encoding.UTF8.GetString(upload.RawResponse);
-
-                string accountId = user.AccountName;
-
-                // Parse the JSON
-                using JsonDocument doc = JsonDocument.Parse(data);
-                var root = doc.RootElement.EnumerateArray();
-
-
-                // Filter result
-                var result = root
-                    .FirstOrDefault(x =>
-                        x.GetProperty("Vendor").GetString() == "Stream Shipping" &&
-                        x.GetProperty("AccountId").GetString() == accountId
-                    );
-                int pkShippingAPIConfigId = result.GetProperty("pkShippingAPIConfigId").GetInt16();
-
-                var get_auth = _dbSqlCContext.Authorizations
-                    .Where(x => x.ClientId == user.ClientId && x.AuthorizationToken == token)
-                    .FirstOrDefault();
-
-                get_auth.ShippingApiConfigId = pkShippingAPIConfigId;
-                _dbSqlCContext.Update(get_auth);
-                _unitOfWork.Commit();
-
-                ProxiedWebRequest requestb = new ProxiedWebRequest();
-                requestb.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices";
-                requestb.Method = "POST";
-                requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
-                var uploadb = obj.ProxyFactory.WebRequest(requestb);
-
-                var datab = Encoding.UTF8.GetString(uploadb.RawResponse);
-
-                using var doc1 = JsonDocument.Parse(data);
-                var root1 = doc1.RootElement;
-
-                if (root1.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var item in root1.EnumerateArray())
-                    {
-                        if (item.TryGetProperty("Services", out var configIdElement) &&
-                            configIdElement.GetInt16() == pkShippingAPIConfigId)
-                        {
-                            string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
-                                ? nameEl.GetString() : null;
-
-                            string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
-                                ? idEl.GetString() : null;
-
-                            var get_service = _dbSqlCContext.PostalServices
-                                .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == linntoken)
-                                .FirstOrDefault();
-                            if (get_service == null)
-                            {
-                                // Create new entity
-                                var postalService = new PostalServices
-                                {
-                                    AuthorizationToken = linntoken, // use your existing token variable
-                                    PostalServiceId = serviceId,
-                                    PostalServiceName = serviceName,
-                                    CreatedAt = DateTime.UtcNow,
-                                    UpdatedAt = DateTime.UtcNow
-                                };
-
-                                // Add to DbContext
-                                _dbSqlCContext.PostalServices.Add(postalService);
-                            }
-                        }
-                    }
-                }
-                _unitOfWork.Commit();
-
 
                 if (!String.IsNullOrEmpty(orderids))
                 {
@@ -173,15 +91,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
                         var orderdata = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(linnorderid));
                         var newjson = JsonConvert.SerializeObject(orderdata);
-                        await _tradingApiOAuthHelper.SaveLinnOrder(newjson, token, user.Email, linntoken, linnorderid.ToString());
+                        await _tradingApiOAuthHelper.SaveLinnOrder(newjson, res.AuthorizationToken, res.Email, linntoken, linnorderid.ToString());
                     }
                 }
                 else
                 {
-                    var filters = _serviceHelper.CreateFilters(linnhour);
+                    var filters = _serviceHelper.CreateFilters(res.LinnDays * 24);
 
                     var allorder = obj.Api.Orders.GetAllOpenOrders(filters, null, Guid.Empty, "");
-                    var allorderdetails = obj.Api.Orders.GetOrders(allorder.Skip(0).Take(linnpage).ToList(), Guid.Empty, true, true);
+                    var allorderdetails = obj.Api.Orders.GetOrders(allorder.Skip(0).Take(res.LinnPage).ToList(), Guid.Empty, true, true);
                     foreach (var _order in allorderdetails)
                     {
 
@@ -195,7 +113,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                             try
                             {
-                                await _tradingApiOAuthHelper.SaveLinnOrder(newjson, token, user.Email, linntoken, _order.NumOrderId.ToString());
+                                await _tradingApiOAuthHelper.SaveLinnOrder(newjson, res.AuthorizationToken, res.Email, linntoken, _order.NumOrderId.ToString());
                             }
                             catch (Exception ex)
                             {
@@ -350,7 +268,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Load user configuration
-                AuthorizationConfigClass user = _authToken.Load(token);
+                Rishvi.Models.Authorization user = _authToken.Load(token);
                 if (string.IsNullOrEmpty(user?.ClientId))
                 {
                     return BadRequest("Invalid or missing client ID.");
@@ -390,7 +308,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
         }
 
-        private async Task DispatchOrderInner(AuthorizationConfigClass user, string orderId, string linntoken, string token)
+        private async Task DispatchOrderInner(Rishvi.Models.Authorization user, string orderId, string linntoken, string token)
         {
             //var linnDispatchPath = $"LinnDispatch/{token}_linndispatch_{orderId}.json";
             var linnStreamPath = $"LinnStreamOrder/_streamorder_{orderId}.json";

@@ -26,7 +26,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             _authorization = authorization;
         }
 
-        public TokenDetails GetToken(AuthorizationConfigClass authorizationConfig)
+        public TokenDetails GetToken(Rishvi.Models.Authorization authorizationConfig)
         {
             if (!string.IsNullOrEmpty(authorizationConfig.ClientId) && !string.IsNullOrEmpty(authorizationConfig.ClientSecret))
             {

@@ -48,7 +48,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     return new AddNewUserResponse("Invalid LinnworksUniqueIdentifier");
 
                 // Create a new authorization configuration
-                AuthorizationConfigClass newConfig = _authorizationToken.CreateNew(
+                Rishvi.Models.Authorization newConfig = _authorizationToken.CreateNew(
                     request.Email,
                     "NULL",
                     request.LinnworksUniqueIdentifier,
@@ -77,9 +77,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("UserConfig", null, null, JsonConvert.SerializeObject(request), "UserConfigStart", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
-              //  var obj = new LinnworksBaseStream(request.AuthorizationToken);
+                //  var obj = new LinnworksBaseStream(request.AuthorizationToken);
                 // Authenticate the user
-                AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
                 if (auth == null || authEntity == null)
                 {
@@ -91,7 +91,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
                 SqlHelper.SystemLogInsert("UserConfigauthEntity", null, null, JsonConvert.SerializeObject(authEntity), "UserConfigStart", JsonConvert.SerializeObject(authEntity), false, "clientId");
                 // If config is not activated (Wizard Stage - integration steps)
-                if (!auth.IsConfigActive)
+                if ((bool)!auth.IsConfigActive)
                 {
                     // Assign a default configuration stage for new integrations
                     if (string.IsNullOrEmpty(auth.ConfigStatus))
@@ -153,7 +153,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Authenticate the user and load the config file
-                AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
                 if (auth == null || authEntity == null)
                 {
@@ -170,32 +170,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 if (auth.ConfigStatus == "ContactStage")
                 {
                     // Update configuration details from request items
-                    auth.AccountName = GetConfigValue(request, "NAME");
-                    auth.CompanyName = GetConfigValue(request, "COMPANY");
-                    auth.AddressLine1 = GetConfigValue(request, "ADDRESS1");
-                    auth.AddressLine2 = GetConfigValue(request, "ADDRESS2");
-                    auth.AddressLine3 = GetConfigValue(request, "ADDRESS3");
-                    auth.City = GetConfigValue(request, "CITY");
-                    auth.County = GetConfigValue(request, "REGION");
-                    auth.CountryCode = GetConfigValue(request, "COUNTRY");
-                    auth.ContactPhoneNo = GetConfigValue(request, "TELEPHONE");
-                    auth.PostCode = GetConfigValue(request, "POSTCODE");
-                    auth.ClientId = GetConfigValue(request, "ClientId");
-                    auth.ClientSecret = GetConfigValue(request, "ClientSecret");
-                    auth.AutoOrderSync =  Convert.ToBoolean(GetConfigValue(request, "AutoOrderSync"));
-                    auth.AutoOrderDespatchSync = Convert.ToBoolean(GetConfigValue(request, "AutoOrderDespatchSync"));
-                    auth.UseDefaultLocation = Convert.ToBoolean(GetConfigValue(request, "UseDefaultLocation"));
-                    auth.DefaultLocation = GetConfigValue(request, "DefaultLocation");
-                    auth.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
-                    auth.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
-                    auth.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
-                    auth.LabelReference = GetConfigValue(request, "LABELREFERENCE");
-
-                    // Mark config as active and update status
-                    auth.ConfigStatus = "CONFIG";
-                    auth.IsConfigActive = true;
-                    //auth.Save();
-
                     authEntity.AccountName = GetConfigValue(request, "NAME");
                     authEntity.CompanyName = GetConfigValue(request, "COMPANY");
                     authEntity.AddressLine1 = GetConfigValue(request, "ADDRESS1");
@@ -225,7 +199,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     return new UpdateConfigResponse();
                 }
                 // Handle the "CONFIG" stage or active configurations
-                else if (auth.ConfigStatus == "CONFIG" || auth.IsConfigActive)
+                else if (auth.ConfigStatus == "CONFIG" || (auth.IsConfigActive.HasValue && auth.IsConfigActive.Value))
                 {
                     // Allow changes to certain config properties
                     auth.AccountName = GetConfigValue(request, "NAME");
@@ -289,7 +263,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Load and authenticate the configuration using the authorization token
-                AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
                     return new ConfigDeleteResponse($"Authorization failed for token {request.AuthorizationToken}");
@@ -313,7 +287,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         public UserAvailableServicesResponse UserAvailableServices([FromBody] UserAvailableServicesRequest request)
         {
             // Authenticate the user using the provided authorization token
-            AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+            Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
             if (auth == null)
             {
                 return new UserAvailableServicesResponse($"Authorization failed for token {request.AuthorizationToken}");
@@ -330,7 +304,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         public ExtendedPropertyMappingResponse ExtendedPropertyMapping([FromBody] ExtendedPropertyMappingRequest request)
         {
             // Load and authenticate the user configuration using the provided authorization token
-            AuthorizationConfigClass auth = _authorizationToken.Load(request.AuthorizationToken);
+            Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
             if (auth == null)
             {
                 // Return an error response if authentication fails
@@ -373,7 +347,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Load and authenticate the user configuration using the provided authorization token
-                AuthorizationConfigClass auth = _authorizationToken.Load(authToken);
+                Rishvi.Models.Authorization auth = _authorizationToken.Load(authToken);
                 if (auth == null)
                 {
                     // Return an error response if authentication fails
