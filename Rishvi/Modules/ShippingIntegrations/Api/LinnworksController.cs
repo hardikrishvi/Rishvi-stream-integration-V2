@@ -698,15 +698,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                                 var logindata = await _configController.Get(user.Email);
                                 var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
-
+                                
                                 if (strorderdaat != null)
                                 {
                                     if (strorderdaat.response.valid)
                                     {
                                         foreach (var gr in strorderdaat.response.order.groups)
                                         {
-
-
+                                            gr.runDetails.groupSequence
+                                            
                                             string Stream_trackingURL = strorderdaat.response.order.trackingURL;
                                             string Stream_trackingId = strorderdaat.response.order.trackingId;
                                             string Stream_driverName = gr.runDetails.driverName;
@@ -725,6 +725,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                             string Stream_endActualDateTime = gr.runDetails.end.actualDateTime;
                                             string Stream_endPlannedDateTime = gr.runDetails.end.plannedDateTime;
                                             string linnworksorderid = strorderdaat.response.order.header.orderNo;
+                                            string stream_GroupSequence = gr.runDetails.groupSequence.ToString();
 
 
 
@@ -766,6 +767,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                                     {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
                                                     {"Stream_vehicleType",Stream_vehicleType },
                                                     {"Stream_dispatched",Stream_dispatched },
+                                                    {"stream_GroupSequence",stream_GroupSequence },
                                                     {"Stream_departed",Stream_departed },
                                                     {"Stream_completed",Stream_completed},
                                                     {"Stream_startActualDateTime", Stream_startActualDateTime},
