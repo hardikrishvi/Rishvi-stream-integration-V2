@@ -705,7 +705,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     {
                                         foreach (var gr in strorderdaat.response.order.groups)
                                         {
-                                            gr.runDetails.groupSequence
                                             
                                             string Stream_trackingURL = strorderdaat.response.order.trackingURL;
                                             string Stream_trackingId = strorderdaat.response.order.trackingId;
