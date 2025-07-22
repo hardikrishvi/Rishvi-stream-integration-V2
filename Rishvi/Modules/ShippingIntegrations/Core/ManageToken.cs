@@ -63,10 +63,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                         isAuthorized = true;
                     }
-                  
-                       
                 }
-
 
                 //if (AwsS3.S3FileIsExists("Authorization", "StreamToken/" + ClientId + ".json").Result)
                 //{

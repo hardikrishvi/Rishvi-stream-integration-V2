@@ -243,96 +243,130 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                var list_user = _dbSqlCContext.Authorizations.ToList();
+                var list_user = await _dbSqlCContext.Authorizations.ToListAsync();  // Use async to avoid blocking
+
                 foreach (var user in list_user)
                 {
                     var obj = new LinnworksBaseStream(user.LinnworksToken);
 
-                    ProxiedWebRequest request = new ProxiedWebRequest();
-                    request.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations";
-                    request.Method = "POST";
+                    ProxiedWebRequest request = new ProxiedWebRequest
+                    {
+                        Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations",
+                        Method = "POST"
+                    };
                     request.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
-                    var upload = obj.ProxyFactory.WebRequest(request);
 
+                    // Perform the web request and get the response
+                    var upload = obj.ProxyFactory.WebRequest(request);
                     var data = Encoding.UTF8.GetString(upload.RawResponse);
 
                     string accountId = user.AccountName;
 
                     // Parse the JSON
+                    //using JsonDocument doc = JsonDocument.Parse(data);
+                    //var root = doc.RootElement.EnumerateArray();
+
+                    // Parse the JSON response
                     using JsonDocument doc = JsonDocument.Parse(data);
-                    var root = doc.RootElement.EnumerateArray();
+                    var root = doc.RootElement;
 
 
-                    // Filter result
-                    var result = root
-                        .FirstOrDefault(x =>
-                            x.GetProperty("Vendor").GetString() == "Stream Shipping" &&
-                            x.GetProperty("AccountId").GetString() == accountId
-                        );
-                    int pkShippingAPIConfigId = result.GetProperty("pkShippingAPIConfigId").GetInt16();
-
-                    //Update the Authorization with the ShippingApiConfigId
-                    user.ShippingApiConfigId = pkShippingAPIConfigId;
-                    _dbSqlCContext.Update(user);
-                    _unitOfWork.Commit();
-
-                    ProxiedWebRequest requestb = new ProxiedWebRequest();
-                    requestb.Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices";
-                    requestb.Method = "POST";
-                    requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
-                    var uploadb = obj.ProxyFactory.WebRequest(requestb);
-
-                    using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
-                    var root1 = doc1.RootElement;
-
-                    if (root1.ValueKind == JsonValueKind.Array)
+                    if (root.ValueKind == JsonValueKind.Array)
                     {
-                        foreach (var item in root1.EnumerateArray())
+                        // Process the array if the root is an array
+                        var result = root.EnumerateArray()
+                            .FirstOrDefault(x =>
+                                x.TryGetProperty("Vendor", out var vendor) && vendor.GetString() == "Stream Shipping" &&
+                                x.TryGetProperty("AccountId", out var account) && account.GetString() == accountId
+                            );
+
+                        // If no result is found, handle it accordingly
+                        if (result.ValueKind != JsonValueKind.Undefined)
                         {
-                            if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
-                                configIdElement.GetInt16() == pkShippingAPIConfigId)
+                            // Safely extract the pkShippingAPIConfigId
+                            if (result.TryGetProperty("pkShippingAPIConfigId", out var pkShippingAPIConfigIdProp))
                             {
-                                string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
-                                    ? nameEl.GetString() : null;
+                                int pkShippingAPIConfigId = pkShippingAPIConfigIdProp.GetInt32(); // GetInt32() is a better fit for an ID.
 
-                                string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
-                                    ? idEl.GetString() : null;
+                                // Update the Authorization with the ShippingApiConfigId
+                                user.ShippingApiConfigId = pkShippingAPIConfigId;
+                                _dbSqlCContext.Update(user);
+                                await _unitOfWork.CommitAsync();  // Async commit
 
-                                var get_service = _dbSqlCContext.PostalServices
-                                    .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == user.AuthorizationToken)
-                                    .FirstOrDefault();
-                                if (get_service == null)
+                                // Fetch Postal Services
+                                ProxiedWebRequest requestb = new ProxiedWebRequest
                                 {
-                                    // Create new entity
-                                    var postalService = new PostalServices
-                                    {
-                                        AuthorizationToken = user.AuthorizationToken, // use your existing token variable
-                                        PostalServiceId = serviceId,
-                                        PostalServiceName = serviceName,
-                                        CreatedAt = DateTime.UtcNow,
-                                        UpdatedAt = DateTime.UtcNow
-                                    };
+                                    Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices",
+                                    Method = "POST"
+                                };
+                                requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
 
-                                    // Add to DbContext
-                                    _dbSqlCContext.PostalServices.Add(postalService);
+                                // Perform the web request and get the response
+                                var uploadb = obj.ProxyFactory.WebRequest(requestb);
+
+                                using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
+                                var root1 = doc1.RootElement;
+
+                                if (root1.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var item in root1.EnumerateArray())
+                                    {
+                                        if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
+                                            configIdElement.GetInt16() == pkShippingAPIConfigId)
+                                        {
+                                            string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
+                                                ? nameEl.GetString() : null;
+
+                                            string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
+                                                ? idEl.GetString() : null;
+
+                                            var get_service = await _dbSqlCContext.PostalServices
+                                                .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == user.AuthorizationToken)
+                                                .FirstOrDefaultAsync();  // Use async query
+
+                                            if (get_service == null)
+                                            {
+                                                // Create new entity
+                                                var postalService = new PostalServices
+                                                {
+                                                    AuthorizationToken = user.AuthorizationToken, // use your existing token variable
+                                                    PostalServiceId = serviceId,
+                                                    PostalServiceName = serviceName,
+                                                    CreatedAt = DateTime.UtcNow,
+                                                    UpdatedAt = DateTime.UtcNow
+                                                };
+
+                                                // Add to DbContext
+                                                await _dbSqlCContext.PostalServices.AddAsync(postalService);  // Async insert
+                                            }
+                                        }
+                                    }
                                 }
+
+                                await _unitOfWork.CommitAsync();  // Async commit after all the changes
+                                
+                            }
+                            else
+                            {
+                                throw new Exception("Missing 'pkShippingAPIConfigId' property in the response.");
                             }
                         }
                     }
-                    _unitOfWork.Commit();
 
+                    await Task.Delay(TimeSpan.FromMinutes(1));
                 }
+
                 return Ok("Postal service processed successfully.");
             }
             catch (Exception ex)
             {
+                // Log the error using a better logging mechanism (e.g., ILogger, Serilog)
                 SqlHelper.SystemLogInsert("Postal Service Method", null, null, null, "Postal Service", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, "All");
 
-                // Log the exception for debugging purposes
-                Console.WriteLine($"An error occurred: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
         [HttpGet, Route("StartOtherService")]
         [AllowAnonymous]
