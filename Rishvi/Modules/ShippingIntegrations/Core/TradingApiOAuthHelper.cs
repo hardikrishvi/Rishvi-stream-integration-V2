@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Amazon.Runtime.Internal;
+using Azure.Core;
 using LinnworksAPI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
 using Rishvi.Modules.Core.Data;
+using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Api;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
@@ -103,7 +105,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
             }
         }
-        
+
         public Task SaveStreamOrder(string s, string AuthorizationToken, string email, string ebayorderid, string linnworksorderid, string consignmentid, string trackingnumber, string trackingurl, string order = "")
         {
             try
@@ -252,8 +254,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
             catch (Exception ex)
             {
+                return Task.FromException(ex);
                 Console.WriteLine($"Error in SaveStreamOrder: {ex.Message}");
-                throw;
+                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, linnworksorderid, "SaveStreamOrder", ex.Message, true, "clientId");
             }
         }
 
@@ -406,7 +409,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 }
                 catch (Exception ex)
                 {
-                    var str = ex.Message;
+                    SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "UpdateLinnworksOrdersToStream", ex.Message, true, "clientId");
                 }
             }
         }
@@ -520,30 +523,28 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             streamOrderResponse.Item1.ItemId = "";
                             if (streamOrderResponse.Item1.response == null)
                             {
-                                await SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
                             }
                             else
                             {
-                                await SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
+                                SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
                                     streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
                             }
                         }
                         catch
                         {
-                            throw new Exception("Order data not found for OrderId: " + OrderId);
+                            SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                         }
                     }
                     else
                     {
-                        throw new Exception("Order data not found for OrderId: " + OrderId);
+                        SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Postal Service not found: " + OrderId);
+                    SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Postal Service not found: " + OrderId, true, "clientId");
                 }
-
-                
             }
         }
         public async Task DispatchOrderInLinnworks(Rishvi.Models.Authorization _User, int OrderRef, string linntoken,
@@ -578,8 +579,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public async Task<StreamGetOrderResponse.Root> GetStreamOrder(Rishvi.Models.Authorization _User, string OrderId)
         {
             var streamAuth = _manageToken.GetToken(_User);
-            //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
-            //var streamAuth = manageToken.GetToken(_User);
             return StreamOrderApi.GetOrder(streamAuth.AccessToken, OrderId, _User.ClientId);
         }
         #endregion
@@ -682,6 +681,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
             catch (Exception ex)
             {
+                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, json, "RegisterSaveFromJson", ex.Message, true, "clientId");
                 Console.WriteLine("❌ Error inserting order: " + ex.Message);
                 if (ex.InnerException != null)
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
@@ -810,6 +810,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         }
         public void InsertOrderFromJson(string json, string linntoken)
         {
+            SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, json, null, "InsertOrderFromJson", null, true, "clientId");
             try
             {
                 var root = JsonConvert.DeserializeObject<OrderRoot>(json);
@@ -1129,17 +1130,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 {
                     Console.WriteLine($"❌ Failed to insert order: {ex.Message}");
                     _unitOfWork.Context.ChangeTracker.Clear(); // EF Core >=5
-
+                    SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, json, "InsertOrderFromJson", ex.Message, true, "clientId");
                 }
-
-
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine("❌ Error inserting order: " + ex.Message);
                 if (ex.InnerException != null)
                     Console.WriteLine("🔍 Inner: " + ex.InnerException.Message);
+                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, json, "InsertOrderFromJson", ex.Message, true, "clientId");
             }
         }
         public async Task UpdateOrderRootFullAsync(OrderRoot updatedOrder)

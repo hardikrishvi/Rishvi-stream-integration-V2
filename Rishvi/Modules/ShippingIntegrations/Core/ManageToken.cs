@@ -65,15 +65,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     }
                 }
 
-                //if (AwsS3.S3FileIsExists("Authorization", "StreamToken/" + ClientId + ".json").Result)
-                //{
-                //    string json = AwsS3.GetS3File("Authorization", "StreamToken/" + ClientId + ".json");
-                //    authorizationModel = JsonConvert.DeserializeObject<AuthorizationModel>(json);
-                //    if (authorizationModel.ExpireTime >= DateTime.UtcNow && !string.IsNullOrEmpty(authorizationModel.AccessToken))
-                //        isAuthorized = true;
-                //    isAuthorized = false;
-                //}
-
                 if (!isAuthorized)
                 {
                     string uniqueCode = CodeHelper.GenerateUniqueCode(32);
@@ -91,8 +82,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         authorizationModel = JsonConvert.DeserializeObject<AuthorizationModel>(response.Content);
 
                         var jsonData = JsonConvert.SerializeObject(authorizationModel);
-                        //Stream stream = AwsS3.GenerateStreamFromString(jsonData);
-                        //AwsS3.UploadFileToS3("Authorization", stream, "StreamToken/" + ClientId + ".json");
 
                         get_auth.access_token = authorizationModel.AccessToken;
                         get_auth.token_type = authorizationModel.TokenType;
@@ -103,37 +92,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                         _unitOfWork.Commit();
                     }
-                    //else
-                    //{
-                    //    Stream stream = AwsS3.GenerateStreamFromString(response.Content);
-                    //    AwsS3.UploadFileToS3("Authorization", stream, "StreamErrorToken/" + ClientId + "-" + uniqueCode + ".json");
-                    //    Console.WriteLine("Error: " + response.ErrorMessage);
-                    //}
-
+                    
                 }
                 return authorizationModel;
             }
             catch (WebException ex)
             {
-                //string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                //if (ex.Response != null)
-                //{
-                //    using (Stream responseStream = ex.Response.GetResponseStream())
-                //    {
-                //        if (responseStream != null)
-                //        {
-                //            AwsS3.UploadFileToS3("Authorization", responseStream, "StreamErrorToken/" + ClientId + "-" + uniqueCode + ".json");
-                //        }
-                //    }
-                //}
-                //else
-                //{
-                //    Stream responseStream = AwsS3.GenerateStreamFromString(ex.ToString());
-                //    AwsS3.UploadFileToS3("Authorization", responseStream, "StreamErrorToken/" + ClientId + "-" + uniqueCode + ".json");
-                //    System.IO.File.WriteAllText("C:/Files/TheRange/User/Error.txt", ex.ToString());
-                //}
+                SqlHelper.SystemLogInsert("ManageToken", null, null, ClientId, "AuthorizeClient", ex.Message, true, ClientId);
+                return null;
             }
-            return null;
+            
         }
     }
 }
