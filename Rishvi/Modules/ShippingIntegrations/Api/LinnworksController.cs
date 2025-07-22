@@ -71,12 +71,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                
                 //var user = _authToken.Load(token);
+                string requestJson = JsonConvert.SerializeObject(res);
                 var linntoken = res.LinnworksToken;
 
                 if (String.IsNullOrEmpty(linntoken))
                 {
-                    return BadRequest("Linnworks token is missing.");
+                    string errorMessage = "Linnworks token is missing.";
+                    SqlHelper.SystemLogInsert("GetLinnOrderForStream", null, requestJson, null, "TokenMissing", errorMessage, true, res.AuthorizationToken);
+                    return BadRequest(errorMessage);
                 }
 
                 var obj = new LinnworksBaseStream(linntoken);
@@ -93,6 +97,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         var newjson = JsonConvert.SerializeObject(orderdata);
                         await _tradingApiOAuthHelper.SaveLinnOrder(newjson, res.AuthorizationToken, res.Email, linntoken, linnorderid.ToString());
                     }
+                    string successMessage = "Processed orders by IDs.";
+                    SqlHelper.SystemLogInsert("GetLinnOrderForStream", null, requestJson, null, "ProcessedByIds", successMessage, false, res.AuthorizationToken);
                 }
                 else
                 {
@@ -117,19 +123,23 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             }
                             catch (Exception ex)
                             {
-
+                                string errorMessage = $"Error saving order { _order.NumOrderId.ToString() }: {ex.Message}";
+                                SqlHelper.SystemLogInsert("GetLinnOrderForStream", null, newjson, null, "ErrorSavingOrder", errorMessage, true, res.AuthorizationToken);
 
                             }
 
                         }
                     }
+                    string successMessage = "Processed open orders.";
+                    SqlHelper.SystemLogInsert("GetLinnOrderForStream", null, requestJson, null, "ProcessedOpenOrders", successMessage, false, res.AuthorizationToken);
                 }
                 return Ok("Orders processed successfully.");
             }
             catch (Exception ex)
             {
                 // Log the error (use ILogger for production)
-                Console.WriteLine($"Error while processing Linn orders: {ex.Message}");
+                string errorMessage = $"Error while processing Linn orders: {ex.Message}";
+                SqlHelper.SystemLogInsert("GetLinnOrderForStream", null, JsonConvert.SerializeObject(res), null, "Error", errorMessage, true, res.AuthorizationToken);
                 return StatusCode(500, "An unexpected error occurred.");
             }
 
@@ -141,10 +151,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Load user configuration
+                string requestJson = $"token: {token}, orderids: {orderids}";
                 var user = _authToken.Load(token);
                 if (string.IsNullOrEmpty(user?.ClientId))
                 {
-                    return BadRequest("Invalid client ID.");
+                    string errorMessage = "Invalid client ID.";
+                    SqlHelper.SystemLogInsert("CreateLinnworksOrdersToStream", null, requestJson, null, "InvalidClientId", errorMessage, true, token);
+                    return BadRequest(errorMessage);
                 }
 
                 if (string.IsNullOrEmpty(orderids))
@@ -162,6 +175,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
                         string ab = JsonConvert.SerializeObject(pendingOrder);
 
+                        SqlHelper.SystemLogInsert("CreateLinnworksOrdersToStream", null, ab, null, "ProcessingPendingOrder", $"Processing pending order: {pendingOrder.LinnNumOrderId}", false, token);
+
                         await _tradingApiOAuthHelper.CreateLinnworksOrdersToStream(user, pendingOrder.LinnNumOrderId.ToString());
                     }
                 }
@@ -171,15 +186,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     var orderidlist = Regex.Split(orderids, ",");
                     foreach (var _ord in orderidlist)
                     {
+                        SqlHelper.SystemLogInsert("CreateLinnworksOrdersToStream", null, _ord, null, "ProcessingOrderId", $"Processing order ID: {_ord}", false, token);
                         await _tradingApiOAuthHelper.CreateLinnworksOrdersToStream(user, _ord);
                     }
                 }
+                SqlHelper.SystemLogInsert("CreateLinnworksOrdersToStream", null, requestJson, null, "Success", "Linnworks orders successfully created.", false, token);
                 return Ok("Linnworks orders successfully created.");
             }
             catch (Exception ex)
             {
                 // Log exception (replace Console.WriteLine with ILogger for production)
                 Console.WriteLine($"Error creating Linnworks orders: {ex.Message}");
+                string errorMessage = $"Error creating Linnworks orders: {ex.Message}";
+                SqlHelper.SystemLogInsert("CreateLinnworksOrdersToStream", null, $"token: {token}, orderids: {orderids}", null, "Error", errorMessage, true, token);
                 return StatusCode(500, "An unexpected error occurred.");
             }
 
@@ -190,18 +209,23 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                string requestJson = $"token: {token}, linntoken: {linntoken}, orderids: {orderids}";
 
                 // Load user configuration
                 var user = _authToken.Load(token);
                 if (string.IsNullOrEmpty(user?.ClientId))
                 {
-                    return BadRequest("Invalid client ID.");
+                    string errorMessage = "Invalid client ID.";
+                    SqlHelper.SystemLogInsert("UpdateLinnworksOrdersToStream", null, requestJson, null, "InvalidClientId", errorMessage, true, token);
+                    return BadRequest(errorMessage);
                 }
                 linntoken = string.IsNullOrEmpty(linntoken) ? user.LinnworksToken : linntoken;
 
                 if (String.IsNullOrEmpty(linntoken))
                 {
-                    return BadRequest("Linnworks token is missing.");
+                    string errorMessage = "Linnworks token is missing.";
+                    SqlHelper.SystemLogInsert("UpdateLinnworksOrdersToStream", null, requestJson, null, "TokenMissing", errorMessage, true, token);
+                    return BadRequest(errorMessage);
                 }
 
                 var obj = new LinnworksBaseStream(linntoken);
@@ -220,6 +244,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         var orderdetails = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(pendingOrder.LinnNumOrderId));
                         var newjson = JsonConvert.SerializeObject(orderdetails);
                         var updatedOrder = JsonConvert.DeserializeObject<OrderRoot>(newjson);
+                        SqlHelper.SystemLogInsert("UpdateLinnworksOrdersToStream", null, newjson, null, "ProcessingPendingOrder", $"Processing pending order: {pendingOrder.LinnNumOrderId}", false, token);
+
                         await _tradingApiOAuthHelper.UpdateOrderRootFullAsync(updatedOrder);
                         await _tradingApiOAuthHelper.UpdateLinnworksOrdersToStream(user, pendingOrder.LinnNumOrderId.ToString(), pendingOrder.StreamOrderId);
                     }
@@ -246,17 +272,23 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             var orderdata = obj.Api.Orders.GetOrderDetailsByNumOrderId(Convert.ToInt32(linnOrders.LinnNumOrderId));
                             var newjson = JsonConvert.SerializeObject(orderdata);
                             var updatedOrder = JsonConvert.DeserializeObject<OrderRoot>(newjson);
+                            SqlHelper.SystemLogInsert("UpdateLinnworksOrdersToStream", null, newjson, null, "ProcessingOrderId", $"Processing order ID: {_ord}", false, token);
+
                             await _tradingApiOAuthHelper.UpdateOrderRootFullAsync(updatedOrder);
                             await _tradingApiOAuthHelper.UpdateLinnworksOrdersToStream(user, _ord, linnOrders.StreamOrderId);
                         }
                     }
                 }
+                SqlHelper.SystemLogInsert("UpdateLinnworksOrdersToStream", null, requestJson, null, "Success", "Linnworks orders successfully updated.", false, token);
+
                 return Ok("Linnworks orders successfully created.");
             }
             catch (Exception ex)
             {
                 // Log exception (replace Console.WriteLine with ILogger for production)
                 Console.WriteLine($"Error creating Linnworks orders: {ex.Message}");
+                string errorMessage = $"Error updating Linnworks orders: {ex.Message}";
+                SqlHelper.SystemLogInsert("UpdateLinnworksOrdersToStream", null, $"token: {token}, linntoken: {linntoken}, orderids: {orderids}", null, "Error", errorMessage, true, token);
                 return StatusCode(500, "An unexpected error occurred.");
             }
 
@@ -267,11 +299,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                string requestJson = $"token: {token}, orderids: {orderids}, linntoken: {linntoken}";
                 // Load user configuration
                 Rishvi.Models.Authorization user = _authToken.Load(token);
                 if (string.IsNullOrEmpty(user?.ClientId))
                 {
-                    return BadRequest("Invalid or missing client ID.");
+                    string errorMessage = "Invalid or missing client ID.";
+                    SqlHelper.SystemLogInsert("DispatchLinnworksOrdersFromStream", null, requestJson, null, "InvalidClientId", errorMessage, true, token);
+                    return BadRequest(errorMessage);
                 }
 
                 if (string.IsNullOrEmpty(orderids))
@@ -285,6 +320,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                     foreach (var _linnord in dispatchlinnfromstream)
                     {
+                        SqlHelper.SystemLogInsert("DispatchLinnworksOrdersFromStream", null, $"LinnNumOrderId: {_linnord.LinnNumOrderId}", null, "ProcessingDispatchOrder", $"Dispatching order: {_linnord.LinnNumOrderId}", false, token);
                         await DispatchOrderInner(user, _linnord.LinnNumOrderId, linntoken, token);
                     }
 
@@ -295,33 +331,43 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     var orderidlist = Regex.Split(orderids, ",");
                     foreach (var _ord in orderidlist)
                     {
+                        SqlHelper.SystemLogInsert("DispatchLinnworksOrdersFromStream", null, $"OrderId: {_ord}", null, "ProcessingDispatchOrder", $"Dispatching order: {_ord}", false, token);
+
                         await DispatchOrderInner(user, _ord, linntoken, token);
                     }
                 }
+                SqlHelper.SystemLogInsert("DispatchLinnworksOrdersFromStream", null, requestJson, null, "Success", "Linnworks orders successfully dispatched.", false, token);
+
                 return Ok("Orders dispatched successfully.");
             }
             catch (Exception ex)
             {
                 // Log the error (replace Console.WriteLine with ILogger for production)
                 Console.WriteLine($"Error dispatching Linnworks orders: {ex.Message}");
+                string errorMessage = $"Error dispatching Linnworks orders: {ex.Message}";
+                SqlHelper.SystemLogInsert("DispatchLinnworksOrdersFromStream", null, $"token: {token}, orderids: {orderids}, linntoken: {linntoken}", null, "Error", errorMessage, true, token);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
         private async Task DispatchOrderInner(Rishvi.Models.Authorization user, string orderId, string linntoken, string token)
         {
-            //var linnDispatchPath = $"LinnDispatch/{token}_linndispatch_{orderId}.json";
-            var linnStreamPath = $"LinnStreamOrder/_streamorder_{orderId}.json";
-            var streamOrderExists = await _dbSqlCContext.StreamOrderRecord
-                .AnyAsync(x => x.LinnworksOrderId == orderId);
+            try
+            {
+                //var linnDispatchPath = $"LinnDispatch/{token}_linndispatch_{orderId}.json";
+                string requestJson = $"user: {user?.Email}, orderId: {orderId}, linntoken: {linntoken}";
+                var linnStreamPath = $"LinnStreamOrder/_streamorder_{orderId}.json";
+                var streamOrderExists = await _dbSqlCContext.StreamOrderRecord
+                    .AnyAsync(x => x.LinnworksOrderId == orderId);
 
-            var dispatchDone = await _dbSqlCContext.ReportModel
-                .Where(x => x.LinnNumOrderId == orderId)
-                .Select(x => x.IsLinnOrderDispatchFromStream)
-                .FirstOrDefaultAsync();
+                var dispatchDone = await _dbSqlCContext.ReportModel
+                    .Where(x => x.LinnNumOrderId == orderId)
+                    .Select(x => x.IsLinnOrderDispatchFromStream)
+                    .FirstOrDefaultAsync();
 
             if (!dispatchDone && streamOrderExists)
             {
+
                 var jsonData = AwsS3.GetS3File("Authorization", linnStreamPath);
                 var streamData = JsonConvert.DeserializeObject<StreamOrderRespModel.Root>(jsonData);
 
@@ -336,8 +382,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         streamData.response.trackingURL,
                         null
                     );
+                    SqlHelper.SystemLogInsert("DispatchOrderInner", null, $"OrderId: {orderId}", null, "DispatchSuccess", $"Order {orderId} successfully dispatched to Linnworks", false, token);
+
+                }
+                else
+                {
+                    // Log failure when stream data is null or invalid
+                    SqlHelper.SystemLogInsert("DispatchOrderInner", null, $"OrderId: {orderId}", null, "StreamDataError", "Stream data is null or invalid", true, token);
                 }
             }
+            else
+            {
+                SqlHelper.SystemLogInsert("DispatchOrderInner", null, requestJson, null, "DispatchSkipped", $"Order {orderId} was skipped due to dispatch status or stream order not found.", false, token);
+            }
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                string errorMessage = $"Error dispatching Linnworks order {orderId}: {ex.Message}";
+                SqlHelper.SystemLogInsert("DispatchOrderInner", null, $"orderId: {orderId}", null, "Error", errorMessage, true, token);
+            }
+            
         }
 
         [HttpGet, Route("DispatchOrder")]
@@ -345,17 +410,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                string requestJson = JsonConvert.SerializeObject(value);
                 // Validate the token and user configuration
                 var user = _authToken.Load(value.token);
                 if (string.IsNullOrEmpty(user?.access_token))
                 {
-                    return BadRequest("Invalid or missing access token.");
+                    string errorMessage = "Invalid or missing access token.";
+                    SqlHelper.SystemLogInsert("DispatchOrder", null, requestJson, null, "InvalidAccessToken", errorMessage, true, value.token);
+                    return BadRequest(errorMessage);
                 }
 
                 // Validate the order reference
                 if (!value.IsValidInt32())
                 {
-                    return BadRequest("Invalid order reference.");
+                    string errorMessage = "Invalid order reference.";
+                    SqlHelper.SystemLogInsert("DispatchOrder", null, requestJson, null, "InvalidOrderReference", errorMessage, true, value.token);
+                    return BadRequest(errorMessage);
                 }
 
                 // Perform the dispatch action
@@ -368,6 +438,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     value.trackingurl,
                     null
                 );
+                SqlHelper.SystemLogInsert("DispatchOrder", null, requestJson, null, "Success", $"Order {value.orderref} dispatched successfully.", false, value.token);
 
                 return Ok("Order dispatched successfully.");
             }
@@ -375,6 +446,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 // Log the error
                 Console.WriteLine($"Error dispatching order: {ex.Message}");
+                string errorMessage = $"Error dispatching order: {ex.Message}";
+                SqlHelper.SystemLogInsert("DispatchOrder", null, JsonConvert.SerializeObject(value), null, "Error", errorMessage, true, value.token);
                 return StatusCode(500, "An unexpected error occurred while dispatching the order.");
             }
         }
@@ -384,14 +457,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                string requestJson = $"linntoken: {linntoken}, orderid: {orderid}, identifier: {identifier}";
                 // Validate inputs
                 if (string.IsNullOrWhiteSpace(linntoken))
                 {
-                    throw new ArgumentException("Invalid Linnworks token.");
+                    string errorMessage = "Invalid Linnworks token.";
+                    SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, requestJson, null, "InvalidToken", errorMessage, true, linntoken);
+                    throw new ArgumentException(errorMessage);
                 }
                 if (string.IsNullOrWhiteSpace(identifier))
                 {
-                    throw new ArgumentException("Identifier cannot be null or empty.");
+                    string errorMessage = "Identifier cannot be null or empty.";
+                    SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, requestJson, null, "InvalidIdentifier", errorMessage, true, linntoken);
+                    throw new ArgumentException(errorMessage);
                 }
 
                 // Initialize Linnworks API object
@@ -401,7 +479,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var linnOrderDetails = obj.Api.Orders.GetOrderDetailsByNumOrderId(orderid);
                 if (linnOrderDetails == null)
                 {
-                    throw new Exception($"Order with ID {orderid} not found.");
+                    string errorMessage = $"Order with ID {orderid} not found.";
+                    SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, requestJson, null, "OrderNotFound", errorMessage, true, linntoken);
+                    throw new Exception(errorMessage);
                 }
 
                 // Standardize identifier tag
@@ -412,6 +492,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 if (!identifiers.Any(d => d.Tag == identifierTag))
                 {
                     // Save the new identifier
+                    SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, requestJson, null, "SaveIdentifier", $"Saving new identifier {identifierTag}.", false, linntoken);
                     await SaveNewIdentifier(obj, identifierTag);
                 }
 
@@ -421,9 +502,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     OrderIds = new[] { linnOrderDetails.OrderId },
                     Tag = identifierTag
                 });
+                SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, requestJson, null, "Success", $"Order {orderid} successfully updated with identifier {identifierTag}.", false, linntoken);
+
             }
             catch (Exception ex)
             {
+                string errorMessage = $"Error updating order identifier: {ex.Message}";
+                SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, $"linntoken: {linntoken}, orderid: {orderid}, identifier: {identifier}", null, "Error", errorMessage, true, linntoken);
+
                 var webhookOrder1 = new WebhookOrder
                 {
                     sequence = 1,
@@ -444,10 +530,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                string requestJson = $"linntoken: {linntoken}, orderid: {orderid}, dispatchdate: {dispatchdate}";
+
                 // Validate inputs
                 if (string.IsNullOrWhiteSpace(linntoken))
                 {
-                    throw new ArgumentException("Invalid Linnworks token.");
+                    string errorMessage = "Invalid Linnworks token.";
+                    SqlHelper.SystemLogInsert("UpdateDispatchDate", null, requestJson, null, "InvalidToken", errorMessage, true, linntoken);
+                    throw new ArgumentException(errorMessage);
                 }
                 // Initialize Linnworks API object
                 var obj = new LinnworksBaseStream(linntoken);
@@ -456,7 +546,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var linnOrderDetails = obj.Api.Orders.GetOrderDetailsByNumOrderId(orderid);
                 if (linnOrderDetails == null)
                 {
-                    throw new Exception($"Order with ID {orderid} not found.");
+                    string errorMessage = $"Order with ID {orderid} not found.";
+                    SqlHelper.SystemLogInsert("UpdateDispatchDate", null, requestJson, null, "OrderNotFound", errorMessage, true, linntoken);
+                    throw new Exception(errorMessage);
                 }
 
                 // Standardize identifier tag
@@ -465,10 +557,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 // Update the order's GeneralInfo with the new DespatchByDate
                 obj.Api.Orders.SetOrderGeneralInfo(linnOrderDetails.OrderId, generalInfo, false);
+                SqlHelper.SystemLogInsert("UpdateDispatchDate", null, requestJson, null, "Success", $"Successfully updated dispatch date for order {orderid} to {dispatchdate}.", false, linntoken);
+
 
             }
             catch (Exception ex)
             {
+                string errorMessage = $"Error updating dispatch date for order {orderid}: {ex.Message}";
+                SqlHelper.SystemLogInsert("UpdateDispatchDate", null, $"linntoken: {linntoken}, orderid: {orderid}, dispatchdate: {dispatchdate}", null, "Error", errorMessage, true, linntoken);
                 var webhookOrder1 = new WebhookOrder
                 {
                     sequence = 1,
@@ -486,6 +582,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
         private async Task SaveNewIdentifier(LinnworksBaseStream obj, string identifierTag)
         {
+            string requestJson = $"identifierTag: {identifierTag}";
+            var standardizedIdentifierTag = identifierTag.ToUpper();
+
             await Task.Run(() =>
             {
                 obj.Api.OpenOrders.SaveIdentifier(new SaveIdentifiersRequest
@@ -500,6 +599,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     }
                 });
             });
+            SqlHelper.SystemLogInsert("SaveNewIdentifier", null, requestJson, null, "Success", $"New identifier {standardizedIdentifierTag} saved successfully.", false, obj.Api.GetSessionId().ToString());
+
         }
 
         [HttpGet, Route("CreateIdentifier")]
@@ -507,15 +608,21 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                string requestJson = $"linntoken: {linntoken}, identifier: {identifier}";
+
                 // Validate inputs
                 if (string.IsNullOrWhiteSpace(linntoken))
                 {
-                    return BadRequest("Invalid Linnworks token.");
+                    string errorMessage = "Invalid Linnworks token.";
+                    SqlHelper.SystemLogInsert("CreateIdentifier", null, requestJson, null, "InvalidToken", errorMessage, true, linntoken);
+                    return BadRequest(errorMessage);
                 }
 
                 if (string.IsNullOrWhiteSpace(identifier))
                 {
-                    return BadRequest("Identifier cannot be null or empty.");
+                    string errorMessage = "Identifier cannot be null or empty.";
+                    SqlHelper.SystemLogInsert("CreateIdentifier", null, requestJson, null, "InvalidIdentifier", errorMessage, true, linntoken);
+                    return BadRequest(errorMessage);
                 }
                 // Handle "days" case
                 if (identifier.ToLower() == "days")
@@ -523,14 +630,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     var daysOfWeek = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
                     foreach (var day in daysOfWeek)
                     {
+                        SqlHelper.SystemLogInsert("CreateIdentifier", null, $"linntoken: {linntoken}, identifier: {day}", null, "ProcessingDayIdentifier", $"Processing day identifier: {day}", false, linntoken);
+
                         await _serviceHelper.ManageIdentifier(linntoken, day);
                     }
                 }
                 else
                 {
                     // Handle single identifier
+                    SqlHelper.SystemLogInsert("CreateIdentifier", null, $"linntoken: {linntoken}, identifier: {identifier}", null, "ProcessingSingleIdentifier", $"Processing identifier: {identifier}", false, linntoken);
+
                     await _serviceHelper.ManageIdentifier(linntoken, identifier);
                 }
+                
                 return Ok("Identifier(s) processed successfully.");
 
             }
@@ -538,6 +650,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 // Log the error (replace Console.WriteLine with ILogger in production)
                 Console.WriteLine($"Error creating identifier: {ex.Message}");
+                string errorMessage = $"Error creating identifier: {ex.Message}";
+                SqlHelper.SystemLogInsert("CreateIdentifier", null, $"linntoken: {linntoken}, identifier: {identifier}", null, "Error", errorMessage, true, linntoken);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -548,9 +662,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Validate token
+                string requestJson = $"token: {token}";
+
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    return BadRequest("Token is required.");
+                    string errorMessage = "Token is required.";
+                    SqlHelper.SystemLogInsert("SubscribeWebhook", null, requestJson, null, "InvalidToken", errorMessage, true, token);
+                    return BadRequest(errorMessage);
                 }
 
                 var user = _authToken.Load(token);
@@ -558,7 +676,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 var streamAuth = _managetoken.GetToken(user);
                 if (string.IsNullOrWhiteSpace(streamAuth?.AccessToken))
                 {
-                    return BadRequest("Invalid or missing access token.");
+                    string errorMessage = "Invalid or missing access token.";
+                    SqlHelper.SystemLogInsert("SubscribeWebhook", null, requestJson, null, "InvalidAccessToken", errorMessage, true, token);
+                    return BadRequest(errorMessage);
                 }
 
                 // Define webhooks
@@ -577,6 +697,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 foreach (var webhook in webhooks)
                 {
                     await _serviceHelper.CreateWebhook(user, webhook, token);
+                    
                 }
 
                 return Ok("Webhooks subscribed successfully.");
@@ -585,6 +706,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 // Log the exception (replace with ILogger for production)
                 Console.WriteLine($"Error subscribing to webhooks: {ex.Message}");
+                string errorMessage = $"Error subscribing to webhooks: {ex.Message}";
+                SqlHelper.SystemLogInsert("SubscribeWebhook", null, $"token: {token}", null, "Error", errorMessage, true, token);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -633,6 +756,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 CreatedAt = DateTime.Now,
                 UpdatedAt = null
             };
+            SqlHelper.SystemLogInsert("Webhook", "", $"Subscription: {JsonConvert.SerializeObject(subscription)}, Event: {JsonConvert.SerializeObject(@event)}, Run: {JsonConvert.SerializeObject(run)}", "", "ProcessedWebhook", "Webhook data processed", false, "Webhook");
+
             _subscription.Add(subscription);
             _event.Add(@event);
             _run.Add(run);
@@ -657,6 +782,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
                     output.webhook.@event.event_code == "PLANNEDGROUP")
                 {
+                    SqlHelper.SystemLogInsert("Webhook", "", $"Handling specific event code: {output.webhook.@event.event_code}", "", "EventHandling", "Handling specific event code in webhook", false, "Webhook");
+
                     var webhookOrder = new WebhookOrder
                     {
                         sequence = 0,
@@ -672,6 +799,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         {
                             try
                             {
+                                SqlHelper.SystemLogInsert("Webhook", "", $"Processing order {strorder.order}", "", "OrderProcessing", $"Processing order {strorder.order} in specific event", false, "Webhook");
 
 
                                 // need to update on linn order
@@ -705,7 +833,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     {
                                         foreach (var gr in strorderdaat.response.order.groups)
                                         {
-                                            
+                                            SqlHelper.SystemLogInsert("Webhook", "", $"Updating Linnworks order {Stream_orderid} with tracking and driver info", "", "LinnworksUpdate", "Updating Linnworks order with driver and vehicle details", false, "Webhook");
+
                                             string Stream_trackingURL = strorderdaat.response.order.trackingURL;
                                             string Stream_trackingId = strorderdaat.response.order.trackingId;
                                             string Stream_driverName = gr.runDetails.driverName;
@@ -752,6 +881,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                             // update on linnworks
                                             if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                             {
+                                                SqlHelper.SystemLogInsert("Webhook", "", $"Updating Linnworks order {linnworksorderid} with tracking info", "", "LinnworksTrackingUpdate", $"Updating Linnworks order {linnworksorderid} with tracking ID {Stream_trackingId}", false, "Webhook");
+
                                                 await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
                                                     {"Stream_runloadid",Stream_runloadid },
                                                     {"Stream_runstatus",Stream_runstatus },
@@ -823,6 +954,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             }
                             catch (Exception ex)
                             {
+                                SqlHelper.SystemLogInsert("Webhook", "", $"Error processing order {strorder.order}: {ex.Message}", "", "OrderProcessingError", "Error processing order in webhook", true, "Webhook");
 
                                 EmailHelper.SendEmail("Error Webhook Update", "webhook error Data:" + data + "  ex: " + ex.ToString());
                             }
@@ -930,6 +1062,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             catch (Exception ex)
             {
+                string errorMessage = $"Error handling webhook data: {ex.Message}";
+                SqlHelper.SystemLogInsert("Webhook", "", $"data: {data}", "", "Error", errorMessage, true, "Webhook");
 
                 EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
             }
