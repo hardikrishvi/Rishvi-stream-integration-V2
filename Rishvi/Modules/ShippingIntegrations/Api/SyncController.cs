@@ -243,7 +243,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             string requestJson = $"identifierTag: {identifierTag}";
             var standardizedIdentifierTag = identifierTag.ToUpper();
-            var img = $"https://stream-api-stg.rishvi.app/{identifierTag.Replace(" ", "")}.png";
+            var img = $"https://stream-shipping-integration-file-storage.s3.eu-west-2.amazonaws.com/Images/{identifierTag.Replace(" ", "")}.png";
             await Task.Run(() =>
             {
                
@@ -263,7 +263,23 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
         }
 
+
+        [HttpGet("setup-PostalService-job")]
+        [AllowAnonymous]
+        public IActionResult SetupPostalServiceJob()
+        {
+            RecurringJob.AddOrUpdate<SyncController>(
+             "Order-PostalService",
+             x => x.PostalService(),
+             "0 6 * * *"  // Every 30 minutes
+             );
+
+            return Ok("Recurring job setup complete.");
+        }
+
+
         [HttpPost, Route("PostalService")]
+        [AllowAnonymous]
         public async Task<IActionResult> PostalService()
         {
             try
