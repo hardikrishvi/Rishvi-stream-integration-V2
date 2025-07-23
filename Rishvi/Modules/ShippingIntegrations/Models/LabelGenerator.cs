@@ -13,6 +13,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
 
         public static string GenerateLabel(GenerateLabelRequest request, Item item, string newTrackingNumber, string consignmentNo, string AddressFormatted, int itemCount, int totalItemCount, string labelReference, string companyName)
         {
+            SqlHelper.SystemLogInsert("GenerateLabel", null, request.ToString(), null, "success", "Label generated successfully", false, "Generate Lebel");
             try
             {
                 // Specify the width and height of the image
@@ -263,7 +264,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true,"Generate Lebel");
+                SqlHelper.SystemLogInsert("GenerateLabel", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true,"Generate Lebel");
                 EmailHelper.SendEmail("Failed generate label", ex.Message);
             }
             return string.Empty;

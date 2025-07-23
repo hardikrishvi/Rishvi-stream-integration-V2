@@ -472,31 +472,32 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     var auth1 = _dbSqlCContext.Authorizations.Where(x => x.AuthorizationToken == dta.AuthorizationToken).FirstOrDefault();
 
                     var streamAuth = _manageToken.GetToken(auth1);
-
-                    if (json != "null")
+                    if (streamAuth.AccessToken != null)
                     {
-                        try
+                        if (json != "null")
                         {
-                            var jsopndata = orderRoot;
-                            int orderId = jsopndata.NumOrderId;
-                            var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
+                            try
                             {
-                                AuthorizationToken = auth1.AuthorizationToken,
-                                AddressLine1 = jsopndata.CustomerInfo.Address.Address1,
-                                AddressLine2 = jsopndata.CustomerInfo.Address.Address2,
-                                AddressLine3 = jsopndata.CustomerInfo.Address.Address3,
-                                Postalcode = jsopndata.CustomerInfo.Address.PostCode,
-                                CompanyName = jsopndata.CustomerInfo.Address.Company,
-                                CountryCode = "GB",
-                                DeliveryNote = "",
-                                //ServiceId = courierSettings.SelectedServiceId,
-                                // Access the static property directly using the class name instead of an instance
-                                ServiceId = CourierSettings.SelectedServiceId,
-                                Email = auth.Email,
-                                Name = jsopndata.CustomerInfo.Address.FullName,
-                                OrderReference = jsopndata.NumOrderId.ToString(),
-                                OrderId = 0,
-                                Packages = new List<Package>() { new Package() {
+                                var jsopndata = orderRoot;
+                                int orderId = jsopndata.NumOrderId;
+                                var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
+                                {
+                                    AuthorizationToken = auth1.AuthorizationToken,
+                                    AddressLine1 = jsopndata.CustomerInfo.Address.Address1,
+                                    AddressLine2 = jsopndata.CustomerInfo.Address.Address2,
+                                    AddressLine3 = jsopndata.CustomerInfo.Address.Address3,
+                                    Postalcode = jsopndata.CustomerInfo.Address.PostCode,
+                                    CompanyName = jsopndata.CustomerInfo.Address.Company,
+                                    CountryCode = "GB",
+                                    DeliveryNote = "",
+                                    //ServiceId = courierSettings.SelectedServiceId,
+                                    // Access the static property directly using the class name instead of an instance
+                                    ServiceId = CourierSettings.SelectedServiceId,
+                                    Email = auth.Email,
+                                    Name = jsopndata.CustomerInfo.Address.FullName,
+                                    OrderReference = jsopndata.NumOrderId.ToString(),
+                                    OrderId = 0,
+                                    Packages = new List<Package>() { new Package() {
                                         PackageDepth = 0,
                                         PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
                                         Items = jsopndata.Items.Select(f=> new Item()
@@ -513,33 +514,35 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                                         }).ToList()
                                   }},
-                                ServiceConfigItems = new List<ServiceConfigItem>(),
-                                OrderExtendedProperties = new List<Models.ExtendedProperty>(),
-                                Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
-                                Region = jsopndata.CustomerInfo.Address.Region,
-                                Town = jsopndata.CustomerInfo.Address.Town
-                            }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null);
-                            streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
-                            streamOrderResponse.Item1.ItemId = "";
-                            if (streamOrderResponse.Item1.response == null)
-                            {
-                                SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                    ServiceConfigItems = new List<ServiceConfigItem>(),
+                                    OrderExtendedProperties = new List<Models.ExtendedProperty>(),
+                                    Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
+                                    Region = jsopndata.CustomerInfo.Address.Region,
+                                    Town = jsopndata.CustomerInfo.Address.Town
+                                }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null);
+                                streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
+                                streamOrderResponse.Item1.ItemId = "";
+                                if (streamOrderResponse.Item1.response == null)
+                                {
+                                    SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                }
+                                else
+                                {
+                                    SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
+                                        streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                                }
                             }
-                            else
+                            catch
                             {
-                                SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
-                                    streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                             }
                         }
-                        catch
+                        else
                         {
                             SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                         }
                     }
-                    else
-                    {
-                        SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
-                    }
+                    
                 }
                 catch (Exception ex)
                 {
