@@ -471,6 +471,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                     var auth1 = _dbSqlCContext.Authorizations.Where(x => x.AuthorizationToken == dta.AuthorizationToken).FirstOrDefault();
 
+                    string LocationName = "SGK";
+                    string HandsonDate = "";
+
+                    if (auth.HandsOnDate)
+                    {
+                        HandsonDate = DateTime.Now.ToString();
+                    }
+                    if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+                    {
+                        LocationName = auth.DefaultLocation;
+                    }
+
                     var streamAuth = _manageToken.GetToken(auth1);
 
                     if (json != "null")
@@ -518,7 +530,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                 Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                                 Region = jsopndata.CustomerInfo.Address.Region,
                                 Town = jsopndata.CustomerInfo.Address.Town
-                            }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null);
+                            }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null,LocationName,HandsonDate);
                             streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
                             streamOrderResponse.Item1.ItemId = "";
                             if (streamOrderResponse.Item1.response == null)

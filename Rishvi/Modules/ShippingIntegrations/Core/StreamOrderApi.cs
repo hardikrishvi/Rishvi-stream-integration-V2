@@ -56,7 +56,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return null;
         }
 
-        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid)
+        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid,string LocationName,string Handsondate)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
             string errorMessage = string.Empty;
@@ -68,7 +68,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
                     var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                     var request = new RestRequest(AppSettings.CreateOrderUrl, Method.Post);
-                    request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type));
+                    request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type ,LocationName,Handsondate));
                     request.AddHeader("Accept", "application/json");
                     request.AddHeader("Content-Type", "application/json");
                     request.AddHeader("Stream-Nonce", uniqueCode);
@@ -84,7 +84,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         errorMessage = response.Content;
                         try
                         {
-                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
+                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type,LocationName,Handsondate), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
                         }
                         catch
                         {
@@ -171,6 +171,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             ItemName = i.description,
                             Quantity = i.quantity,
                             UnitWeight = i.weight
+                           
                         }).ToList()
                     });
                 }
@@ -391,7 +392,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
 
-        public static string MappingStreamOrderRequest(GenerateLabelRequest generateLabelRequest, CourierService service, string type)
+        public static string  MappingStreamOrderRequest(GenerateLabelRequest generateLabelRequest, CourierService service, string type, string LocationName, string Handsondate)
         {
             if (type == "COLLECTION")
             {
@@ -420,7 +421,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.header.customer.contact.tel1 = generateLabelRequest.Phone;
                 streamOrderRequest.header.customer.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.header.customer.contact.optOutEmail = false;
-                streamOrderRequest.header.customer.contact.optOutSms = false;
+                streamOrderRequest.header.customer.contact.optOutSms = false;  
                 streamOrderRequest.header.customerOrderNo = generateLabelRequest.OrderReference;
                 streamOrderRequest.header.driverNotes = generateLabelRequest.DeliveryNote;
                 streamOrderRequest.header.cutOffTimeMet = true;
@@ -454,8 +455,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             description = item.ItemName,
                             quantity = item.Quantity,
                             weight = item.UnitWeight,
-                            stockLocation = "SGK",
-                            onHandDate = ""
+                            stockLocation = LocationName,
+                            onHandDate = Handsondate
                         });
                         itemCount++;
                     }
@@ -514,8 +515,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             description = item.ItemName,
                             quantity = item.Quantity,
                             weight = item.UnitWeight,
-                            stockLocation = "SGK",
-                            onHandDate = ""
+                            stockLocation = LocationName,
+                            onHandDate = Handsondate
                         });
                         itemCount++;
                     }

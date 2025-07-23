@@ -38,6 +38,21 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
                 Email = auth.Email;
+
+                string LocationName = "SGK";
+                string HandsonDate = "";
+
+                if (auth.HandsOnDate)
+                {
+                    HandsonDate = DateTime.Now.ToString();
+                }
+                if (auth.UseDefaultLocation && auth.DefaultLocation!="")
+                {
+                    LocationName = auth.DefaultLocation;
+                }
+
+
+
                 SqlHelper.SystemLogInsert("CreateOrder", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false,auth.Email);
                 // load all the services we have (either for this user specifically or all services)
                 List<CourierService> services = Services.GetServices;
@@ -51,7 +66,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 // get the service code
                 string serviceCode = selectedService.ServiceCode;
-                //and some other information, whatever we need
+                //and some other information, whatever we need 
                 string VendorCode = selectedService.ServiceGroup;
 
                 //create response class, we will be adding packages to it
@@ -60,7 +75,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var manageToken = new ManageToken(_unitOfWork, _au,  _context);
                 var streamAuth = _manageToken.GetToken(auth);
 
-                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString());
+                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString(),LocationName,HandsonDate);
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
                  */
@@ -131,7 +146,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 {
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
-                Email = auth.Email; 
+                Email = auth.Email;
+                string LocationName = "SGK";
+                string HandsonDate = "";
+
+                if (auth.HandsOnDate)
+                {
+                    HandsonDate = DateTime.Now.ToString();
+                }
+                if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+                {
+                    LocationName = auth.DefaultLocation;
+                }
+
                 SqlHelper.SystemLogInsert("CreateOrder", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
                 // load all the services we have (either for this user specifically or all services)
                 List<CourierService> services = Services.GetServices;
@@ -155,7 +182,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
                 //var streamAuth = manageToken.GetToken(auth);
 
-                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString());
+                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString(),LocationName,HandsonDate);
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
                  */
