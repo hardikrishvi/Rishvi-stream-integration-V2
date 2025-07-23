@@ -451,7 +451,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 return StatusCode(500, "An unexpected error occurred while dispatching the order.");
             }
         }
-
+       
         [NonAction]
         public async Task UpdateOrderIdentifier(string linntoken, int orderid, string identifier)
         {
@@ -748,7 +748,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 CreatedAt = DateTime.Now,
                 UpdatedAt = null
             };
-            var run = new Run
+            Run run = new Run();
+            if (output.webhook.run!=null)
+            {
+
+
+             run = new Run
             {
                 loadId = output.webhook.run.loadId,
                 status = output.webhook.run.status,
@@ -756,11 +761,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 CreatedAt = DateTime.Now,
                 UpdatedAt = null
             };
-            SqlHelper.SystemLogInsert("Webhook", "", $"Subscription: {JsonConvert.SerializeObject(subscription)}, Event: {JsonConvert.SerializeObject(@event)}, Run: {JsonConvert.SerializeObject(run)}", "", "ProcessedWebhook", "Webhook data processed", false, "Webhook");
+                _run.Add(run);
+            }
+            SqlHelper.SystemLogInsert("Webhook", "", $"Subscription: {JsonConvert.SerializeObject(subscription)}, Event: {JsonConvert.SerializeObject(@event)}, Run: { JsonConvert.SerializeObject(run)}", "", "ProcessedWebhook", "Webhook data processed", false, "Webhook");
 
             _subscription.Add(subscription);
             _event.Add(@event);
-            _run.Add(run);
+            
             foreach (var order in output.webhook.orders)
             {
                 var webhookOrder = new WebhookOrder
@@ -831,7 +838,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 
                                 if (strorderdaat != null)
                                 {
-                                    if (strorderdaat.response.valid)
+                                    if (strorderdaat.response.valid)  
                                     {
                                         foreach (var gr in strorderdaat.response.order.groups)
                                         {

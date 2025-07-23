@@ -86,13 +86,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\Friday.png">
+    <Content Update="wwwroot\FRIDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\main.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Monday.png">
+    <Content Update="wwwroot\MONDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\profile.html">
@@ -101,22 +101,22 @@
     <Content Update="wwwroot\report.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Saturday.png">
+    <Content Update="wwwroot\SATURDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Sunday.png">
+    <Content Update="wwwroot\SUNDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\sync.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Thrusday.png">
+    <Content Update="wwwroot\THRUSDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Tuesday.png">
+    <Content Update="wwwroot\TUESDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Wednesday.png">
+    <Content Update="wwwroot\WEDNESDAY.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

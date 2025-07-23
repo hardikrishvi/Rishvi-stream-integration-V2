@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
-using System.Text;
-using Hangfire;
+﻿using Hangfire;
+using LinnworksAPI;
 using LinnworksMacroHelpers.Classes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +13,8 @@ using Rishvi.Modules.Core.Data;
 using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
+using System.Text;
+using System.Text.Json;
 using YamlDotNet.Core.Tokens;
 using ZXing.Aztec.Internal;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -238,11 +239,79 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             return Ok("Recurring job setup complete.");
         }
 
+        private async Task SaveNewIdentifier(LinnworksBaseStream obj, string identifierTag)
+        {
+            string requestJson = $"identifierTag: {identifierTag}";
+            var standardizedIdentifierTag = identifierTag.ToUpper();
+            var img = $"https://stream-api-stg.rishvi.app/{identifierTag.Replace(" ", "")}.png";
+            await Task.Run(() =>
+            {
+               
+                obj.Api.OpenOrders.SaveIdentifier(new SaveIdentifiersRequest
+                {
+                    Identifier = new Identifier
+                    {
+                        Name = identifierTag.ToUpper(),
+                        Tag = identifierTag.ToUpper(),
+                        IsCustom = true,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = img
+                    }
+                });
+            });
+            SqlHelper.SystemLogInsert("SaveNewIdentifier", null, requestJson, null, "Success", $"New identifier {standardizedIdentifierTag} saved successfully.", false, obj.Api.GetSessionId().ToString());
+
+        }
+
         [HttpPost, Route("PostalService")]
         public async Task<IActionResult> PostalService()
         {
             try
             {
+                var listuser = _dbSqlCContext.Authorizations.ToList();
+
+                var uniqueEmailUsers = listuser
+                    .GroupBy(x => x.Email)
+                    .Select(g => g.Last())
+                    .ToList();
+
+
+                foreach (var item in uniqueEmailUsers)
+                {
+                    var obj = new LinnworksBaseStream(item.LinnworksToken);
+                    
+                    string Runidentifier = "RUN 01,RUN 02,RUN 03,RUN 04,RUN 05,RUN 06,RUN 07,RUN 08";
+                    var identifiers = obj.Api.OpenOrders.GetIdentifiers();
+
+                    foreach (var strrun in Runidentifier.Split(','))
+                    {
+
+                        if (!identifiers.Any(d => d.Tag == strrun))
+                        {
+                            // Save the new identifier
+                            SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, item.Email, null, "SaveIdentifier", $"Saving new identifier {strrun}.", false, item.LinnworksToken);
+                            await SaveNewIdentifier(obj, strrun);
+                        }
+                    }
+
+                    string Days = "SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THRUSDAY,FRIDAY,SATURDAY";
+
+                    
+                    foreach (var strrun in Runidentifier.Split(','))
+                    {
+
+                        if (!identifiers.Any(d => d.Tag == strrun))
+                        {
+                            // Save the new identifier
+                            SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, item.Email, null, "SaveIdentifier", $"Saving new identifier {strrun}.", false, item.LinnworksToken);
+                            await SaveNewIdentifier(obj, strrun);
+                        }
+                    }
+                }
+
+              
+
+
                 var list_user = await _dbSqlCContext.Authorizations.ToListAsync();  // Use async to avoid blocking
 
                 foreach (var user in list_user)
