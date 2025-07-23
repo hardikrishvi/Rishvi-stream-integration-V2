@@ -358,7 +358,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                 // Serialize to indented JSON
                 var json = JsonConvert.SerializeObject(orderRoot);
+                string LocationName = "SGK";
+                string HandsonDate = "";
 
+                if (auth.HandsOnDate)
+                {
+                    HandsonDate = DateTime.Now.ToString();
+                }
+                if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+                {
+                    LocationName = auth.DefaultLocation;
+                }
                 int orderId = Convert.ToInt32(StreamOrderId);
                 try
                 {
@@ -395,7 +405,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Region = jsopndata.CustomerInfo.Address.Region,
                         Town = jsopndata.CustomerInfo.Address.Town,
 
-                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId);
+                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId,LocationName,HandsonDate);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
                     //if (streamOrderResponse.Item1.response == null)
@@ -471,6 +481,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                     var auth1 = _dbSqlCContext.Authorizations.Where(x => x.AuthorizationToken == dta.AuthorizationToken).FirstOrDefault();
 
+                    string LocationName = "SGK";
+                    string HandsonDate = "";
+
+                    if (auth.HandsOnDate)
+                    {
+                        HandsonDate = DateTime.Now.ToString();
+                    }
+                    if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+                    {
+                        LocationName = auth.DefaultLocation;
+                    }
+
                     var streamAuth = _manageToken.GetToken(auth1);
                     if (streamAuth.AccessToken != null)
                     {
@@ -514,35 +536,33 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                                         }).ToList()
                                   }},
-                                    ServiceConfigItems = new List<ServiceConfigItem>(),
-                                    OrderExtendedProperties = new List<Models.ExtendedProperty>(),
-                                    Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
-                                    Region = jsopndata.CustomerInfo.Address.Region,
-                                    Town = jsopndata.CustomerInfo.Address.Town
-                                }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null);
-                                streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
-                                streamOrderResponse.Item1.ItemId = "";
-                                if (streamOrderResponse.Item1.response == null)
-                                {
-                                    SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
-                                }
-                                else
-                                {
-                                    SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
-                                        streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
-                                }
-                            }
-                            catch
+                                ServiceConfigItems = new List<ServiceConfigItem>(),
+                                OrderExtendedProperties = new List<Models.ExtendedProperty>(),
+                                Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
+                                Region = jsopndata.CustomerInfo.Address.Region,
+                                Town = jsopndata.CustomerInfo.Address.Town
+                            }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null,LocationName,HandsonDate);
+                            streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
+                            streamOrderResponse.Item1.ItemId = "";
+                            if (streamOrderResponse.Item1.response == null)
                             {
-                                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
+                                SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                            }
+                            else
+                            {
+                                SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
+                                    streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
                             }
                         }
-                        else
+                        catch
                         {
                             SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                         }
                     }
-                    
+                    else
+                    {
+                        SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
+                    }
                 }
                 catch (Exception ex)
                 {
