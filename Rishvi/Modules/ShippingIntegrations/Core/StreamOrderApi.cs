@@ -515,6 +515,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             quantity = item.Quantity,
                             weight = item.UnitWeight,
                             stockLocation = "SGK",
+                            onHandDate = ""
                         });
                         itemCount++;
                     }

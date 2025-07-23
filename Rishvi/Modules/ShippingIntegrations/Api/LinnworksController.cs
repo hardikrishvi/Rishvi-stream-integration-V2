@@ -824,7 +824,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     _unitOfWork.Context.SaveChanges();
                                 }
 
-                                var logindata = await _configController.Get(user.Email);
+                                var logindata = _dbSqlCContext.Authorizations.Where(x => x.Email == user.Email).FirstOrDefault();
+
+                               // var logindata = await _configController.Get(user.Email);
                                 var strorderdaat = await _streamController.GetStreamOrder(user.AuthorizationToken, Stream_orderid);
                                 
                                 if (strorderdaat != null)
@@ -862,11 +864,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                             string LinnworksSyncToken = "";
                                             string Email = "";
 
-                                            if (logindata is OkObjectResult okResult)
+                                            if (logindata !=null)
                                             {
-                                                var userData = okResult.Value as RegistrationData;
-                                                LinnworksSyncToken = userData.LinnworksSyncToken;
-                                                Email = userData.Email;
+                                               // var userData = okResult.Value as RegistrationData;
+                                                LinnworksSyncToken = logindata.LinnworksToken;
+                                                Email = logindata.Email;
                                             }
                                             var webhookOrder1 = new WebhookOrder
                                             {
@@ -919,12 +921,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                                     //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, Regex.Split(gr.planned.fromDateTime, "T")[0]);
 
                                                 }
+                                                if (Stream_rundescription!=null)
+                                                {
+                                                    await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), Stream_rundescription);
+                                                }
 
                                                 if (gr.planned.fromDateTime != null)
                                                 {
                                                     var dte = DateTime.SpecifyKind(
-    DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")),
-    DateTimeKind.Utc);
+                                                                                    DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")),
+                                                                                    DateTimeKind.Utc);
                                                     await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
                                                    // DateTime.Parse(gr.planned.fromDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).Date);
                                                    DateTime.SpecifyKind(DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")), DateTimeKind.Local));

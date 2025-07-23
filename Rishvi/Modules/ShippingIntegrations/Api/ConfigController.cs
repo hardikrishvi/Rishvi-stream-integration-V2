@@ -103,7 +103,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var transformedEmail = _serviceHelper.TransformEmail(email);
                 //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
 
-                var getData = _dbContext.IntegrationSettings
+                var getData = _dbContext.Authorizations
                     .FirstOrDefault(x => x.Email == email);
 
                 // Retrieve the file directly

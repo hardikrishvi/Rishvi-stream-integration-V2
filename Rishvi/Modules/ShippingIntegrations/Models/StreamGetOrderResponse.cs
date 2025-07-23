@@ -80,7 +80,7 @@
             public bool confirmedPlanning { get; set; }
             public string liveDate { get; set; }
             public int quantity { get; set; }
-            public int weight { get; set; }
+            public decimal weight { get; set; }
             public double cube { get; set; }
             public TimeOnSite timeOnSite { get; set; }
             public bool bookingRequired { get; set; }
@@ -101,7 +101,7 @@
             public Partner partner { get; set; }
             public string orderNo { get; set; }
             public string customerOrderNo { get; set; }
-            public int orderWeight { get; set; }
+            public decimal orderWeight { get; set; }
             public bool assemblyRequired { get; set; }
             public string orderStatus { get; set; }
             public string collectionStatus { get; set; }
@@ -125,7 +125,7 @@
             public string code { get; set; }
             public string description { get; set; }
             public int quantity { get; set; }
-            public int weight { get; set; }
+            public decimal weight { get; set; }
             public double cube { get; set; }
             public string stockLocation { get; set; }
             public string onHandDate { get; set; }

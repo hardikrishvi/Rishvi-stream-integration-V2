@@ -65,6 +65,9 @@
         public decimal Width { get; set; }
         public decimal Length { get; set; }
 
+        public string stockLocation { get; set; }
+        public string onHandDate { get; set; }
+
         public List<ExtendedProperty> ExtendedProperties = new List<ExtendedProperty>();
     }
 
