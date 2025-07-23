@@ -115,17 +115,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 //streamOrder.re.Addresses ??= new StreamGetOrderResponse.Addresses();
                 //StreamGetOrderResponse.Address address = streamOrder.StreamGetOrderResponse.Addresses.Address1 ?? new StreamGetOrderResponse.Address();
 
-
-                if (streamOrder?.response?.order?.header?.customer?.address?.address1 !=
-                    generateLabelRequest.AddressLine1)
-                {
+                
+               
                     changes.Add("address1", generateLabelRequest.AddressLine1);
-                }
-                if (streamOrder?.response?.order?.header?.customer?.address?.address2 !=
-                    generateLabelRequest.AddressLine2)
-                {
+               
+                
                     changes.Add("address2", generateLabelRequest.AddressLine2);
-                }
+               
                 if (streamOrder?.response?.order?.header?.customer?.address?.address3 !=
                     generateLabelRequest.AddressLine3)
                 {
@@ -136,21 +132,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 {
                     changes.Add("postcode", generateLabelRequest.Postalcode);
                 }
-                if (streamOrder?.response?.order?.header?.customer?.address?.name !=
-                    generateLabelRequest.Name)
-                {
+               
                     changes.Add("name", generateLabelRequest.Name);
-                }
-                if(streamOrder?.response?.order?.header?.customer?.contact?.email !=
-                    generateLabelRequest.Email)
-                {
+              
                     changes.Add("email", generateLabelRequest.Email);
-                }
-                if(streamOrder?.response?.order?.header?.customer?.contact?.tel1 !=
-                    generateLabelRequest.Phone)
-                {
+                
+               
                     changes.Add("phone", generateLabelRequest.Phone);
-                }
+              
                 if (streamOrder?.response?.order?.groups?.FirstOrDefault()?.driverNotes !=
                     generateLabelRequest.DeliveryNote)
                 {
