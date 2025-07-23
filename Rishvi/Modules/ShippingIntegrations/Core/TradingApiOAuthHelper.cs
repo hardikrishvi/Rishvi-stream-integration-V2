@@ -358,7 +358,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                 // Serialize to indented JSON
                 var json = JsonConvert.SerializeObject(orderRoot);
+                string LocationName = "SGK";
+                string HandsonDate = "";
 
+                if (auth.HandsOnDate)
+                {
+                    HandsonDate = DateTime.Now.ToString();
+                }
+                if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+                {
+                    LocationName = auth.DefaultLocation;
+                }
                 int orderId = Convert.ToInt32(StreamOrderId);
                 try
                 {
@@ -395,7 +405,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Region = jsopndata.CustomerInfo.Address.Region,
                         Town = jsopndata.CustomerInfo.Address.Town,
 
-                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId);
+                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId,LocationName,HandsonDate);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
                     //if (streamOrderResponse.Item1.response == null)
