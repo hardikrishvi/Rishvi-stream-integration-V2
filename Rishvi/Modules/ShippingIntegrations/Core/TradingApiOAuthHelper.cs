@@ -536,38 +536,40 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                                         }).ToList()
                                   }},
-                                ServiceConfigItems = new List<ServiceConfigItem>(),
-                                OrderExtendedProperties = new List<Models.ExtendedProperty>(),
-                                Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
-                                Region = jsopndata.CustomerInfo.Address.Region,
-                                Town = jsopndata.CustomerInfo.Address.Town
-                            }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null,LocationName,HandsonDate);
-                            streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
-                            streamOrderResponse.Item1.ItemId = "";
-                            if (streamOrderResponse.Item1.response == null)
-                            {
-                                SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                    ServiceConfigItems = new List<ServiceConfigItem>(),
+                                    OrderExtendedProperties = new List<Models.ExtendedProperty>(),
+                                    Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
+                                    Region = jsopndata.CustomerInfo.Address.Region,
+                                    Town = jsopndata.CustomerInfo.Address.Town
+                                }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null, LocationName, HandsonDate);
+                                streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
+                                streamOrderResponse.Item1.ItemId = "";
+                                if (streamOrderResponse.Item1.response == null)
+                                {
+                                    SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                }
+                                else
+                                {
+                                    SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
+                                        streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                                }
                             }
-                            else
+                            catch
                             {
-                                SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
-                                    streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                             }
                         }
-                        catch
+                        else
                         {
                             SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                         }
-                    }
-                    else
-                    {
-                        SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                     }
                 }
                 catch (Exception ex)
                 {
                     SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Postal Service not found: " + OrderId, true, "clientId");
                 }
+            
             }
         }
         public async Task DispatchOrderInLinnworks(Rishvi.Models.Authorization _User, int OrderRef, string linntoken,
