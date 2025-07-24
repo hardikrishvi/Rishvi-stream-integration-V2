@@ -897,26 +897,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                                 SqlHelper.SystemLogInsert("Webhook", "", $"Updating Linnworks order {linnworksorderid} with tracking info", "", "LinnworksTrackingUpdate", $"Updating Linnworks order {linnworksorderid} with tracking ID {Stream_trackingId}", false, "Webhook");
 
                                                 await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
-                                                    {"Stream_runloadid",Stream_runloadid },
-                                                    {"Stream_runstatus",Stream_runstatus },
-                                                    {"Stream_rundescription",Stream_rundescription },
-                                                    {"Stream_orderid",Stream_orderid },
+                                                    //{"Stream_runloadid",Stream_runloadid },
+                                                    //{"Stream_runstatus",Stream_runstatus },
+                                                    //{"Stream_rundescription",Stream_rundescription },
+                                                    //{"Stream_orderid",Stream_orderid },
                                                     {"Stream_driverName",Stream_driverName },
-                                                    {"Stream_driver",Stream_driver},
-                                                    {"Stream_vehicle",Stream_vehicle },
+                                                   // {"Stream_driver",Stream_driver},
+                                                   // {"Stream_vehicle",Stream_vehicle },
                                                     {"Stream_vehicleName",Stream_vehicleName },
-                                                    {"Stream_status",Stream_status },
+                                                   // {"Stream_status",Stream_status },
                                                     {"Stream_driverNotes",Stream_driverNotes },
-                                                    {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
-                                                    {"Stream_vehicleType",Stream_vehicleType },
-                                                    {"Stream_dispatched",Stream_dispatched },
-                                                    {"stream_GroupSequence",stream_GroupSequence },
-                                                    {"Stream_departed",Stream_departed },
-                                                    {"Stream_completed",Stream_completed},
-                                                    {"Stream_startActualDateTime", Stream_startActualDateTime},
-                                                    {"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
-                                                    {"Stream_endActualDateTime",Stream_endActualDateTime },
-                                                    { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
+                                                    //{"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
+                                                   // {"Stream_vehicleType",Stream_vehicleType },
+                                                    //{"Stream_dispatched",Stream_dispatched },
+                                                    //{"Stream_departed",Stream_departed },
+                                                    //{"Stream_completed",Stream_completed},
+                                                    //{"Stream_startActualDateTime", Stream_startActualDateTime},
+                                                    //{"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
+                                                    //{"Stream_endActualDateTime",Stream_endActualDateTime },
+                                                    //{ "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
                                                 });
                                                 if (gr.estimateArrivalDateTime != "0")
                                                 {
@@ -1024,25 +1023,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                 {
                                     await _tradingApiOAuthHelper.UpdateOrderExProperty(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), new Dictionary<string, string>() {
-                                {"Stream_runloadid",Stream_runloadid },
-                                {"Stream_runstatus",Stream_runstatus },
-                                {"Stream_rundescription",Stream_rundescription },
-                                {"Stream_orderid",Stream_orderid },
+                                //{"Stream_runloadid",Stream_runloadid },
+                                //{"Stream_runstatus",Stream_runstatus },
+                                //{"Stream_rundescription",Stream_rundescription },
+                                //{"Stream_orderid",Stream_orderid },
                                 {"Stream_driverName",Stream_driverName },
-                                {"Stream_driver",Stream_driver},
-                                {"Stream_vehicle",Stream_vehicle },
+                               // {"Stream_driver",Stream_driver},
+                               // {"Stream_vehicle",Stream_vehicle },
                                 {"Stream_vehicleName",Stream_vehicleName },
-                                {"Stream_status",Stream_status },
+                               // {"Stream_status",Stream_status },
                                 {"Stream_driverNotes",Stream_driverNotes },
-                                {"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
-                                {"Stream_vehicleType",Stream_vehicleType },
-                                {"Stream_dispatched",Stream_dispatched },
-                                {"Stream_departed",Stream_departed },
-                                {"Stream_completed",Stream_completed},
-                                {"Stream_startActualDateTime", Stream_startActualDateTime},
-                                {"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
-                                {"Stream_endActualDateTime",Stream_endActualDateTime },
-                                { "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
+                                //{"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
+                               // {"Stream_vehicleType",Stream_vehicleType },
+                                //{"Stream_dispatched",Stream_dispatched },
+                                //{"Stream_departed",Stream_departed },
+                                //{"Stream_completed",Stream_completed},
+                                //{"Stream_startActualDateTime", Stream_startActualDateTime},
+                                //{"Stream_startPlannedDateTime", Stream_startPlannedDateTime},
+                                //{"Stream_endActualDateTime",Stream_endActualDateTime },
+                                //{ "Stream_endPlannedDateTime",Stream_endPlannedDateTime }
                             });
                                     if (gr.estimateArrivalDateTime != "0")
                                     {
