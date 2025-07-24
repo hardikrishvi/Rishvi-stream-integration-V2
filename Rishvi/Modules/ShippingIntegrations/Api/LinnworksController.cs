@@ -890,7 +890,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                             };
                                             _webhookOrder.Add(webhookOrder1);
                                             _unitOfWork.Context.SaveChanges();
-
+                                            Task.Delay(5000);
                                             // update on linnworks
                                             if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                             {
@@ -1019,6 +1019,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     LinnworksSyncToken = userData.LinnworksSyncToken;
                                     Email = userData.Email;
                                 }
+                                Task.Delay(5000);
                                 // update on linnworks
                                 if (linnworksorderid.IsValidInt32() && !String.IsNullOrEmpty(LinnworksSyncToken))
                                 {
