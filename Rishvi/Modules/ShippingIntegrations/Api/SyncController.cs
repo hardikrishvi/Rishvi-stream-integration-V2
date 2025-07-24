@@ -196,7 +196,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                var listuser = _dbSqlCContext.Authorizations.ToList();
+                var listuser = _dbSqlCContext.Authorizations.OrderByDescending(x => x.Id).ToList();
 
                 var uniqueEmailUsers = listuser
                     .GroupBy(x => x.Email)
@@ -313,22 +313,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     string Days = "SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THRUSDAY,FRIDAY,SATURDAY";
 
                     
-                    foreach (var strrun in Runidentifier.Split(','))
+                    foreach (var strrun1 in Days.Split(','))
                     {
 
-                        if (!identifiers.Any(d => d.Tag == strrun))
+                        if (!identifiers.Any(d => d.Tag == strrun1))
                         {
                             // Save the new identifier
-                            SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, item.Email, null, "SaveIdentifier", $"Saving new identifier {strrun}.", false, item.LinnworksToken);
-                            await SaveNewIdentifier(obj, strrun);
+                            SqlHelper.SystemLogInsert("UpdateOrderIdentifier", null, item.Email, null, "SaveIdentifier", $"Saving new identifier {strrun1}.", false, item.LinnworksToken);
+                            await SaveNewIdentifier(obj, strrun1);
                         }
                     }
                 }
 
-              
 
 
-                var list_user = await _dbSqlCContext.Authorizations.ToListAsync();  // Use async to avoid blocking
+
+                // var list_user = await _dbSqlCContext.Authorizations.ToListAsync();  // Use async to avoid blocking
+                var list_user = await _dbSqlCContext.Authorizations
+     .OrderByDescending(x => x.Id) // or x.CreatedAt
+     .ToListAsync();
 
                 foreach (var user in list_user)
                 {
@@ -341,105 +344,272 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     };
                     request.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
 
-                    // Perform the web request and get the response
                     var upload = obj.ProxyFactory.WebRequest(request);
                     var data = Encoding.UTF8.GetString(upload.RawResponse);
 
                     string accountId = user.AccountName;
 
-                    // Parse the JSON
-                    //using JsonDocument doc = JsonDocument.Parse(data);
-                    //var root = doc.RootElement.EnumerateArray();
-
-                    // Parse the JSON response
                     using JsonDocument doc = JsonDocument.Parse(data);
                     var root = doc.RootElement;
 
-
                     if (root.ValueKind == JsonValueKind.Array)
                     {
-                        // Process the array if the root is an array
                         var result = root.EnumerateArray()
                             .FirstOrDefault(x =>
                                 x.TryGetProperty("Vendor", out var vendor) && vendor.GetString() == "Stream Shipping" &&
                                 x.TryGetProperty("AccountId", out var account) && account.GetString() == accountId
                             );
 
-                        // If no result is found, handle it accordingly
-                        if (result.ValueKind != JsonValueKind.Undefined)
+                        if (result.ValueKind == JsonValueKind.Object &&
+                            result.TryGetProperty("pkShippingAPIConfigId", out var pkShippingAPIConfigIdProp) &&
+                            pkShippingAPIConfigIdProp.TryGetInt32(out int pkShippingAPIConfigId))
                         {
-                            // Safely extract the pkShippingAPIConfigId
-                            if (result.TryGetProperty("pkShippingAPIConfigId", out var pkShippingAPIConfigIdProp))
+                            // Save to user and commit
+                            user.ShippingApiConfigId = pkShippingAPIConfigId;
+                            _dbSqlCContext.Update(user);
+                            await _unitOfWork.CommitAsync();
+
+                            // Fetch Postal Services
+                            ProxiedWebRequest requestb = new ProxiedWebRequest
                             {
-                                int pkShippingAPIConfigId = pkShippingAPIConfigIdProp.GetInt32(); // GetInt32() is a better fit for an ID.
+                                Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices",
+                                Method = "POST"
+                            };
+                            requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
 
-                                // Update the Authorization with the ShippingApiConfigId
-                                user.ShippingApiConfigId = pkShippingAPIConfigId;
-                                _dbSqlCContext.Update(user);
-                                await _unitOfWork.CommitAsync();  // Async commit
+                            var uploadb = obj.ProxyFactory.WebRequest(requestb);
+                            using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
+                            var root1 = doc1.RootElement;
 
-                                // Fetch Postal Services
-                                ProxiedWebRequest requestb = new ProxiedWebRequest
+                            if (root1.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var item in root1.EnumerateArray())
                                 {
-                                    Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices",
-                                    Method = "POST"
-                                };
-                                requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
-
-                                // Perform the web request and get the response
-                                var uploadb = obj.ProxyFactory.WebRequest(requestb);
-
-                                using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
-                                var root1 = doc1.RootElement;
-
-                                if (root1.ValueKind == JsonValueKind.Array)
-                                {
-                                    foreach (var item in root1.EnumerateArray())
+                                    if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
+                                        configIdElement.TryGetInt32(out int configId) &&
+                                        configId == pkShippingAPIConfigId)
                                     {
-                                        if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
-                                            configIdElement.GetInt16() == pkShippingAPIConfigId)
+                                        string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl) &&
+                                                             nameEl.ValueKind == JsonValueKind.String
+                                            ? nameEl.GetString()
+                                            : null;
+
+                                        string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl) &&
+                                                           idEl.ValueKind == JsonValueKind.String
+                                            ? idEl.GetString()
+                                            : null;
+
+                                        var get_service = await _dbSqlCContext.PostalServices
+                                            .Where(x => x.PostalServiceId == serviceId &&
+                                                        x.AuthorizationToken == user.AuthorizationToken)
+                                            .FirstOrDefaultAsync();
+
+                                        if (get_service == null)
                                         {
-                                            string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
-                                                ? nameEl.GetString() : null;
-
-                                            string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
-                                                ? idEl.GetString() : null;
-
-                                            var get_service = await _dbSqlCContext.PostalServices
-                                                .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == user.AuthorizationToken)
-                                                .FirstOrDefaultAsync();  // Use async query
-
-                                            if (get_service == null)
+                                            var postalService = new PostalServices
                                             {
-                                                // Create new entity
-                                                var postalService = new PostalServices
-                                                {
-                                                    AuthorizationToken = user.AuthorizationToken, // use your existing token variable
-                                                    PostalServiceId = serviceId,
-                                                    PostalServiceName = serviceName,
-                                                    CreatedAt = DateTime.UtcNow,
-                                                    UpdatedAt = DateTime.UtcNow
-                                                };
+                                                AuthorizationToken = user.AuthorizationToken,
+                                                PostalServiceId = serviceId,
+                                                PostalServiceName = serviceName,
+                                                CreatedAt = DateTime.UtcNow,
+                                                UpdatedAt = DateTime.UtcNow
+                                            };
 
-                                                // Add to DbContext
-                                                await _dbSqlCContext.PostalServices.AddAsync(postalService);  // Async insert
-                                            }
+                                            await _dbSqlCContext.PostalServices.AddAsync(postalService);
                                         }
                                     }
                                 }
+                            }
 
-                                await _unitOfWork.CommitAsync();  // Async commit after all the changes
-                                
-                            }
-                            else
-                            {
-                                throw new Exception("Missing 'pkShippingAPIConfigId' property in the response.");
-                            }
+                            await _unitOfWork.CommitAsync();
                         }
                     }
 
                     await Task.Delay(TimeSpan.FromMinutes(1));
                 }
+
+
+                //            foreach (var user in list_user)
+                //            {
+                //                var obj = new LinnworksBaseStream(user.LinnworksToken);
+
+                //                ProxiedWebRequest request = new ProxiedWebRequest
+                //                {
+                //                    Url = "https://eu-ext.linnworks.net/api/ShippingService/GetIntegrations",
+                //                    Method = "POST"
+                //                };
+                //                request.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+
+                //                // Perform the web request and get the response
+                //                var upload = obj.ProxyFactory.WebRequest(request);
+                //                var data = Encoding.UTF8.GetString(upload.RawResponse);
+
+                //                string accountId = user.AccountName;
+
+                //                // Parse the JSON
+                //                //using JsonDocument doc = JsonDocument.Parse(data);
+                //                //var root = doc.RootElement.EnumerateArray();
+
+                //                // Parse the JSON response
+                //                using JsonDocument doc = JsonDocument.Parse(data);
+                //                var root = doc.RootElement;
+
+
+                //                if (root.ValueKind == JsonValueKind.Array)
+                //                {
+                //                    // Process the array if the root is an array
+                //                    //var result = root.EnumerateArray()
+                //                    //    .FirstOrDefault(x =>
+                //                    //        x.TryGetProperty("Vendor", out var vendor) && vendor.GetString() == "Stream Shipping" &&
+                //                    //        x.TryGetProperty("AccountId", out var account) && account.GetString() == accountId
+                //                    //    );
+
+                //                    var matches = root.EnumerateArray()
+                //.Where(x =>
+                //    x.TryGetProperty("Vendor", out var vendor) && vendor.GetString() == "Stream Shipping")
+                //.ToList(); // Check if this already filters anything
+
+                //                    var result = matches
+                //                        .Where(x =>
+                //                            x.TryGetProperty("AccountId", out var account) && account.GetString() == accountId)
+                //                        .ToList(); // Then check this
+
+
+                //                    // If no result is found, handle it accordingly
+                //                    //if (result.ValueKind != JsonValueKind.Undefined)
+                //                    //{
+                //                    //    // Safely extract the pkShippingAPIConfigId
+                //                    //    if (result.TryGetProperty("pkShippingAPIConfigId", out var pkShippingAPIConfigIdProp))
+                //                    //    {
+                //                    //        int pkShippingAPIConfigId = pkShippingAPIConfigIdProp.GetInt32(); // GetInt32() is a better fit for an ID.
+
+                //                    //        // Update the Authorization with the ShippingApiConfigId
+                //                    //        user.ShippingApiConfigId = pkShippingAPIConfigId;
+                //                    //        _dbSqlCContext.Update(user);
+                //                    //        await _unitOfWork.CommitAsync();  // Async commit
+
+                //                    //        // Fetch Postal Services
+                //                    //        ProxiedWebRequest requestb = new ProxiedWebRequest
+                //                    //        {
+                //                    //            Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices",
+                //                    //            Method = "POST"
+                //                    //        };
+                //                    //        requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+
+                //                    //        // Perform the web request and get the response
+                //                    //        var uploadb = obj.ProxyFactory.WebRequest(requestb);
+
+                //                    //        using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
+                //                    //        var root1 = doc1.RootElement;
+
+                //                    //        if (root1.ValueKind == JsonValueKind.Array)
+                //                    //        {
+                //                    //            foreach (var item in root1.EnumerateArray())
+                //                    //            {
+                //                    //                if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
+                //                    //                    configIdElement.GetInt16() == pkShippingAPIConfigId)
+                //                    //                {
+                //                    //                    string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl)
+                //                    //                        ? nameEl.GetString() : null;
+
+                //                    //                    string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl)
+                //                    //                        ? idEl.GetString() : null;
+
+                //                    //                    var get_service = await _dbSqlCContext.PostalServices
+                //                    //                        .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == user.AuthorizationToken)
+                //                    //                        .FirstOrDefaultAsync();  // Use async query
+
+                //                    //                    if (get_service == null)
+                //                    //                    {
+                //                    //                        // Create new entity
+                //                    //                        var postalService = new PostalServices
+                //                    //                        {
+                //                    //                            AuthorizationToken = user.AuthorizationToken, // use your existing token variable
+                //                    //                            PostalServiceId = serviceId,
+                //                    //                            PostalServiceName = serviceName,
+                //                    //                            CreatedAt = DateTime.UtcNow,
+                //                    //                            UpdatedAt = DateTime.UtcNow
+                //                    //                        };
+
+                //                    //                        // Add to DbContext
+                //                    //                        await _dbSqlCContext.PostalServices.AddAsync(postalService);  // Async insert
+                //                    //                    }
+                //                    //                }
+                //                    //            }
+                //                    //        }
+
+                //                    //        await _unitOfWork.CommitAsync();  // Async commit after all the changes
+
+                //                    //    }
+                //                    //    else
+                //                    //    {
+                //                    //        throw new Exception("Missing 'pkShippingAPIConfigId' property in the response.");
+                //                    //    }
+                //                    //}
+                //                    if (result.ValueKind == JsonValueKind.Object &&
+                //result.TryGetProperty("pkShippingAPIConfigId", out var pkShippingAPIConfigIdProp) &&
+                //pkShippingAPIConfigIdProp.TryGetInt32(out int pkShippingAPIConfigId))
+                //                    {
+                //                        user.ShippingApiConfigId = pkShippingAPIConfigId;
+                //                        _dbSqlCContext.Update(user);
+                //                        await _unitOfWork.CommitAsync();
+
+                //                        ProxiedWebRequest requestb = new ProxiedWebRequest
+                //                        {
+                //                            Url = "https://eu-ext.linnworks.net/api/ShippingService/GetPostalServices",
+                //                            Method = "POST"
+                //                        };
+                //                        requestb.Headers.Add("Authorization", obj.Api.GetSessionId().ToString());
+
+                //                        var uploadb = obj.ProxyFactory.WebRequest(requestb);
+
+                //                        using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
+                //                        var root1 = doc1.RootElement;
+
+                //                        if (root1.ValueKind == JsonValueKind.Array)
+                //                        {
+                //                            foreach (var item in root1.EnumerateArray())
+                //                            {
+                //                                if (item.TryGetProperty("fkShippingAPIConfigId", out var configIdElement) &&
+                //                                    configIdElement.TryGetInt32(out int configId) &&
+                //                                    configId == pkShippingAPIConfigId)
+                //                                {
+                //                                    string serviceName = item.TryGetProperty("PostalServiceName", out var nameEl) &&
+                //                                                         nameEl.ValueKind == JsonValueKind.String
+                //                                                         ? nameEl.GetString() : null;
+
+                //                                    string serviceId = item.TryGetProperty("pkPostalServiceId", out var idEl) &&
+                //                                                       idEl.ValueKind == JsonValueKind.String
+                //                                                       ? idEl.GetString() : null;
+
+                //                                    var get_service = await _dbSqlCContext.PostalServices
+                //                                        .Where(x => x.PostalServiceId == serviceId && x.AuthorizationToken == user.AuthorizationToken)
+                //                                        .FirstOrDefaultAsync();
+
+                //                                    if (get_service == null)
+                //                                    {
+                //                                        var postalService = new PostalServices
+                //                                        {
+                //                                            AuthorizationToken = user.AuthorizationToken,
+                //                                            PostalServiceId = serviceId,
+                //                                            PostalServiceName = serviceName,
+                //                                            CreatedAt = DateTime.UtcNow,
+                //                                            UpdatedAt = DateTime.UtcNow
+                //                                        };
+
+                //                                        await _dbSqlCContext.PostalServices.AddAsync(postalService);
+                //                                    }
+                //                                }
+                //                            }
+                //                        }
+
+                //                        await _unitOfWork.CommitAsync();
+                //                    }
+
+                //                }
+
+                //                await Task.Delay(TimeSpan.FromMinutes(1));
+                //            }
 
                 return Ok("Postal service processed successfully.");
             }
