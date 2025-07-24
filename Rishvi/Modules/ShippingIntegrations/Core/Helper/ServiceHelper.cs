@@ -77,11 +77,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core.Helper
                 {
                     new DateFieldFilter
                     {
-                        DateFrom = DateTime.Now.AddHours(-linnhour),
-                        DateTo = DateTime.Now,
-                        FieldCode = FieldCode.GENERAL_INFO_DATE,
-                        Type = DateTimeFieldFilterType.Range,
-                        Value = 0
+                        //DateFrom = DateTime.Now.AddHours(-linnhour),
+                        //DateTo = DateTime.Now,
+                        //FieldCode = FieldCode.GENERAL_INFO_DATE,
+                        //Type = DateTimeFieldFilterType.Range,
+                        //Value = 0
                     }
                 }
             };

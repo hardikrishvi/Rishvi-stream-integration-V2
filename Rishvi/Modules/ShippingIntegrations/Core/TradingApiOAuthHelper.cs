@@ -408,7 +408,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Region = jsopndata.CustomerInfo.Address.Region,
                         Town = jsopndata.CustomerInfo.Address.Town,
 
-                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId, LocationName, HandsonDate,auth.IsLiveAccount);
+                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId, LocationName, HandsonDate, auth.IsLiveAccount);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
                     //if (streamOrderResponse.Item1.response == null)
@@ -461,74 +461,74 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         .Include(o => o.Items)
                         .FirstOrDefaultAsync(o => o.NumOrderId == (numOrderId));
 
-                    if (orderRoot == null)
+                    if (orderRoot != null)
                     {
-                        throw new Exception($"Order with ID {OrderId} not found in database.");
-                    }
-                    if (orderRoot.Items == null || !orderRoot.Items.Any())
-                    {
-                        orderRoot.Items = await _dbSqlCContext.Item
-                            .Where(i => i.OrderId == orderRoot.OrderId)
-                            .ToListAsync();
-                    }
+                        //throw new Exception($"Order with ID {OrderId} not found in database.");
 
-                    // Serialize to indented JSON
-                    var json = JsonConvert.SerializeObject(orderRoot);
-
-                    var shippingdata = orderRoot.ShippingInfo.PostalServiceId;
-
-                    try
-                    {
-                        var dta = _dbSqlCContext.PostalServices
-                            .FirstOrDefault(x => x.PostalServiceId == orderRoot.ShippingInfo.PostalServiceId.ToString());
-
-                        if (dta != null)
+                        if (orderRoot.Items == null || !orderRoot.Items.Any())
                         {
-                            
-                            // throw new Exception($"Postal service with ID {orderRoot.ShippingInfo.PostalServiceId} not found.");
+                            orderRoot.Items = await _dbSqlCContext.Item
+                                .Where(i => i.OrderId == orderRoot.OrderId)
+                                .ToListAsync();
+                        }
 
+                        // Serialize to indented JSON
+                        var json = JsonConvert.SerializeObject(orderRoot);
 
-                            var auth1 = _dbSqlCContext.Authorizations.Where(x => x.AuthorizationToken == dta.AuthorizationToken).FirstOrDefault();
+                        var shippingdata = orderRoot.ShippingInfo.PostalServiceId;
 
-                            string LocationName = "SGK";
-                            string HandsonDate = "";
+                        try
+                        {
+                            var dta = _dbSqlCContext.PostalServices
+                                .FirstOrDefault(x => x.PostalServiceId == orderRoot.ShippingInfo.PostalServiceId.ToString());
 
-                            if (auth.HandsOnDate)
+                            if (dta != null)
                             {
-                                HandsonDate = DateTime.Now.ToString();
-                            }
-                            if (auth.UseDefaultLocation && auth.DefaultLocation != "")
-                            {
-                                LocationName = auth.DefaultLocation;
-                            }
 
-                            var streamAuth = _manageToken.GetToken(auth1);
-                            if (streamAuth.AccessToken != null)
-                            {
-                                if (json != "null")
+                                // throw new Exception($"Postal service with ID {orderRoot.ShippingInfo.PostalServiceId} not found.");
+
+
+                                var auth1 = _dbSqlCContext.Authorizations.Where(x => x.AuthorizationToken == dta.AuthorizationToken).FirstOrDefault();
+
+                                string LocationName = "SGK";
+                                string HandsonDate = "";
+
+                                if (auth.HandsOnDate)
                                 {
-                                    try
+                                    HandsonDate = DateTime.Now.ToString();
+                                }
+                                if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+                                {
+                                    LocationName = auth.DefaultLocation;
+                                }
+
+                                var streamAuth = _manageToken.GetToken(auth1);
+                                if (streamAuth.AccessToken != null)
+                                {
+                                    if (json != "null")
                                     {
-                                        var jsopndata = orderRoot;
-                                        int orderId = jsopndata.NumOrderId;
-                                        var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
+                                        try
                                         {
-                                            AuthorizationToken = auth1.AuthorizationToken,
-                                            AddressLine1 = jsopndata.CustomerInfo.Address.Address1,
-                                            AddressLine2 = jsopndata.CustomerInfo.Address.Address2,
-                                            AddressLine3 = jsopndata.CustomerInfo.Address.Address3,
-                                            Postalcode = jsopndata.CustomerInfo.Address.PostCode,
-                                            CompanyName = jsopndata.CustomerInfo.Address.Company,
-                                            CountryCode = "GB",
-                                            DeliveryNote = "",
-                                            //ServiceId = courierSettings.SelectedServiceId,
-                                            // Access the static property directly using the class name instead of an instance
-                                            ServiceId = CourierSettings.SelectedServiceId,
-                                            Email = auth.Email,
-                                            Name = jsopndata.CustomerInfo.Address.FullName,
-                                            OrderReference = jsopndata.NumOrderId.ToString(),
-                                            OrderId = 0,
-                                            Packages = new List<Package>() { new Package() {
+                                            var jsopndata = orderRoot;
+                                            int orderId = jsopndata.NumOrderId;
+                                            var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
+                                            {
+                                                AuthorizationToken = auth1.AuthorizationToken,
+                                                AddressLine1 = jsopndata.CustomerInfo.Address.Address1,
+                                                AddressLine2 = jsopndata.CustomerInfo.Address.Address2,
+                                                AddressLine3 = jsopndata.CustomerInfo.Address.Address3,
+                                                Postalcode = jsopndata.CustomerInfo.Address.PostCode,
+                                                CompanyName = jsopndata.CustomerInfo.Address.Company,
+                                                CountryCode = "GB",
+                                                DeliveryNote = "",
+                                                //ServiceId = courierSettings.SelectedServiceId,
+                                                // Access the static property directly using the class name instead of an instance
+                                                ServiceId = CourierSettings.SelectedServiceId,
+                                                Email = auth.Email,
+                                                Name = jsopndata.CustomerInfo.Address.FullName,
+                                                OrderReference = jsopndata.NumOrderId.ToString(),
+                                                OrderId = 0,
+                                                Packages = new List<Package>() { new Package() {
                                         PackageDepth = 0,
                                         PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
                                         Items = jsopndata.Items.Select(f=> new Item()
@@ -545,46 +545,46 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                                         }).ToList()
                                   }},
-                                            ServiceConfigItems = new List<ServiceConfigItem>(),
-                                            OrderExtendedProperties = new List<Models.ExtendedProperty>(),
-                                            Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
-                                            Region = jsopndata.CustomerInfo.Address.Region,
-                                            Town = jsopndata.CustomerInfo.Address.Town
-                                        }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null, LocationName, HandsonDate, auth1.IsLiveAccount);
-                                        streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
-                                        streamOrderResponse.Item1.ItemId = "";
-                                        if (streamOrderResponse.Item1.response == null)
-                                        {
-                                            SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                                ServiceConfigItems = new List<ServiceConfigItem>(),
+                                                OrderExtendedProperties = new List<Models.ExtendedProperty>(),
+                                                Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
+                                                Region = jsopndata.CustomerInfo.Address.Region,
+                                                Town = jsopndata.CustomerInfo.Address.Town
+                                            }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null, LocationName, HandsonDate, auth1.IsLiveAccount);
+                                            streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
+                                            streamOrderResponse.Item1.ItemId = "";
+                                            if (streamOrderResponse.Item1.response == null)
+                                            {
+                                                SaveStreamOrder(streamOrderResponse.Item2, auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId, "Error", "Error", "Error", OrderId);
+                                            }
+                                            else
+                                            {
+                                                SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
+                                                    streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                                            }
                                         }
-                                        else
+                                        catch
                                         {
-                                            SaveStreamOrder(JsonConvert.SerializeObject(streamOrderResponse.Item1), auth1.AuthorizationToken.ToString(), auth1.Email, null, OrderId,
-                                                streamOrderResponse.Item1.response.consignmentNo, streamOrderResponse.Item1.response.trackingId, streamOrderResponse.Item1.response.trackingURL, OrderId);
+                                            SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                                         }
                                     }
-                                    catch
+                                    else
                                     {
                                         SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
                                     }
                                 }
-                                else
-                                {
-                                    SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Order data not found for OrderId: " + OrderId, true, "clientId");
-                                }
-                            }
 
+                            }
+                            else
+                            {
+                                SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Postal Service not found: " + OrderId, true, "clientId");
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
                             SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Postal Service not found: " + OrderId, true, "clientId");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Postal Service not found: " + OrderId, true, "clientId");
-                    }
-
                 }
 
             }
@@ -626,7 +626,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public async Task<StreamGetOrderResponse.Root> GetStreamOrder(Rishvi.Models.Authorization _User, string OrderId)
         {
             var streamAuth = _manageToken.GetToken(_User);
-            return StreamOrderApi.GetOrder(streamAuth.AccessToken, OrderId, _User.ClientId,_User.IsLiveAccount);
+            return StreamOrderApi.GetOrder(streamAuth.AccessToken, OrderId, _User.ClientId, _User.IsLiveAccount);
         }
         #endregion
         #region Save s3 data
