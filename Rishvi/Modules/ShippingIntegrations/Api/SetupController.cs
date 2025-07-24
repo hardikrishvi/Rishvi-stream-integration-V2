@@ -371,7 +371,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     http_method,
                     content_type,
                     auth_header,
-                    auth.ClientId
+                    auth.ClientId,
+                    auth.IsLiveAccount
                 );
 
                 // Return a successful response

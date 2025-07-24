@@ -408,7 +408,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         Region = jsopndata.CustomerInfo.Address.Region,
                         Town = jsopndata.CustomerInfo.Address.Town,
 
-                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId, LocationName, HandsonDate);
+                    }, auth.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", StreamOrderId, LocationName, HandsonDate,auth.IsLiveAccount);
                     streamOrderResponse.Item1.AuthorizationToken = auth.AuthorizationToken;
                     streamOrderResponse.Item1.ItemId = "";
                     //if (streamOrderResponse.Item1.response == null)
@@ -550,7 +550,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                             Phone = jsopndata.CustomerInfo.Address.PhoneNumber,
                                             Region = jsopndata.CustomerInfo.Address.Region,
                                             Town = jsopndata.CustomerInfo.Address.Town
-                                        }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null, LocationName, HandsonDate);
+                                        }, auth1.ClientId, streamAuth.AccessToken, selectedService, true, jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY", null, LocationName, HandsonDate, auth1.IsLiveAccount);
                                         streamOrderResponse.Item1.AuthorizationToken = auth1.AuthorizationToken;
                                         streamOrderResponse.Item1.ItemId = "";
                                         if (streamOrderResponse.Item1.response == null)
@@ -626,7 +626,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public async Task<StreamGetOrderResponse.Root> GetStreamOrder(Rishvi.Models.Authorization _User, string OrderId)
         {
             var streamAuth = _manageToken.GetToken(_User);
-            return StreamOrderApi.GetOrder(streamAuth.AccessToken, OrderId, _User.ClientId);
+            return StreamOrderApi.GetOrder(streamAuth.AccessToken, OrderId, _User.ClientId,_User.IsLiveAccount);
         }
         #endregion
         #region Save s3 data

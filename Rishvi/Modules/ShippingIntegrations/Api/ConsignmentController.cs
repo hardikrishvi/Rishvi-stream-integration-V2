@@ -75,7 +75,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var manageToken = new ManageToken(_unitOfWork, _au,  _context);
                 var streamAuth = _manageToken.GetToken(auth);
 
-                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString(),LocationName,HandsonDate);
+                var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString(),LocationName,HandsonDate,auth.IsLiveAccount);
                 /* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
                  * on the whole request
                  */
@@ -182,7 +182,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
                 //var streamAuth = manageToken.GetToken(auth);
 
-                StreamGetOrderResponse.Root streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId);
+                StreamGetOrderResponse.Root streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId,auth.IsLiveAccount);
 
                 //if (streamOrder!=null)
                 //{
@@ -282,7 +282,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
                 //var streamAuth = manageToken.GetToken(auth);
 
-                var streamDeleteOrderResponse = StreamOrderApi.DeleteOrder(streamAuth.AccessToken, request.OrderReference, auth.ClientId);
+                var streamDeleteOrderResponse = StreamOrderApi.DeleteOrder(streamAuth.AccessToken, request.OrderReference, auth.ClientId,auth.IsLiveAccount);
                 if (streamDeleteOrderResponse.Item1.response == null && !string.IsNullOrEmpty(streamDeleteOrderResponse.Item2))
                 {
                     return new CancelLabelResponse(streamDeleteOrderResponse.Item2);

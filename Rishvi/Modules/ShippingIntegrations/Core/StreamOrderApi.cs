@@ -31,11 +31,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    return clientId.StartsWith("RIS") ? _streamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
         //}
 
-        public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId)
+        public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId,bool IsliveAccount)
         {
             string uniqueCode = CodeHelper.GenerateUniqueCode(32);
             //var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
-            var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+            var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath: StreamApiSettings.DemoUrl ;
             var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
             var request = new RestRequest("/orders/orders/" + orderNo, Method.Get);
             request.AddHeader("Accept", "application/json");
@@ -56,7 +56,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return null;
         }
 
-        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid,string LocationName,string Handsondate)
+        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid,string LocationName,string Handsondate,bool IsLiveAccount)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
             string errorMessage = string.Empty;
@@ -65,7 +65,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 try
                 {
                     string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                    var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+                    var baseUrl = IsLiveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl ;
                     var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                     var request = new RestRequest(AppSettings.CreateOrderUrl, Method.Post);
                     request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type ,LocationName,Handsondate));
@@ -112,7 +112,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             }
             else
             {
-                StreamGetOrderResponse.Root streamOrder = GetOrder(streamAuthToken, streamorderid, clientId);
+                StreamGetOrderResponse.Root streamOrder = GetOrder(streamAuthToken, streamorderid, clientId, IsLiveAccount);
                 var changes = new Dictionary<string, string>() { };
                 //streamOrder.re.Addresses ??= new StreamGetOrderResponse.Addresses();
                 //StreamGetOrderResponse.Address address = streamOrder.StreamGetOrderResponse.Addresses.Address1 ?? new StreamGetOrderResponse.Address();
@@ -170,19 +170,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                 if (changes.Count > 0)
                 {
-                    UpdateOrder(changes, clientId, streamAuthToken, streamorderid);
+                    UpdateOrder(changes, clientId, streamAuthToken, streamorderid,IsLiveAccount);
                 }
             }
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
-        public static Tuple<StreamOrderResponse, string> UpdateOrder(Dictionary<string, string> changereq, string clientId, string streamAuthToken, string orderid)
+        public static Tuple<StreamOrderResponse, string> UpdateOrder(Dictionary<string, string> changereq, string clientId, string streamAuthToken, string orderid,bool IsliveAccount)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
             string errorMessage = string.Empty;
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+                var baseUrl = IsliveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl ;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest("/orders/orders/" + orderid, Method.Patch);
                 string finalreq = JsonConvert.SerializeObject(new StreamOrderUpdateReq.Root()
@@ -282,14 +282,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
 
-        public static Tuple<StreamDeleteOrderResponse, string> DeleteOrder(string streamAuthToken, string orderNo, string clientId)
+        public static Tuple<StreamDeleteOrderResponse, string> DeleteOrder(string streamAuthToken, string orderNo, string clientId,bool IsLiveAccount)
         {
             StreamDeleteOrderResponse streamOrderResponse = new StreamDeleteOrderResponse();
             string errorMessage = string.Empty;
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+                var baseUrl = IsLiveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl ;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.DeleteOrderUrl) + orderNo, Method.Delete);
                 //request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service));
@@ -328,7 +328,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
 
-        public static Tuple<WebhookSubscribeResp.Root, string> WebhookSubscribe(string streamAuthToken, string authToken, string eventname, string event_type, string url_path, string http_method, string content_type, string auth_header, string clientId)
+        public static Tuple<WebhookSubscribeResp.Root, string> WebhookSubscribe(string streamAuthToken, string authToken, string eventname, string event_type, string url_path, string http_method, string content_type, string auth_header, string clientId,bool IsLiveAccount)
         {
             WebhookSubscribeResp.Root streamOrderResponse = new WebhookSubscribeResp.Root();
             string errorMessage = string.Empty;
@@ -344,7 +344,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     http_method = http_method
                 };
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = clientId.StartsWith("RIS") ? StreamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
+                var baseUrl = IsLiveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest("/webhooks/webhooks", Method.Post);
                 request.AddJsonBody(JsonConvert.SerializeObject(req));
