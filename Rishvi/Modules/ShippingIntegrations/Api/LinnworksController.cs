@@ -939,12 +939,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                                                 if (gr.planned.fromDateTime != null)
                                                 {
-                                                    var dte = DateTime.SpecifyKind(
-                                                                                    DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")),
-                                                                                    DateTimeKind.Utc);
-                                                    await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                                   // DateTime.Parse(gr.planned.fromDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).Date);
-                                                   DateTime.SpecifyKind(DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")), DateTimeKind.Local));
+                                                    var dte = DateTime.Parse(gr.planned.fromDateTime.Substring(0, 11) + gr.planned.fromDateTime.Substring(11).Replace("-", ":"), null, System.Globalization.DateTimeStyles.RoundtripKind);
+
+                                                    await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),dte);
                                                     //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
 
                                                 }
@@ -1067,12 +1064,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                                     if (gr.planned.fromDateTime != null)
                                     {
-                                        var dte = DateTime.SpecifyKind(
-                                                                        DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")),
-                                                                        DateTimeKind.Utc);
-                                        await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                       // DateTime.Parse(gr.planned.fromDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).Date);
-                                       DateTime.SpecifyKind(DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")), DateTimeKind.Local));
+                                        var dte = DateTime.Parse(gr.planned.fromDateTime.Substring(0, 11) + gr.planned.fromDateTime.Substring(11).Replace("-", ":"), null, System.Globalization.DateTimeStyles.RoundtripKind);
+
+                                        await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), dte);
                                         //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
 
                                     }
