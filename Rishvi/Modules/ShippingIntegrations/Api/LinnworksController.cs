@@ -785,16 +785,20 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
 
 
-                if (output.webhook.@event.event_code == "LOCKPLANNING" ||
+                if (output.webhook.@event.event_code == "OPENPLANNING" ||
+                    output.webhook.@event.event_code == "LOCKPLANNING" ||
+                    output.webhook.@event.event_code == "CLOSEPLANNING" ||
+                    output.webhook.@event.event_code == "DISPATCHED" ||
                     output.webhook.@event.event_code == "PLANNEDDELIVERY" ||
-                    output.webhook.@event.event_code == "PLANNEDGROUP")
+                    output.webhook.@event.event_code == "PLANNEDGROUP"
+                    )
                 {
                     SqlHelper.SystemLogInsert("Webhook", "", $"Handling specific event code: {output.webhook.@event.event_code}", "", "EventHandling", "Handling specific event code in webhook", false, "Webhook");
 
                     var webhookOrder = new WebhookOrder
                     {
                         sequence = 0,
-                        order = "Add Event Code",
+                        order = output.webhook.@event.event_code,
                         CreatedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now
                     };
