@@ -1060,6 +1060,23 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                         //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, Regex.Split(gr.planned.fromDateTime, "T")[0]);
 
                                     }
+                                    if (Stream_rundescription != null)
+                                    {
+                                        await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid), Stream_rundescription);
+                                    }
+
+                                    if (gr.planned.fromDateTime != null)
+                                    {
+                                        var dte = DateTime.SpecifyKind(
+                                                                        DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")),
+                                                                        DateTimeKind.Utc);
+                                        await UpdateDispatchDate(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
+                                       // DateTime.Parse(gr.planned.fromDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).Date);
+                                       DateTime.SpecifyKind(DateTime.Parse(gr.planned.fromDateTime.Replace("T00-01Z", "T00:01Z")), DateTimeKind.Local));
+                                        //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
+
+                                    }
+
                                     var alldata = _reportsController.GetReportData(new ReportModelReq() { email = Email }).Result;
                                     if (alldata.Count(d => d.LinnNumOrderId == linnworksorderid && d.IsLinnOrderCreatedInStream == true && d.IsLinnOrderDispatchInStream == false) > 0)
                                     {
