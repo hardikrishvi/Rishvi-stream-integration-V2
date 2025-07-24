@@ -33,6 +33,19 @@
                         SortOrder = 2,
                         ValueType = Classes.ConfigValueType.PASSWORD
                     },
+                    
+                    new Classes.ConfigItem()
+                    {
+                        ConfigItemId = "IsLiveAccount",
+                        Description = "Is it live account or staging?",
+                        GroupName = "Account Details",
+                        MustBeSpecified = true,
+                        Name = "Is Live Account",
+                        ReadOnly = false,
+                        SelectedValue = authConfig.IsLiveAccount.ToString(),
+                        SortOrder = 2,
+                        ValueType = Classes.ConfigValueType.BOOLEAN
+                    },
                     new Classes.ConfigItem()
                     {
                         ConfigItemId = "NAME",

@@ -190,6 +190,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
                     authEntity.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
                     authEntity.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
+                    authEntity.IsLiveAccount = Convert.ToBoolean(GetConfigValue(request, "IsLiveAccount"));
                     authEntity.ConfigStatus = "CONFIG";
                     authEntity.IsConfigActive = true;
                     _authorizationRepository.Update(authEntity);
@@ -226,6 +227,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.LinnDays = Convert.ToInt32(GetConfigValue(request, "LinnDays"));
                     authEntity.SendChangeToStream = Convert.ToBoolean(GetConfigValue(request, "SendChangeToStream"));
                     authEntity.HandsOnDate = Convert.ToBoolean(GetConfigValue(request, "HandsOnDate"));
+                    authEntity.IsLiveAccount = Convert.ToBoolean(GetConfigValue(request, "IsLiveAccount"));
                     _authorizationRepository.Update(authEntity);
                     _unitOfWork.Commit();
 

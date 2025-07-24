@@ -78,6 +78,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     if (response.IsSuccessful)
                     {
                         streamOrderResponse = JsonConvert.DeserializeObject<StreamOrderResponse>(response.Content);
+
+                        SqlHelper.SystemLogInsert("CreateStreamOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type, LocationName, Handsondate), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated"+ streamOrderResponse.response.orderNo, !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, false, clientId);
                     }
                     else
                     {

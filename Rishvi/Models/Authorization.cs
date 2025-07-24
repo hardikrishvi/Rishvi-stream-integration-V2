@@ -53,6 +53,7 @@ namespace Rishvi.Models
         public bool SendChangeToStream { get; set; } = true;
         public bool HandsOnDate { get; set; } = false;
         public int ShippingApiConfigId { get; set; } = 0;
+        public bool IsLiveAccount { get; set; } = false;
         public DateTime  CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
