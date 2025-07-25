@@ -447,7 +447,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             quantity = item.Quantity,
                             weight = item.UnitWeight,
                             stockLocation = LocationName,
-                            onHandDate = Handsondate
+                            onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
                         });
                         itemCount++;
                     }
@@ -507,7 +507,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             quantity = item.Quantity,
                             weight = item.UnitWeight,
                             stockLocation = LocationName,
-                            onHandDate = Handsondate
+                            onHandDate = Handsondate!=""? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd"):null
                         });
                         itemCount++;
                     }
