@@ -356,7 +356,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     {
                         var result = root.EnumerateArray()
                             .FirstOrDefault(x =>
-                                x.TryGetProperty("Vendor", out var vendor) && vendor.GetString() == "Stream Shipping" &&
+                                x.TryGetProperty("Vendor", out var vendor) && vendor.GetString().Contains("Stream Shipping") &&
                                 x.TryGetProperty("AccountId", out var account) && account.GetString() == accountId
                             );
 
@@ -379,6 +379,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                             var uploadb = obj.ProxyFactory.WebRequest(requestb);
                             using var doc1 = JsonDocument.Parse(uploadb.RawResponse);
+                            string jsonString = Encoding.UTF8.GetString(uploadb.RawResponse);
                             var root1 = doc1.RootElement;
 
                             if (root1.ValueKind == JsonValueKind.Array)

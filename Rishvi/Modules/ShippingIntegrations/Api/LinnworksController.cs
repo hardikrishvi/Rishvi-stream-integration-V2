@@ -907,6 +907,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                                     {"Stream_vehicleName",Stream_vehicleName },
                                                    // {"Stream_status",Stream_status },
                                                     {"Stream_driverNotes",Stream_driverNotes },
+                                                     {"stream_GroupSequence",stream_GroupSequence },
                                                     //{"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
                                                    // {"Stream_vehicleType",Stream_vehicleType },
                                                     //{"Stream_dispatched",Stream_dispatched },
@@ -1007,6 +1008,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 string Stream_startPlannedDateTime = gr.runDetails.start.plannedDateTime;
                                 string Stream_endActualDateTime = gr.runDetails.end.actualDateTime;
                                 string Stream_endPlannedDateTime = gr.runDetails.end.plannedDateTime;
+                                string stream_GroupSequence = gr.runDetails.groupSequence.ToString();
                                 string linnworksorderid = strorderdaat.response.order.header.orderNo;
 
                                 string LinnworksSyncToken = "";
@@ -1033,6 +1035,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 {"Stream_vehicleName",Stream_vehicleName },
                                // {"Stream_status",Stream_status },
                                 {"Stream_driverNotes",Stream_driverNotes },
+                                 {"stream_GroupSequence",stream_GroupSequence },
                                 //{"Stream_estimateArrivalDateTime",Stream_estimateArrivalDateTime },
                                // {"Stream_vehicleType",Stream_vehicleType },
                                 //{"Stream_dispatched",Stream_dispatched },
