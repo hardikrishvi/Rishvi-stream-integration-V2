@@ -102,6 +102,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models.Classes
                 SendChangeToStream = get_auth.SendChangeToStream,
                 HandsOnDate = get_auth.HandsOnDate,
                 ShippingApiConfigId = get_auth.ShippingApiConfigId,
+                IsLiveAccount = get_auth.IsLiveAccount,
             };
             return output;
         }
