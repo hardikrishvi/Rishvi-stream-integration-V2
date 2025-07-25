@@ -400,6 +400,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.header.services.Add(new CollectionOrderRequest.Service { code = service.ServiceCode });
                 streamOrderRequest.header.customer = new CollectionOrderRequest.Customer();
                 streamOrderRequest.header.customer.name = generateLabelRequest.Name;
+                streamOrderRequest.header.serviceLevel = generateLabelRequest.PostalServiceName;
                 streamOrderRequest.header.customer.address = new CollectionOrderRequest.Address();
                 streamOrderRequest.header.customer.address.name = generateLabelRequest.Name;
                 streamOrderRequest.header.customer.address.address1 = generateLabelRequest.AddressLine1;
@@ -466,6 +467,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.header.orderType = type;
                 streamOrderRequest.header.services.Add(new Service { code = service.ServiceCode });
                 streamOrderRequest.header.customer.name = generateLabelRequest.Name;
+                streamOrderRequest.header.serviceLevel = generateLabelRequest.PostalServiceName;
                 streamOrderRequest.header.customer.address.name = generateLabelRequest.Name;
                 streamOrderRequest.header.customer.address.address1 = generateLabelRequest.AddressLine1;
                 streamOrderRequest.header.customer.address.address2 = generateLabelRequest.AddressLine2;

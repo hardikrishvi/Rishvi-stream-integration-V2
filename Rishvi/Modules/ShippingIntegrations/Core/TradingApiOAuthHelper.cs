@@ -514,6 +514,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                             var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
                                             {
                                                 AuthorizationToken = auth1.AuthorizationToken,
+                                                PostalServiceName = dta.PostalServiceName,
                                                 AddressLine1 = jsopndata.CustomerInfo.Address.Address1,
                                                 AddressLine2 = jsopndata.CustomerInfo.Address.Address2,
                                                 AddressLine3 = jsopndata.CustomerInfo.Address.Address3,

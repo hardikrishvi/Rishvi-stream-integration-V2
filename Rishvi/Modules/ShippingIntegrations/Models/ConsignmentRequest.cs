@@ -24,6 +24,9 @@
         public string OrderReference { get; set; }
         public string OrderCurrency { get; set; }
         public decimal OrderValue { get; set; }
+
+        public string PostalServiceName { get; set; }
+
         public decimal PostageCharges { get; set; }
 
         public List<ExtendedProperty> OrderExtendedProperties = new List<ExtendedProperty>();
