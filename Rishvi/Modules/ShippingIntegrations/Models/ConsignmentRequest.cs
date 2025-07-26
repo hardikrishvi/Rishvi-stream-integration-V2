@@ -27,6 +27,10 @@
 
         public string PostalServiceName { get; set; }
 
+        public string deliveryMethod { get; set; }
+
+        
+
         public decimal PostageCharges { get; set; }
 
         public List<ExtendedProperty> OrderExtendedProperties = new List<ExtendedProperty>();

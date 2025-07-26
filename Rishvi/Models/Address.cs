@@ -21,4 +21,9 @@ public class Address : IModificationHistory
     public Guid? CountryId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public string name { get; set; }
+    public string country { get; set; }
+    public string postcode { get; set; }
+    public double lat { get; set; }
+    public double @long { get; set; }
 }

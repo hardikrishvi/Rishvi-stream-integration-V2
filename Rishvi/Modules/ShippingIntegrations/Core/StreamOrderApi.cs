@@ -31,6 +31,43 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    return clientId.StartsWith("RIS") ? _streamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
         //}
 
+        public static Rishvi.Models.DeportRoot GetDepots(string streamAuthToken, string clientId, bool IsliveAccount)
+        {
+            string uniqueCode = CodeHelper.GenerateUniqueCode(32);
+            var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
+            var client = new RestClient(baseUrl);
+            var request = new RestRequest("/depots/depots", Method.Get);
+            request.AddHeader("Accept", "application/json");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Stream-Nonce", uniqueCode);
+            request.AddHeader("Stream-Party", clientId);
+            request.AddHeader("Authorization", "bearer " + streamAuthToken);
+
+            RestResponse response = client.Execute(request);
+
+            if (response.IsSuccessful)
+            {
+                return JsonConvert.DeserializeObject<Rishvi.Models.DeportRoot>(response.Content);
+            }
+            else
+            {
+                string errorMessage = response.Content;
+                SqlHelper.SystemLogInsert(
+                    "GetDepots",
+                    null,
+                    streamAuthToken,
+                    !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null,
+                    "ErrorGetDepots",
+                    !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null,
+                    true,
+                    clientId
+                );
+            }
+
+            return null;
+        }
+
+
         public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId,bool IsliveAccount)
         {
             string uniqueCode = CodeHelper.GenerateUniqueCode(32);
@@ -408,6 +445,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.header.customer.address.address3 = generateLabelRequest.AddressLine3;
                 streamOrderRequest.header.customer.address.country = generateLabelRequest.CountryCode;
                 streamOrderRequest.header.customer.address.postcode = generateLabelRequest.Postalcode;
+                //streamOrderRequest.delivery.deliveryMethod = generateLabelRequest.deliveryMethod;
                 streamOrderRequest.header.customer.contact = new CollectionOrderRequest.Contact();
                 streamOrderRequest.header.customer.contact.name = generateLabelRequest.Name;
                 streamOrderRequest.header.customer.contact.tel1 = generateLabelRequest.Phone;
@@ -432,7 +470,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.collection.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.collection.contact.optOutEmail = false;
                 streamOrderRequest.collection.contact.optOutSms = false;
-                streamOrderRequest.collection.collectionMethod = "NORTH";
+                streamOrderRequest.collection.collectionMethod = generateLabelRequest.deliveryMethod!=null? generateLabelRequest.deliveryMethod: "NORTH";
                 streamOrderRequest.collection.bookingRequired = true;
                 int itemCount = 1;
                 streamOrderRequest.collection.items = new List<CollectionOrderRequest.Item>();
@@ -479,6 +517,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.header.customer.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.header.customer.contact.optOutEmail = false;
                 streamOrderRequest.header.customer.contact.optOutSms = false;
+                //streamOrderRequest.delivery.deliveryMethod = "";
                 streamOrderRequest.header.customerOrderNo = generateLabelRequest.OrderReference;
                 streamOrderRequest.header.driverNotes = generateLabelRequest.DeliveryNote;
                 streamOrderRequest.header.cutOffTimeMet = true;
@@ -494,7 +533,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.delivery.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.delivery.contact.optOutEmail = false;
                 streamOrderRequest.delivery.contact.optOutSms = false;
-                streamOrderRequest.delivery.deliveryMethod = "SGK";
+                streamOrderRequest.delivery.deliveryMethod = generateLabelRequest.deliveryMethod!=null ? generateLabelRequest.deliveryMethod : "SGK";
                 streamOrderRequest.delivery.bookingRequired = true;
                 int itemCount = 1;
                 foreach (var packages in generateLabelRequest.Packages)

@@ -492,6 +492,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                                 string LocationName = "SGK";
                                 string HandsonDate = "";
+                                string deieveryMethod = "";
 
                                 if (auth.HandsOnDate)
                                 {
@@ -511,6 +512,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                         {
                                             var jsopndata = orderRoot;
                                             int orderId = jsopndata.NumOrderId;
+
+                                            var getdepots = StreamOrderApi.GetDepots(auth1.AuthorizationToken,  auth1.ClientId, auth1.IsLiveAccount);
+
+                                            if (getdepots != null && getdepots.response != null && getdepots.response.depots.Count > 0)
+                                            {
+                                              var singledeport =   getdepots.response.depots.Where(x => x.address.name == LocationName).FirstOrDefault();
+
+                                                if (singledeport != null) {
+
+                                                    var chdel = jsopndata.ShippingInfo.PostalServiceName.ToLower().Contains("pickup") ? "COLLECTION" : "DELIVERY";
+
+                                                    var delmethod = singledeport.deliveryMethods.Where(x => x.type == chdel).Select(y => y.name).FirstOrDefault();
+
+                                                    deieveryMethod = delmethod ?? "";
+
+                                                }
+
+                                            }
+
                                             var streamOrderResponse = StreamOrderApi.CreateOrder(new GenerateLabelRequest()
                                             {
                                                 AuthorizationToken = auth1.AuthorizationToken,
@@ -522,6 +542,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                                 CompanyName = jsopndata.CustomerInfo.Address.Company,
                                                 CountryCode = "GB",
                                                 DeliveryNote = "",
+                                                deliveryMethod = deieveryMethod,
                                                 //ServiceId = courierSettings.SelectedServiceId,
                                                 // Access the static property directly using the class name instead of an instance
                                                 ServiceId = CourierSettings.SelectedServiceId,
