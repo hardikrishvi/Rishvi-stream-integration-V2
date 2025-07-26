@@ -85,6 +85,9 @@ namespace Rishvi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("temp")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

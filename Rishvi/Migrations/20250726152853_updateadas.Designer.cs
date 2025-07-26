@@ -12,8 +12,8 @@ using Rishvi.Modules.Core.Data;
 namespace Rishvi.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    [Migration("20250716164351_AddItemDetails1")]
-    partial class AddItemDetails1
+    [Migration("20250726152853_updateadas")]
+    partial class updateadas
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,6 +88,9 @@ namespace Rishvi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("temp")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -120,6 +123,12 @@ namespace Rishvi.Migrations
                     b.Property<string>("AuthorizationToken")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("AutoOrderDespatchSync")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AutoOrderSync")
+                        .HasColumnType("bit");
+
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
@@ -150,6 +159,9 @@ namespace Rishvi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DefaultLocation")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -168,14 +180,26 @@ namespace Rishvi.Migrations
                     b.Property<string>("FtpUsername")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HandsOnDate")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("IntegratedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<bool?>("IsConfigActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLiveAccount")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LabelReference")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LinnDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LinnPage")
+                        .HasColumnType("int");
 
                     b.Property<string>("LinnRefreshToken")
                         .HasColumnType("nvarchar(max)");
@@ -195,11 +219,20 @@ namespace Rishvi.Migrations
                     b.Property<string>("PostCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("SendChangeToStream")
+                        .HasColumnType("bit");
+
                     b.Property<string>("SessionID")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ShippingApiConfigId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("UseDefaultLocation")
+                        .HasColumnType("bit");
 
                     b.Property<string>("access_token")
                         .HasColumnType("nvarchar(max)");
@@ -758,6 +791,41 @@ namespace Rishvi.Migrations
                     b.HasIndex("TotalsInfoId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Rishvi.Models.PostalServices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorizationToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GetDate()");
+
+                    b.Property<string>("PostalServiceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostalServiceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GetDate()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PostalServices");
                 });
 
             modelBuilder.Entity("Rishvi.Models.Run", b =>

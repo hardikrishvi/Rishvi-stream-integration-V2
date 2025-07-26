@@ -435,7 +435,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         public async Task CreateLinnworksOrdersToStream(Rishvi.Models.Authorization auth, string OrderId)
         {
             // Proper Any query
+            try
+            {
 
+           
             List<CourierService> services = Services.GetServices;
             //var streamAuth = _manageToken.GetToken(auth);
 
@@ -614,7 +617,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             {
                 SqlHelper.SystemLogInsert("TradingApiOAuthHelper", null, null, OrderId, "CreateLinnworksOrdersToStream", "Postal Service not found: " + OrderId, true, "clientId");
             }
+            }
+            catch (Exception ex)
+            {
 
+               var str = ex.ToString();
+            }
         }
         public async Task DispatchOrderInLinnworks(Rishvi.Models.Authorization _User, int OrderRef, string linntoken,
             string Service, string TrackingNumber, string TrackingUrl, string dispatchdate)

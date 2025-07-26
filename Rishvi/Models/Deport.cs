@@ -26,7 +26,7 @@
     public class Depot
     {
         public string id { get; set; }
-        public Address address { get; set; }
+        public DAddress address { get; set; }
         public Contact contact { get; set; }
         public StockLocation stockLocation { get; set; }
         public List<DeliveryMethod> deliveryMethods { get; set; }
