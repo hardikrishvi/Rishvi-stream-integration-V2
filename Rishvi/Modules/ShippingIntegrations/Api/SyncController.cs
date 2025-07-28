@@ -228,7 +228,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
         }
 
-        [HttpGet, Route("PluggableStartService")]
+        [HttpPost, Route("PluggableStartService")]
         [AllowAnonymous]
         public async Task<bool> PluggableStartService(string Email, string orderIds)
         {
