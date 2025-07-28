@@ -163,12 +163,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         //            {
         //                await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
         //            }
-              
+
         //            //if (res.Sync.DispatchEbayOrderFromStream)
         //            //{
         //            //    await _ebayController.DispatchOrderFromStream(res.AuthorizationToken, "");
         //            //}
-                  
+
 
         //            res.LastSyncOn = DateTime.UtcNow.ToString("dd/MM/yyyy hh:mm:ss");
         //            res.LastSyncOnDate = DateTime.Now;
@@ -176,7 +176,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         //            _integrationSettingsRepository.Update(res);
         //            _unitOfWork.Commit();
 
-                   
+
         //        }
 
         //        return true;
@@ -196,10 +196,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-
-             //    var getdepots = StreamOrderApi.GetDepots("f8a28932bc88473d0724c44c1d4c1fd90845bebe", "RISHV000000000001", false);
-
-
+                //    var getdepots = StreamOrderApi.GetDepots("f8a28932bc88473d0724c44c1d4c1fd90845bebe", "RISHV000000000001", false);
 
                 var listuser = _dbSqlCContext.Authorizations.OrderByDescending(x => x.Id).ToList();
 
@@ -219,6 +216,32 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     _dbSqlCContext.Update(res);
                     _unitOfWork.Commit();
                 }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SqlHelper.SystemLogInsert("sync Method", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, "All");
+                // Log the exception for debugging
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return false; // Indicate failure
+            }
+        }
+
+        [HttpGet, Route("PluggableStartService")]
+        [AllowAnonymous]
+        public async Task<bool> PluggableStartService(string token, string orderIds)
+        {
+            try
+            {
+                var user = _dbSqlCContext.Authorizations.Where(u => u.AuthorizationToken == token).FirstOrDefault();
+
+                await _linnworksController.GetLinnOrderForStream(user, orderIds);
+                await _linnworksController.CreateLinnworksOrdersToStream(user.AuthorizationToken, orderIds);
+
+                user.UpdatedAt = DateTime.UtcNow;
+                _dbSqlCContext.Update(user);
+                _unitOfWork.Commit();
 
                 return true;
             }
@@ -251,7 +274,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             var img = $"https://stream-shipping-integration-file-storage.s3.eu-west-2.amazonaws.com/Images/{identifierTag.Replace(" ", "")}.png";
             await Task.Run(() =>
             {
-               
+
                 obj.Api.OpenOrders.SaveIdentifier(new SaveIdentifiersRequest
                 {
                     Identifier = new Identifier
@@ -300,7 +323,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 foreach (var item in uniqueEmailUsers)
                 {
                     var obj = new LinnworksBaseStream(item.LinnworksToken);
-                    
+
                     string Runidentifier = "RUN 01,RUN 02,RUN 03,RUN 04,RUN 05,RUN 06,RUN 07,RUN 08";
                     var identifiers = obj.Api.OpenOrders.GetIdentifiers();
 
@@ -317,7 +340,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                     string Days = "SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THRUSDAY,FRIDAY,SATURDAY";
 
-                    
+
                     foreach (var strrun1 in Days.Split(','))
                     {
 
@@ -655,7 +678,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         res.Sync = new SyncSettings();
                     }
 
-                 
+
                     if (res.Sync.UpdateLinnworksOrderToStream)
                     {
                         await _linnworksController.UpdateLinnworksOrdersToStream(res.AuthorizationToken, res.LinnworksSyncToken, "");
@@ -670,7 +693,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     _integrationSettingsRepository.Update(res);
                     _unitOfWork.Commit();
 
-                  
+
                 }
 
                 return true;
