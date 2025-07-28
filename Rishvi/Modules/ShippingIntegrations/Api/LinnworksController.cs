@@ -716,18 +716,30 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [Route("webhook")]
         public async Task<ActionResult<Dictionary<string, string>>> webhook()
         {
-            SqlHelper.SystemLogInsert("Webhook_01", "", JsonConvert.SerializeObject(Request).Replace("'", "''"), "", "Webhook_Initaite", "", false, "Webhook");
+           
             string data = (await new StreamReader(Request.Body).ReadToEndAsync()).ToString().Trim();
             var query = new Dictionary<string, string>();
             foreach (var sItem in Request.Query.Keys)
             {
                 query.Add(sItem, Request.Query[sItem].ToString());
             }
-            SqlHelper.SystemLogInsert("Webhook_01", "", JsonConvert.SerializeObject(Request).Replace("'", "''"), "", "Webhook", "", false, "Webhook");
-            SqlHelper.SystemLogInsert("Webhook_02", "", JsonConvert.SerializeObject(query).Replace("'", "''"), "", "Webhook_Query", "", false, "Webhook");
+           
+            
             var output = JsonConvert.DeserializeObject<WebhookResponse.Root>(data);
             //await _tradingApiOAuthHelper.SaveWebhook(data, output.webhook.subscription.party_id, DateTime.Now.ToString("ddMMyyyyhhmmss"));
-            SqlHelper.SystemLogInsert("Webhook_start", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook_Initaite", "", false, "Webhook");
+            try
+            {
+                SqlHelper.SystemLogInsert("Webhook_01", "", JsonConvert.SerializeObject(Request).Replace("'", "''"), "", "Webhook_Initaite", "", false, "Webhook");
+                SqlHelper.SystemLogInsert("Webhook_02", "", JsonConvert.SerializeObject(query).Replace("'", "''"), "", "Webhook_Query", "", false, "Webhook");
+                SqlHelper.SystemLogInsert("Webhook_start", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook_Initaite", "", false, "Webhook");
+            }
+            catch (Exception ex)
+            {
+                SqlHelper.SystemLogInsert("Webhook_0102", "", null, ex.Message, "Webhook_Initaite", "", true, "Webhook");
+
+            }
+
+            
 
             var subscription = new Subscription()
             {
