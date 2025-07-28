@@ -724,6 +724,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             var output = JsonConvert.DeserializeObject<WebhookResponse.Root>(data);
             //await _tradingApiOAuthHelper.SaveWebhook(data, output.webhook.subscription.party_id, DateTime.Now.ToString("ddMMyyyyhhmmss"));
+            SqlHelper.SystemLogInsert("Webhook_Hdata", "", JsonConvert.SerializeObject(data).Replace("'", "''"), "", "Webhook", "", false, "Webhook");
             SqlHelper.SystemLogInsert("Webhook_H", "", JsonConvert.SerializeObject(output).Replace("'", "''"), "", "Webhook", "", false, "Webhook");
             //try
             //{
