@@ -230,11 +230,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
         [HttpGet, Route("PluggableStartService")]
         [AllowAnonymous]
-        public async Task<bool> PluggableStartService(string token, string orderIds)
+        public async Task<bool> PluggableStartService(string Email, string orderIds)
         {
             try
             {
-                var user = _dbSqlCContext.Authorizations.Where(u => u.AuthorizationToken == token).FirstOrDefault();
+                var user = _dbSqlCContext.Authorizations.Where(u => u.Email == Email).FirstOrDefault();
 
                 await _linnworksController.GetLinnOrderForStream(user, orderIds);
                 await _linnworksController.CreateLinnworksOrdersToStream(user.AuthorizationToken, orderIds);
