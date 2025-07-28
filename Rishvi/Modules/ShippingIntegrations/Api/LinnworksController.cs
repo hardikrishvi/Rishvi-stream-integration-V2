@@ -920,8 +920,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                                 });
                                                 if (gr.estimateArrivalDateTime != "0")
                                                 {
-                                                    await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
-                                                    DateTime.Parse(gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
+                                                    var cleanedDate = gr.estimateArrivalDateTime.Substring(0, 11) + gr.estimateArrivalDateTime.Substring(11).Replace("-", ":");
+                                                    var parsedDate = DateTime.Parse(cleanedDate, null, System.Globalization.DateTimeStyles.RoundtripKind);
+
+                                                    await UpdateOrderIdentifier(
+                                                        LinnworksSyncToken,
+                                                        Convert.ToInt32(linnworksorderid),
+                                                        parsedDate.DayOfWeek.ToString()
+                                                    );
+                                                    //await UpdateOrderIdentifier(LinnworksSyncToken, Convert.ToInt32(linnworksorderid),
+                                                    //DateTime.Parse(gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"), null, System.Globalization.DateTimeStyles.RoundtripKind).DayOfWeek.ToString());
                                                     //await _tradingApiOAuthHelper.DispatchOrderInLinnworks(user, Convert.ToInt32(linnworksorderid), LinnworksSyncToken, "Stream", Stream_trackingId, Stream_trackingURL, gr.estimateArrivalDateTime.Replace("-00Z", ":00Z"));
 
                                                 }
