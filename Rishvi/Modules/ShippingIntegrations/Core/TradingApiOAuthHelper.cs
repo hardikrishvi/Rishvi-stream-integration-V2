@@ -516,7 +516,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                             var jsopndata = orderRoot;
                                             int orderId = jsopndata.NumOrderId;
 
-                                            var getdepots = StreamOrderApi.GetDepots(auth1.AuthorizationToken,  auth1.ClientId, auth1.IsLiveAccount);
+                                            var getdepots = StreamOrderApi.GetDepots(streamAuth.AccessToken,  auth1.ClientId, auth1.IsLiveAccount);
 
                                             if (getdepots != null && getdepots.response != null && getdepots.response.depots.Count > 0)
                                             {

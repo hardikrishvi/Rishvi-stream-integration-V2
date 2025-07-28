@@ -197,7 +197,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
 
-                 var getdepots = StreamOrderApi.GetDepots("f8a28932bc88473d0724c44c1d4c1fd90845bebe", "RISHV000000000001", false);
+             //    var getdepots = StreamOrderApi.GetDepots("f8a28932bc88473d0724c44c1d4c1fd90845bebe", "RISHV000000000001", false);
 
 
 

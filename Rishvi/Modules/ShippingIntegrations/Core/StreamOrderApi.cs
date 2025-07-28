@@ -31,7 +31,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         //    return clientId.StartsWith("RIS") ? _streamApiSettings.DemoUrl : AppSettings.StreamApiBasePath;
         //}
 
-        public static Rishvi.Models.DeportRoot GetDepots(string streamAuthToken, string clientId, bool IsliveAccount)
+        public static Rishvi.Models.DeportRoot GetDepots(string streamAccessToken, string clientId, bool IsliveAccount)
         {
             string uniqueCode = CodeHelper.GenerateUniqueCode(32);
             var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
@@ -41,7 +41,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Stream-Nonce", uniqueCode);
             request.AddHeader("Stream-Party", clientId);
-            request.AddHeader("Authorization", "bearer " + streamAuthToken);
+            request.AddHeader("Authorization", "bearer " + streamAccessToken);
 
             RestResponse response = client.Execute(request);
 
@@ -55,7 +55,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 SqlHelper.SystemLogInsert(
                     "GetDepots",
                     null,
-                    streamAuthToken,
+                    streamAccessToken,
                     !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null,
                     "ErrorGetDepots",
                     !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null,
