@@ -16,12 +16,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _context;
         private readonly ManageToken _manageToken;
-        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ApplicationDbContext context, ManageToken manageToken)
+        private readonly ILogger<ConsignmentController> _logger;
+        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ApplicationDbContext context, ManageToken manageToken, ILogger<ConsignmentController> logger)
         {
             _authorizationToken = authorizationToken;
             _unitOfWork = unitOfWork;
             _context = context;
             _manageToken = manageToken;
+            _logger = logger;
         }
 
         [HttpPost(), Route("CreateOrder")]
@@ -31,10 +33,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
             try
             {
+                _logger.LogInformation("Consignment - CreateOrder called with request: {Request}", JsonConvert.SerializeObject(request));
                 // lets authenticate the user and make sure we have their config details
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
+                    _logger.LogError("Consignment - CreateOrder Authorization failed for token {Token}", request.AuthorizationToken);
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
                 Email = auth.Email;
@@ -71,8 +75,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 //create response class, we will be adding packages to it
                 GenerateLabelResponse response = new GenerateLabelResponse();
-                //var streamAuth = ManageToken.GetToken(auth);
-                //var manageToken = new ManageToken(_unitOfWork, _au,  _context);
                 var streamAuth = _manageToken.GetToken(auth);
 
                 var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, true, "DELIVERY", request.OrderId.ToString(),LocationName,HandsonDate,auth.IsLiveAccount);
@@ -118,15 +120,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             itemCount++;
                         }
                     }
+                    _logger.LogInformation("Consignment - CreateOrder completed successfully for OrderId: {OrderId}", request.OrderId);
                     return response;
                 }
                 else
                 {
+                    _logger.LogError("Consignment - CreateOrder for OrderId: {OrderId} with Item2: {Error}", request.OrderId, streamOrderResponse.Item2);
                     return new GenerateLabelResponse(streamOrderResponse.Item2);
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Consignment - CreateOrder failed with exception for OrderId: {OrderId}", request.OrderId);
                 SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
                 EmailHelper.SendEmail("Failed generate lable", ex.Message);
                 return new GenerateLabelResponse("Unhandled error " + ex.Message);
@@ -140,10 +145,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
             try
             {
+                _logger.LogInformation("Consignment - GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
                 // lets authenticate the user and make sure we have their config details
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
+                    _logger.LogError("Consignment - GenerateLabel Authorization failed for token {Token}", request.AuthorizationToken);
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
                 Email = auth.Email;
@@ -167,6 +174,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 CourierService selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
                 if (selectedService == null)
                 {
+                    _logger.LogError("Consignment - GenerateLabel Service Id {ServiceId} is not available", request.ServiceId);
                     throw new Exception("Service Id " + request.ServiceId.ToString() + " is not available");
                 }
 
@@ -178,9 +186,6 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //create response class, we will be adding packages to it
                 GenerateLabelResponse response = new GenerateLabelResponse();
                 var streamAuth = _manageToken.GetToken(auth);
-
-                //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
-                //var streamAuth = manageToken.GetToken(auth);
 
                 StreamGetOrderResponse.Root streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId,auth.IsLiveAccount);
 
@@ -230,17 +235,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             itemCount++;
                         }
                     }
+                    _logger.LogInformation("Consignment - GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
                     return response;
                 }
                 else
                 {
-                        return new GenerateLabelResponse("Error");
-                   
-                   
+                    return new GenerateLabelResponse("Error");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Consignment - GenerateLabel failed with exception for OrderId: {OrderId}", request.OrderId);
                 SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
                 EmailHelper.SendEmail("Failed generate lable", ex.ToString());
                 return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
@@ -266,7 +271,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                SqlHelper.SystemLogInsert("DeleteOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "CancelLabelStart", null, false,"");
+                SqlHelper.SystemLogInsert("CancelLabel", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "CancelLabelStart", null, false,"");
 
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)

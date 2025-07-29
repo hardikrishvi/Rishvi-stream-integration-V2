@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Amazon.Runtime.Internal;
+using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Aws;
@@ -20,20 +22,24 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly ServiceHelper _serviceHelper;
         private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
         private readonly SqlContext _dbContext;
-        public ConfigController(AwsS3 awsS3, ServiceHelper serviceHelper, TradingApiOAuthHelper tradingApiOAuthHelper, SqlContext dbContext)
+        private readonly ILogger<ConfigController> _logger;
+        public ConfigController(AwsS3 awsS3, ServiceHelper serviceHelper, TradingApiOAuthHelper tradingApiOAuthHelper,
+            SqlContext dbContext, ILogger<ConfigController> logger)
         {
             _awsS3 = awsS3;
             _serviceHelper = serviceHelper;
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         [HttpPost, Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegistrationData request)
         {
-            SqlHelper.SystemLogInsert("DeleteOrder", null, null, JsonConvert.SerializeObject(request), "OrderDeleted", JsonConvert.SerializeObject(request), false, "clientId");
+            SqlHelper.SystemLogInsert("Register", null, null, JsonConvert.SerializeObject(request), "OrderDeleted", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
+                _logger.LogInformation("Registering user with email: {Email}", request.Email);
                 var transformedEmail = (request.Email);
                 var existsInDb = _dbContext.IntegrationSettings
                     .Any(x => x.Email == transformedEmail);
@@ -43,15 +49,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     request.Password = _serviceHelper.HashPassword(request.Password);
 
                     _tradingApiOAuthHelper.RegisterSave(JsonConvert.SerializeObject(request), "", transformedEmail, request.AuthorizationToken);
+                    _logger.LogInformation("Registe user with email: {Email}", request.Email);
                     return Ok("ok");
                 }
                 else
                 {
+                    _logger.LogWarning("Email already registered: {Email}", request.Email);
                     return Conflict("Email already registered.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error during registration for user: {Name} - {ex}", request.Name, ex.ToString());
                 Console.WriteLine($"Error during registration: {ex.Message}");
                 return StatusCode(500, "An unexpected error occurred.");
             }
@@ -62,14 +71,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                _logger.LogInformation("Loging user with token: {AuthorizationToken}", value.AuthorizationToken);
                 var transformedEmail = _serviceHelper.TransformEmail(value.Email);
                 var getData = _dbContext.IntegrationSettings
-                    .FirstOrDefault(x => x.Email == transformedEmail);
-                //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
-                //if (!await AwsS3.S3FileIsExists("Authorization", fileName))
-                //{
-                //    return NotFound("Email not registered.");
-                //}
+                    .FirstOrDefault(x => x.Email == value.Email);
+                
                 if (getData == null)
                 {
                     return NotFound("Email not registered.");
@@ -80,15 +86,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 //var res = JsonConvert.DeserializeObject<RegistrationData>(output);
                 if (res.Password == _serviceHelper.HashPassword(value.Password))
                 {
+                    _logger.LogInformation("Logged user with token: {AuthorizationToken}", value.AuthorizationToken);
                     return Ok("ok");
                 }
                 else
                 {
+                    _logger.LogInformation("Login fail user with user: {Name}", value.Name);
                     return Unauthorized("Incorrect Password.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error during login for user: {Name} - {ex}", value.Name, ex.ToString());
                 // Log the exception (use ILogger)
                 Console.WriteLine($"Error during login: {ex.Message}");
                 return StatusCode(500, "An unexpected error occurred.");
@@ -100,36 +109,28 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
-                //var transformedEmail = _serviceHelper.TransformEmail(email);
-                //var fileName = "Users/" + "_register_" + transformedEmail + ".json";
-
+                _logger.LogInformation("Retrieving user data for email: {Email}", email);
                 var getData = _dbContext.Authorizations
                     .FirstOrDefault(x => x.Email == email);
 
-                // Retrieve the file directly
-                //if (await AwsS3.S3FileIsExists("Authorization", fileName))
-                //{
-                //    var result = AwsS3.GetS3File("Authorization", fileName);
-                //    var output = JsonConvert.DeserializeObject<RegistrationData>(result);
-                //    // Ensure SyncModel is not null
-                //    output.Sync ??= new SyncModel();
-                //    return Ok(output);
-
-                //}
+               
                 if (getData != null)
                 {
                     var output = _tradingApiOAuthHelper.GetRegistrationData(email);
                     // Ensure SyncModel is not null
                     output.Sync ??= new SyncModel();
+                    _logger.LogInformation("Retrieved user data for email: {Email}", email);
                     return Ok(output);
                 }
                 else
                 {
+                    _logger.LogWarning("User not found for email: {Email}", email);
                     return NotFound("User not found.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error retrieving user data for email: {Email} - {ex}", email, ex.ToString());
                 // Log the error (replace with ILogger for production use)
                 Console.WriteLine($"Error retrieving user data: {ex.Message}");
                 return StatusCode(500, "An unexpected error occurred.");

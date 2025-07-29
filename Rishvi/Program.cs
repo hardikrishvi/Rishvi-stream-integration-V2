@@ -14,11 +14,42 @@ using Rishvi.Modules.ShippingIntegrations.Api;
 using Hangfire;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Dependencies;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using Rishvi.Modules.ShippingIntegrations.Core.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Store configuration reference early
 var config = builder.Configuration;
+
+#region Serilog Configuration
+var elasticUri = builder.Configuration["ElasticsearchSettings:Uri"];    
+var applicationName = builder.Configuration["ElasticsearchSettings:ApplicationName"];
+var env = builder.Environment.EnvironmentName;
+
+var indexFormat = $"{applicationName?.ToLower()}-{env?.ToLower()}-{DateTime.UtcNow:yyyy.MM}";
+var elasticOptions = new ElasticsearchSinkOptions(new Uri(elasticUri!))
+{
+    IndexFormat = indexFormat,
+    BatchPostingLimit = 50,
+    Period = TimeSpan.FromSeconds(5),
+    InlineFields = true,
+};
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.WithCorrelationId()
+        .Enrich.WithCorrelationIdHeader("X-Correlation-ID")
+        .Enrich.WithEnvironmentName()
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .WriteTo.Console()
+        .WriteTo.Elasticsearch(elasticOptions);
+});
+#endregion
 
 // Register services
 builder.Services.AddTransient<ServiceHelper>();
@@ -96,6 +127,9 @@ AppSettings.AppSettingsConfiguration(app.Services.GetRequiredService<IConfigurat
 CourierSettings.CourierSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
 StreamApiSettings.StreamApiSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
 ApplicationSettings.ApplicationSettingsConfiguration(app.Services.GetRequiredService<IConfiguration>());
+
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequstResponseLoggingMiddleware>();
 
 // Configure middleware
 app.Configure(builder.Environment);
