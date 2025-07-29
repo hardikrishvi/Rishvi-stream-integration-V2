@@ -270,6 +270,108 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             return string.Empty;
         }
 
+
+        public static string GenerateLabelNew(GenerateLabelRequest request, List<Item> items, string newTrackingNumber, string consignmentNo, string AddressFormatted, int totalItemCount, string labelReference, string companyName)
+        {
+            SqlHelper.SystemLogInsert("GenerateLabelNew", null, request.ToString(), null, "success", "Label generated successfully", false, "Generate Label");
+            try
+            {
+                // Specify the width and height of the image
+                float widthInInches = 4.0f;
+                float heightInInches = 6.0f;
+                float dpi = 96.0f;
+                string fontName = "sans-serif";
+
+                var paint15PXWithBold = new SKPaint()
+                {
+                    Color = SKColors.Black,
+                    TextSize = 15,
+                    IsAntialias = true,
+                    Typeface = SKTypeface.FromFamilyName(fontName, SKTypefaceStyle.Bold)
+                };
+
+                // Convert inches to pixels
+                int width = (int)GetPixels(widthInInches, dpi);
+                int height = (int)GetPixels(heightInInches, dpi);
+                // Create a new SKBitmap
+                using (var bitmap = new SKBitmap(width, height))
+                {
+                    // Create an SKCanvas to draw on the bitmap
+                    using (var canvas = new SKCanvas(bitmap))
+                    {
+                        // Set the background color (optional)
+                        canvas.Clear(SKColors.White);
+
+                        // Draw the address section
+                        float yOffset = 160; // Initial Y position for address
+                        canvas.DrawText("SHIPPING ADDRESS:", 15, yOffset, paint15PXWithBold);
+                        yOffset += 20;
+                        DrawMultilineText(canvas, paint15PXWithBold, AddressFormatted, 15, yOffset, 180);
+
+                        // Draw the tracking number
+                        yOffset += 40;
+                        canvas.DrawText("TRACKING NO:", 210, yOffset, paint15PXWithBold);
+                        canvas.DrawText(newTrackingNumber ?? "", 210, yOffset + 15, paint15PXWithBold);
+
+                        // Draw the company name
+                        yOffset += 40;
+                        canvas.DrawText("COMPANY:", 210, yOffset, paint15PXWithBold);
+                        canvas.DrawText(companyName, 210, yOffset + 15, paint15PXWithBold);
+
+                        // Loop through each item and add them to the label
+                        float itemYPos = 300; // Starting Y position for item details
+                        int itemCount = 1;
+                        foreach (var item in items)
+                        {
+                            canvas.DrawText("ITEM " + itemCount + ":", 15, itemYPos, paint15PXWithBold);
+                            itemYPos += 20;
+
+                            // Draw item name and description
+                            canvas.DrawText("ITEM DESCRIPTION:", 175, itemYPos, paint15PXWithBold);
+                            itemYPos += 20;
+                            DrawMultilineText(canvas, paint15PXWithBold, item.ItemName, 175, itemYPos, 160);
+
+                            // Draw item code
+                            itemYPos += 40;
+                            canvas.DrawText("ITEM CODE:", 175, itemYPos, paint15PXWithBold);
+                            canvas.DrawText(item.ProductCode, 175, itemYPos + 15, paint15PXWithBold);
+
+                            // Generate and draw QR code for each item
+                            SKImage qrCodeImage = GenerateQRCode(consignmentNo + "-0000" + itemCount);
+                            SKPoint destinationPoint = new SKPoint(15, itemYPos + 40);
+                            var paintqrCode = new SKPaint()
+                            {
+                                Color = SKColors.Black,
+                                IsAntialias = true
+                            };
+                            canvas.DrawImage(qrCodeImage, destinationPoint, paintqrCode);
+
+                            itemCount++; // Increment item count
+                            itemYPos += 100; // Update Y position for next item
+                        }
+
+                        // Save the bitmap to a MemoryStream
+                        using (var stream = new MemoryStream())
+                        {
+                            bitmap.Encode(SKEncodedImageFormat.Png, 100)
+                                .SaveTo(stream);
+                            stream.Position = 0; // Reset stream position to the beginning
+
+                            return Convert.ToBase64String(stream.ToArray());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SqlHelper.SystemLogInsert("GenerateLabel", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true, "Generate Label");
+                EmailHelper.SendEmail("Failed generate label", ex.Message);
+            }
+            return string.Empty;
+        }
+
+
+
         public static float GetPixels(float inches, float dpi)
         {
             return inches * dpi;

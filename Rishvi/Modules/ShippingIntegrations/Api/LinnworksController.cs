@@ -857,6 +857,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                     {
                                         foreach (var gr in strorderdaat.response.order.groups)
                                         {
+
+                                            await Task.Delay(1000);
                                             SqlHelper.SystemLogInsert("Webhook", "", $"Updating Linnworks order {Stream_orderid} with tracking and driver info", "", "LinnworksUpdate", "Updating Linnworks order with driver and vehicle details", false, "Webhook");
 
                                             string Stream_trackingURL = strorderdaat.response.order.trackingURL;
@@ -981,15 +983,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 }
                                 else
                                 {
-                                    EmailHelper.SendEmail("Error Webhook Update", "User Authentication Issue - " + user.AuthorizationToken + " Data:" + data);
+                                   // EmailHelper.SendEmail("Error Webhook Update", "User Authentication Issue - " + user.AuthorizationToken + " Data:" + data);
                                 }
 
                             }
                             catch (Exception ex)
                             {
-                                SqlHelper.SystemLogInsert("Webhook", "", $"Error processing order {strorder.order}: {ex.Message}", "", "OrderProcessingError", "Error processing order in webhook", true, "Webhook");
+                                SqlHelper.SystemLogInsert("Webhook", "", " Data:" + data, "", "OrderProcessingError", $"Error processing order {strorder.order}: {ex.Message}", true, "Webhook");
 
-                                EmailHelper.SendEmail("Error Webhook Update", "webhook error Data:" + data + "  ex: " + ex.ToString());
+                               // EmailHelper.SendEmail("Error Webhook Update", "webhook error Data:" + data + "  ex: " + ex.ToString());
                             }
 
                         }
@@ -1115,7 +1117,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 string errorMessage = $"Error handling webhook data: {ex.Message}";
                 SqlHelper.SystemLogInsert("Webhook", "", $"data: {data}", "", "Error", errorMessage, true, "Webhook");
 
-                EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
+               // EmailHelper.SendEmail("Error Json", data + " Data error " + ex.Message);
             }
             return new Dictionary<string, string>();
         }
