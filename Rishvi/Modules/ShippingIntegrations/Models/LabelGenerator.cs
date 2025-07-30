@@ -212,8 +212,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         //canvas.DrawText(item.ItemName, 175, 314, paint6PX);
 
                         canvas.DrawText("ITEM COUNT:", 175, (400 + (extraLine * 30)), paint13PXWithBold);
-                        canvas.DrawText(itemCount + " of " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
-
+                        //canvas.DrawText(itemCount + " of " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
+                        canvas.DrawText(" Total " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
                         // Draw a horizontal line
                         float startY = 490;
                         float endX = 360;
@@ -321,8 +321,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         // Loop through each item and add them to the label
                         float itemYPos = 300; // Starting Y position for item details
                         int itemCount = 1;
-                        foreach (var item in items)
-                        {
+                        //foreach (var item in items)
+                        //{
+
+                        var item = items[0];
                             canvas.DrawText("ITEM " + itemCount + ":", 15, itemYPos, paint15PXWithBold);
                             itemYPos += 20;
 
@@ -348,7 +350,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
 
                             itemCount++; // Increment item count
                             itemYPos += 100; // Update Y position for next item
-                        }
+                        //}
 
                         // Save the bitmap to a MemoryStream
                         using (var stream = new MemoryStream())

@@ -162,7 +162,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         LocationName = auth.DefaultLocation;
                     }
 
-                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
+                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel with "+request.Packages.Count, "", false, auth.Email);
                     // load all the services we have (either for this user specifically or all services)
                     List<CourierService> services = Services.GetServices;
 
