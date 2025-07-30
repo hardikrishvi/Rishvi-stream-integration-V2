@@ -220,7 +220,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                 {
                                     LabelHeight = 6,                // label height in inches
                                     LabelWidth = 4,                 // label width in inches
-                                    PNGLabelDataBase64 = LabelGenerator.GenerateLabelNew(request, package.Items, streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
+                                    PNGLabelDataBase64 = LabelGenerator.GenerateLabel_New2(request, package.Items[0], streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), totalItemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
                                     SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
                                     PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
                                     TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
