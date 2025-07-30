@@ -212,8 +212,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         //canvas.DrawText(item.ItemName, 175, 314, paint6PX);
 
                         canvas.DrawText("ITEM COUNT:", 175, (400 + (extraLine * 30)), paint13PXWithBold);
-                        //canvas.DrawText(itemCount + " of " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
-                        canvas.DrawText(" Total " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
+                        canvas.DrawText(itemCount + " of " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
+                        
                         // Draw a horizontal line
                         float startY = 490;
                         float endX = 360;
@@ -303,7 +303,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         canvas.Clear(SKColors.White);
 
                         // Draw the address section
-                        float yOffset = 160; // Initial Y position for address
+                        float yOffset = 100; // Initial Y position for address
                         canvas.DrawText("SHIPPING ADDRESS:", 15, yOffset, paint15PXWithBold);
                         yOffset += 20;
                         DrawMultilineText(canvas, paint15PXWithBold, AddressFormatted, 15, yOffset, 180);
@@ -325,7 +325,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         //{
 
                         var item = items[0];
-                            canvas.DrawText("ITEM " + itemCount + ":", 15, itemYPos, paint15PXWithBold);
+                            canvas.DrawText("TOTAL ITEMS :" + items.Count + ":", 15, itemYPos, paint15PXWithBold);
                             itemYPos += 20;
 
                             // Draw item name and description
