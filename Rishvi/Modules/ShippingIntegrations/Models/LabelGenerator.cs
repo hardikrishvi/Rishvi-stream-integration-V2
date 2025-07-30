@@ -452,8 +452,16 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                             // Draw each line onto the SkiaSharp canvas
                             float lineHeight = paint13PX.FontMetrics.Descent - paint13PX.FontMetrics.Ascent;
                             itemFlotY += 15; // Starting Y position
+                            int lincnt = 0;
                             foreach (string line in lines)
                             {
+                                lincnt++;
+
+                                if (lincnt>2)
+                                {
+                                    break;
+                                }
+
                                 if (!string.IsNullOrEmpty(line))
                                 {
                                     canvas.DrawText(line, 175, itemFlotY, paint13PX);
