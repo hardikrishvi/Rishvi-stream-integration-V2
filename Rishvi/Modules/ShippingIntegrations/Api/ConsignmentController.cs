@@ -137,7 +137,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         public GenerateLabelResponse GenerateLabel([FromBody] GenerateLabelRequest request)
         {
 
-            if (request.OrderId == 100479)
+            if (request.OrderId == 100482)
             {
                 string Email = "";
 
