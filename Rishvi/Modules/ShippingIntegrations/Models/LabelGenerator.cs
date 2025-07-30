@@ -407,6 +407,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         // Desired width of the text
                         float desiredItemCodeWidth = 160;
                         // Calculate the width of the text
+                        item.ProductCode = item.ProductCode.Length > 30 ? item.ProductCode.Substring(0, 30) : item.ProductCode;
                         float textItemCodeWidth = paint13PX.MeasureText(item.ProductCode);
                         int extraLineItemCode = 0;
                         // Check if text exceeds the desired width
@@ -434,7 +435,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                             canvas.DrawText(item.ProductCode, 175, itemFlotY, paint13PX);
                             itemFlotY += 15;
                         }
-
+                        item.ItemName = item.ItemName.Length > 30 ? item.ItemName.Substring(0, 30) : item.ItemName;
                         //canvas.DrawText(item.ProductCode, 175, 355, paint13PX);
                         //itemFlotY += 15;
                         canvas.DrawText("ITEM DESCRIPTION:", 175, itemFlotY, paint15PXWithBold);
