@@ -301,9 +301,39 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                     {
                         // Set the background color (optional)
                         canvas.Clear(SKColors.White);
+                        //Draw postal code
+                        if (!string.IsNullOrEmpty(request.Postalcode))
+                        {
+                            var splitPostalCode = request.Postalcode.Split(" ");
 
+                            if (splitPostalCode.Length >= 2)
+                            {
+                                using (var paint = new SKPaint())
+                                {
+                                    paint.Color = SKColors.Black;
+                                    paint.TextSize = 80;
+                                    paint.IsAntialias = true;
+                                    paint.Typeface = SKTypeface.FromFamilyName("sans-serif", SKTypefaceStyle.Bold);
+
+                                    canvas.DrawText(splitPostalCode[0], 135, 70, paint);
+                                    canvas.DrawText(splitPostalCode[1], 135, 135, paint);
+                                }
+                            }
+                            else
+                            {
+                                using (var paint = new SKPaint())
+                                {
+                                    paint.Color = SKColors.Black;
+                                    paint.TextSize = 70;
+                                    paint.IsAntialias = true;
+                                    paint.Typeface = SKTypeface.FromFamilyName("sans-serif", SKTypefaceStyle.Bold);
+
+                                    canvas.DrawText(splitPostalCode[0], 40, 100, paint);
+                                }
+                            }
+                        }
                         // Draw the address section
-                        float yOffset = 100; // Initial Y position for address
+                        float yOffset = 180; // Initial Y position for address
                         canvas.DrawText("SHIPPING ADDRESS:", 15, yOffset, paint15PXWithBold);
                         yOffset += 20;
                         DrawMultilineText(canvas, paint15PXWithBold, AddressFormatted, 15, yOffset, 180);
@@ -319,7 +349,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         canvas.DrawText(companyName, 210, yOffset + 15, paint15PXWithBold);
 
                         // Loop through each item and add them to the label
-                        float itemYPos = 300; // Starting Y position for item details
+                        float itemYPos = 350; // Starting Y position for item details
                         int itemCount = 1;
                         //foreach (var item in items)
                         //{
@@ -336,7 +366,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                             // Draw item code
                             itemYPos += 40;
                             canvas.DrawText("ITEM CODE:", 175, itemYPos, paint15PXWithBold);
-                            canvas.DrawText(item.ProductCode, 175, itemYPos + 15, paint15PXWithBold);
+                            canvas.DrawText(item.ProductCode = item.ProductCode.Length > 30 ? item.ProductCode.Substring(0, 30)+"..." : item.ProductCode
+, 175, itemYPos + 15, paint15PXWithBold);
 
                             // Generate and draw QR code for each item
                             SKImage qrCodeImage = GenerateQRCode(consignmentNo + "-0000" + itemCount);
