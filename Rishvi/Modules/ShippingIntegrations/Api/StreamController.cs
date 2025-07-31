@@ -14,20 +14,24 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
         private readonly TradingApiOAuthHelper _tradingApiOAuthHelper;
         private readonly ReportsController _reportsController;
-        public StreamController(ReportsController reportsController, TradingApiOAuthHelper tradingApiOAuthHelper, IAuthorizationToken authorizationToken)
+        private readonly ILogger<StreamController> _logger;
+        public StreamController(ReportsController reportsController, TradingApiOAuthHelper tradingApiOAuthHelper, IAuthorizationToken authorizationToken, ILogger<StreamController> logger)
         {
             _authorizationToken = authorizationToken;
             _reportsController = reportsController;
             _tradingApiOAuthHelper = tradingApiOAuthHelper;
+            _logger = logger;
         }
 
         [HttpGet, Route("GetStreamOrder")]
         public async Task<StreamGetOrderResponse.Root> GetStreamOrder(string token, string orderids)
         {
             // Load user authorization
+            _logger.LogInformation("Attempting to load user authorization with token: {Token}", token);
             var user = _authorizationToken.Load(token);
             if (user == null || string.IsNullOrEmpty(user.ClientId))
             {
+                _logger.LogWarning("Invalid user or missing Client ID for token: {Token}", token);
                 return null; // Invalid user or missing Client ID
             }
 
@@ -36,66 +40,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             var firstOrderId = orderidlist.FirstOrDefault();
             if (!string.IsNullOrEmpty(firstOrderId))
             {
+                _logger.LogInformation("Fetching stream order for user: {UserEmail}, Order ID: {OrderId}", user.Email, firstOrderId);
                 return await _tradingApiOAuthHelper.GetStreamOrder(user, firstOrderId);
             }
-
+            _logger.LogWarning("No valid order IDs provided for user: {UserEmail}", user.Email);
             return null; // No order IDs were provided
         }
 
-        //[HttpGet, Route("CreateEbayOrdersToStream")]
-        //public async Task<IActionResult> CreateEbayOrdersToStream(string token, string orderids)
-        //{
-        //    try
-        //    {
-        //        // Validate token
-        //        if (string.IsNullOrWhiteSpace(token))
-        //        {
-        //            return BadRequest("Authorization token is required.");
-        //        }
-
-        //        // Load user authorization
-        //        var user = _authorizationToken.Load(token);
-        //        if (user == null || string.IsNullOrEmpty(user.ClientId))
-        //        {
-        //            return Unauthorized("Invalid or missing Client ID.");
-        //        }
-
-        //        // Process orders
-        //        if (string.IsNullOrWhiteSpace(orderids))
-        //        {
-        //            // Fetch all pending eBay orders
-        //            var reportData = await _reportsController.GetReportData(new ReportModelReq { email = user.Email });
-        //            var pendingOrders = reportData
-        //                .Where(f => !f.IsEbayOrderCreatedInStream && !string.IsNullOrEmpty(f.EbayChannelOrderRef))
-        //                .Select(f => f.EbayChannelOrderRef);
-
-        //            await ProcessEbayOrders(user, pendingOrders);
-        //        }
-        //        else
-        //        {
-        //            // Process specific orders
-        //            var orderIdList = Regex.Split(orderids, ",");
-        //            await ProcessEbayOrders(user, orderIdList);
-        //        }
-
-        //        return Ok("eBay orders successfully processed.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the error (replace with ILogger for production)
-        //        Console.WriteLine($"Error creating eBay orders: {ex.Message}");
-        //        return StatusCode(500, "An unexpected error occurred.");
-        //    }
-        //}
-
-        //private async Task ProcessEbayOrders(AuthorizationConfigClass user, IEnumerable<string> orderIds)
-        //{
-        //    var tasks = orderIds
-        //        .Where(orderId => !string.IsNullOrWhiteSpace(orderId)) // Ensure valid order IDs
-        //        .Select(orderId => _tradingApiOAuthHelper.CreateEbayOrdersToStream(user, orderId));
-
-        //    await Task.WhenAll(tasks); // Process all orders in parallel
-        //}
     }
 
 }

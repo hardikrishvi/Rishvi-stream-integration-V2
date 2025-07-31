@@ -20,12 +20,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IUnitOfWork _unitOfWork;
         private readonly ManageToken _manageToken;
         private readonly IRepository<Authorization> _authorizationRepository;
-        public SetupController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ManageToken manageToken, IRepository<Authorization> authorizationRepository)
+        private readonly ILogger<SetupController> _logger;
+        public SetupController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ManageToken manageToken, IRepository<Authorization> authorizationRepository, ILogger<SetupController> logger)
         {
             _authorizationToken = authorizationToken;
             _unitOfWork = unitOfWork;
             _manageToken = manageToken;
             _authorizationRepository = authorizationRepository;
+            _logger = logger;
         }
 
         [HttpPost, Route("AddNewUser")]
@@ -34,8 +36,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("AddNewUser", null, null, JsonConvert.SerializeObject(request), "AddNewUser", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
+                _logger.LogInformation("AddNewUser request received: {Request}", JsonConvert.SerializeObject(request));
 
-              
                 // EmailHelper.SendEmail("stream Add User", JsonConvert.SerializeObject(request));
                 // Validate input fields
                 if (string.IsNullOrWhiteSpace(request.Email))
@@ -55,7 +57,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     request.AccountName
                 );
 
-             
+                _logger.LogInformation("New authorization configuration created: {Config}", JsonConvert.SerializeObject(newConfig));
 
                 //obj.Api.Orders
                 // Return a successful response
@@ -68,6 +70,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             {
                 // Handle exceptions gracefully
                 return new AddNewUserResponse("AddNewUser error: " + ex.Message);
+                _logger.LogError(ex, "An error occurred while processing AddNewUser request: {Request}", JsonConvert.SerializeObject(request));
             }
         }
 
@@ -77,12 +80,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("UserConfig", null, null, JsonConvert.SerializeObject(request), "UserConfigStart", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
+                _logger.LogInformation("UserConfig request received: {Request}", JsonConvert.SerializeObject(request));
                 //  var obj = new LinnworksBaseStream(request.AuthorizationToken);
                 // Authenticate the user
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
                 if (auth == null || authEntity == null)
                 {
+                    _logger.LogWarning("Authorization failed for token: {Token}", request.AuthorizationToken);
                     return new UserConfigResponse()
                     {
                         IsError = true,
@@ -113,9 +118,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             ConfigStatus = "ContactStage"
                         };
                         SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(ret), "UserConfigsucc", JsonConvert.SerializeObject(ret), false, "clientId");
-                        return ret; 
+                        _logger.LogInformation("Returning ContactStage configuration: {ConfigStage}", JsonConvert.SerializeObject(ret.ConfigStage));
+                        return ret;
                     }
                     SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(authEntity), "UserConfigsucc", auth.ConfigStatus, false, "clientId");
+                    _logger.LogInformation("Returning configuration for stage: {ConfigStatus}", auth.ConfigStatus);
                     // Return error for unhandled config stages
                     return new UserConfigResponse($"Config stage is not handled: {auth.ConfigStatus}");
                 }
@@ -129,6 +136,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         ConfigStatus = "CONFIG"
                     };
                     SqlHelper.SystemLogInsert("UserConfig ContactStage", null, null, JsonConvert.SerializeObject(dta), "UserConfigsucc", auth.ConfigStatus, false, "clientId");
+                    _logger.LogInformation("Returning active configuration: {ConfigStage}", JsonConvert.SerializeObject(dta.ConfigStage));
                     return dta;
                 }
             }
@@ -137,6 +145,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 // Log the error (replace with proper logging framework)
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 SqlHelper.SystemLogInsert("UserConfig error", null, null, "JsonConvert.SerializeObject(dta)", "UserConfigsucc", ex.Message, true, "clientId");
+                _logger.LogError(ex, "An error occurred while processing UserConfig request: {Request}", JsonConvert.SerializeObject(request));
                 // Return error response
                 return new UserConfigResponse()
                 {
@@ -152,11 +161,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             SqlHelper.SystemLogInsert("UpdateConfig", null, null, JsonConvert.SerializeObject(request), "UpdateConfig", JsonConvert.SerializeObject(request), false, "clientId");
             try
             {
+                _logger.LogInformation("UpdateConfig request received: {Request}", JsonConvert.SerializeObject(request));
                 // Authenticate the user and load the config file
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 var authEntity = _authorizationRepository.Get(x => x.AuthorizationToken == request.AuthorizationToken).FirstOrDefault();
                 if (auth == null || authEntity == null)
                 {
+                    _logger.LogWarning("Authorization failed for token: {Token}", request.AuthorizationToken);
                     return new UpdateConfigResponse($"Authorization failed for token {request.AuthorizationToken}");
                 }
 
@@ -194,9 +205,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.ConfigStatus = "CONFIG";
                     authEntity.IsConfigActive = true;
                     _authorizationRepository.Update(authEntity);
-                  
-                    _unitOfWork.Commit();
 
+                    _unitOfWork.Commit();
+                    _logger.LogInformation("Configuration updated successfully for ContactStage: {ConfigStatus}", auth.ConfigStatus);
                     return new UpdateConfigResponse();
                 }
                 // Handle the "CONFIG" stage or active configurations
@@ -230,17 +241,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     authEntity.IsLiveAccount = Convert.ToBoolean(GetConfigValue(request, "IsLiveAccount"));
                     _authorizationRepository.Update(authEntity);
                     _unitOfWork.Commit();
-
+                    _logger.LogInformation("Configuration updated successfully for CONFIG stage: {ConfigStatus}", auth.ConfigStatus);
                     return new UpdateConfigResponse();
                 }
                 else
                 {
+                    _logger.LogWarning("Unhandled config stage: {ConfigStatus}", auth.ConfigStatus);
                     // Return error for unhandled config stages
                     return new UpdateConfigResponse($"{auth.ConfigStatus} is not handled.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while processing UpdateConfig request: {Request}", JsonConvert.SerializeObject(request));
                 // Handle unexpected exceptions gracefully
                 return new UpdateConfigResponse($"Unhandled exception saving user config: {ex.Message}");
             }
@@ -261,24 +274,27 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("ConfigDelete")]
         public ConfigDeleteResponse ConfigDelete([FromBody] ConfigDeleteRequest request)
         {
-            SqlHelper.SystemLogInsert("ConfigDelete", null, null, JsonConvert.SerializeObject(request), "ConfigDelete Request",null, false, "clientId");
+            SqlHelper.SystemLogInsert("ConfigDelete", null, null, JsonConvert.SerializeObject(request), "ConfigDelete Request", null, false, "clientId");
             try
             {
+                _logger.LogInformation("ConfigDelete request received: {Request}", JsonConvert.SerializeObject(request));
                 // Load and authenticate the configuration using the authorization token
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
+                    _logger.LogInformation("ConfigDelete - Unuthorized fro token - {AuthorizationToken}", request.AuthorizationToken);
                     return new ConfigDeleteResponse($"Authorization failed for token {request.AuthorizationToken}");
                 }
 
                 // Delete the configuration for the given authorization token
                 _authorizationToken.Delete(request.AuthorizationToken);
-
+                _logger.LogInformation("Config Delete Successfull for json {request}", request);
                 // Return a successful response
                 return new ConfigDeleteResponse();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error occured in ConfigDelete");
                 SqlHelper.SystemLogInsert("ConfigDelete", null, null, JsonConvert.SerializeObject(request), "ConfigDelete Error", ex.ToString(), false, "clientId");
                 // Handle and return errors gracefully
                 return new ConfigDeleteResponse($"Delete Config error: {ex.Message}");
@@ -288,10 +304,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("UserAvailableServices")]
         public UserAvailableServicesResponse UserAvailableServices([FromBody] UserAvailableServicesRequest request)
         {
+            _logger.LogInformation("UserAvailableServices request received: {Request}", JsonConvert.SerializeObject(request));
             // Authenticate the user using the provided authorization token
             Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
             if (auth == null)
             {
+                _logger.LogWarning("Authorization failed for token: {Token}", request.AuthorizationToken);
                 return new UserAvailableServicesResponse($"Authorization failed for token {request.AuthorizationToken}");
             }
 
@@ -305,14 +323,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         [HttpPost, Route("ExtendedPropertyMapping")]
         public ExtendedPropertyMappingResponse ExtendedPropertyMapping([FromBody] ExtendedPropertyMappingRequest request)
         {
+            _logger.LogInformation("ExtendedPropertyMapping request received: {Request}", JsonConvert.SerializeObject(request));
             // Load and authenticate the user configuration using the provided authorization token
             Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
             if (auth == null)
             {
+                _logger.LogWarning("Authorization failed for token: {Token}", request.AuthorizationToken);
                 // Return an error response if authentication fails
                 return new ExtendedPropertyMappingResponse($"Authorization failed for token {request.AuthorizationToken}");
             }
 
+            _logger.LogInformation("Authorization successful for token: {Token}", request.AuthorizationToken);
             // Create and return the mapping response
             return new ExtendedPropertyMappingResponse()
             {
@@ -348,6 +369,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             try
             {
+                _logger.LogInformation("SubscribeWebhook request received with authToken: {AuthToken}, eventname: {EventName}, event_type: {EventType}, url_path: {UrlPath}, http_method: {HttpMethod}, content_type: {ContentType}, auth_header: {AuthHeader}",
+                    authToken, eventname, event_type, url_path, http_method, content_type, auth_header);
                 // Load and authenticate the user configuration using the provided authorization token
                 Rishvi.Models.Authorization auth = _authorizationToken.Load(authToken);
                 if (auth == null)
@@ -374,12 +397,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     auth.ClientId,
                     auth.IsLiveAccount
                 );
-
+                _logger.LogInformation("Webhook subscription successful for authToken: {AuthToken}, eventname: {EventName}, event_type: {EventType}, url_path: {UrlPath}, http_method: {HttpMethod}, content_type: {ContentType}, auth_header: {AuthHeader}",
+                    authToken, eventname, event_type, url_path, http_method, content_type, auth_header);
                 // Return a successful response
                 return new ExtendedPropertyMappingResponse();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while processing SubscribeWebhook request: {AuthToken}, {EventName}, {EventType}, {UrlPath}, {HttpMethod}, {ContentType}, {AuthHeader}",
+                    authToken, eventname, event_type, url_path, http_method, content_type, auth_header);
                 // Handle any unexpected errors gracefully
                 return new ExtendedPropertyMappingResponse($"Unhandled exception in SubscribeWebhook: {ex.Message}");
             }

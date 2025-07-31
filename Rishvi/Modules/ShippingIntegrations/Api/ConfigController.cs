@@ -10,9 +10,6 @@ using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Core.Helper;
 using Rishvi.Modules.ShippingIntegrations.Models;
 
-
-
-
 namespace Rishvi.Modules.ShippingIntegrations.Api
 {
     [Route("api/Config")]
