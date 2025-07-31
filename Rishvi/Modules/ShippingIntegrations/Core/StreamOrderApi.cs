@@ -33,6 +33,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
         public static Rishvi.Models.DeportRoot GetDepots(string streamAccessToken, string clientId, bool IsliveAccount)
         {
+
             string uniqueCode = CodeHelper.GenerateUniqueCode(32);
             var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
             var client = new RestClient(baseUrl);
@@ -68,11 +69,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
         }
 
 
-        public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId,bool IsliveAccount)
+        public static StreamGetOrderResponse.Root GetOrder(string streamAuthToken, string orderNo, string clientId, bool IsliveAccount)
         {
             string uniqueCode = CodeHelper.GenerateUniqueCode(32);
             //var baseUrl = clientId.StartsWith("RIS") ? "https://www.demo.go2stream.net/api" : AppSettings.StreamApiBasePath;
-            var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath: StreamApiSettings.DemoUrl ;
+            var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
             var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
             var request = new RestRequest("/orders/orders/" + orderNo, Method.Get);
             request.AddHeader("Accept", "application/json");
@@ -88,12 +89,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             else
             {
                 string errorMessage = response.Content;
-                SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true,clientId);
+                SqlHelper.SystemLogInsert("DeleteOrder", null, streamAuthToken, !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderDeleted", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
             }
             return null;
         }
 
-        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid,string LocationName,string Handsondate,bool IsLiveAccount)
+        public static Tuple<StreamOrderResponse, string> CreateOrder(GenerateLabelRequest generateLabelRequest, string clientId, string streamAuthToken, CourierService service, bool onlycreate, string type, string streamorderid, string LocationName, string Handsondate, bool IsLiveAccount)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
             string errorMessage = string.Empty;
@@ -102,10 +103,10 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 try
                 {
                     string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                    var baseUrl = IsLiveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl ;
+                    var baseUrl = IsLiveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
                     var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                     var request = new RestRequest(AppSettings.CreateOrderUrl, Method.Post);
-                    request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type ,LocationName,Handsondate));
+                    request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service, type, LocationName, Handsondate));
                     request.AddHeader("Accept", "application/json");
                     request.AddHeader("Content-Type", "application/json");
                     request.AddHeader("Stream-Nonce", uniqueCode);
@@ -116,14 +117,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     {
                         streamOrderResponse = JsonConvert.DeserializeObject<StreamOrderResponse>(response.Content);
 
-                        SqlHelper.SystemLogInsert("CreateStreamOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type, LocationName, Handsondate), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated"+ streamOrderResponse.response.orderNo, !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, false, clientId);
+                        SqlHelper.SystemLogInsert("CreateStreamOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type, LocationName, Handsondate), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated" + streamOrderResponse.response.orderNo, !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, false, clientId);
                     }
                     else
                     {
                         errorMessage = response.Content;
                         try
                         {
-                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type,LocationName,Handsondate), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
+                            SqlHelper.SystemLogInsert("CreateOrder", null, MappingStreamOrderRequest(generateLabelRequest, service, type, LocationName, Handsondate), !string.IsNullOrEmpty(response.Content) ? response.Content.Replace("'", "''") : null, "OrderCreated", !string.IsNullOrEmpty(response.ErrorMessage) ? response.ErrorMessage.Replace("'", "''") : null, true, clientId);
                         }
                         catch
                         {
@@ -154,13 +155,13 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 //streamOrder.re.Addresses ??= new StreamGetOrderResponse.Addresses();
                 //StreamGetOrderResponse.Address address = streamOrder.StreamGetOrderResponse.Addresses.Address1 ?? new StreamGetOrderResponse.Address();
 
-                
-               
-                    changes.Add("address1", generateLabelRequest.AddressLine1);
-               
-                
-                    changes.Add("address2", generateLabelRequest.AddressLine2);
-               
+
+
+                changes.Add("address1", generateLabelRequest.AddressLine1);
+
+
+                changes.Add("address2", generateLabelRequest.AddressLine2);
+
                 if (streamOrder?.response?.order?.header?.customer?.address?.address3 !=
                     generateLabelRequest.AddressLine3)
                 {
@@ -171,25 +172,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 {
                     changes.Add("postcode", generateLabelRequest.Postalcode);
                 }
-               
-                    changes.Add("name", generateLabelRequest.Name);
-              
-                    changes.Add("email", generateLabelRequest.Email);
-                
-               
-                    changes.Add("phone", generateLabelRequest.Phone);
-              
+
+                changes.Add("name", generateLabelRequest.Name);
+
+                changes.Add("email", generateLabelRequest.Email);
+
+
+                changes.Add("phone", generateLabelRequest.Phone);
+
                 if (streamOrder?.response?.order?.groups?.FirstOrDefault()?.driverNotes !=
                     generateLabelRequest.DeliveryNote)
                 {
                     changes.Add("deliveryNote", generateLabelRequest.DeliveryNote);
                 }
-                if(streamOrder?.response?.order?.header?.customerOrderNo != 
+                if (streamOrder?.response?.order?.header?.customerOrderNo !=
                     generateLabelRequest.OrderReference)
                 {
                     changes.Add("customerOrderNo", generateLabelRequest.OrderReference);
                 }
-                if(streamOrder?.response?.order?.groups?.FirstOrDefault().items.Count > 0)
+                if (streamOrder?.response?.order?.groups?.FirstOrDefault().items.Count > 0)
                 {
                     generateLabelRequest.Packages.Add(new Package()
                     {
@@ -199,7 +200,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             ItemName = i.description,
                             Quantity = i.quantity,
                             UnitWeight = i.weight
-                           
+
                         }).ToList()
                     });
                 }
@@ -207,19 +208,19 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
 
                 if (changes.Count > 0)
                 {
-                    UpdateOrder(changes, clientId, streamAuthToken, streamorderid,IsLiveAccount);
+                    UpdateOrder(changes, clientId, streamAuthToken, streamorderid, IsLiveAccount);
                 }
             }
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
-        public static Tuple<StreamOrderResponse, string> UpdateOrder(Dictionary<string, string> changereq, string clientId, string streamAuthToken, string orderid,bool IsliveAccount)
+        public static Tuple<StreamOrderResponse, string> UpdateOrder(Dictionary<string, string> changereq, string clientId, string streamAuthToken, string orderid, bool IsliveAccount)
         {
             StreamOrderResponse streamOrderResponse = new StreamOrderResponse();
             string errorMessage = string.Empty;
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = IsliveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl ;
+                var baseUrl = IsliveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest("/orders/orders/" + orderid, Method.Patch);
                 string finalreq = JsonConvert.SerializeObject(new StreamOrderUpdateReq.Root()
@@ -319,14 +320,14 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
 
-        public static Tuple<StreamDeleteOrderResponse, string> DeleteOrder(string streamAuthToken, string orderNo, string clientId,bool IsLiveAccount)
+        public static Tuple<StreamDeleteOrderResponse, string> DeleteOrder(string streamAuthToken, string orderNo, string clientId, bool IsLiveAccount)
         {
             StreamDeleteOrderResponse streamOrderResponse = new StreamDeleteOrderResponse();
             string errorMessage = string.Empty;
             try
             {
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = IsLiveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl ;
+                var baseUrl = IsLiveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest(AWSParameter.GetConnectionString(AppSettings.DeleteOrderUrl) + orderNo, Method.Delete);
                 //request.AddJsonBody(MappingStreamOrderRequest(generateLabelRequest, service));
@@ -365,7 +366,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
 
-        public static Tuple<WebhookSubscribeResp.Root, string> WebhookSubscribe(string streamAuthToken, string authToken, string eventname, string event_type, string url_path, string http_method, string content_type, string auth_header, string clientId,bool IsLiveAccount)
+        public static Tuple<WebhookSubscribeResp.Root, string> WebhookSubscribe(string streamAuthToken, string authToken, string eventname, string event_type, string url_path, string http_method, string content_type, string auth_header, string clientId, bool IsLiveAccount)
         {
             WebhookSubscribeResp.Root streamOrderResponse = new WebhookSubscribeResp.Root();
             string errorMessage = string.Empty;
@@ -381,7 +382,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     http_method = http_method
                 };
                 string uniqueCode = CodeHelper.GenerateUniqueCode(32);
-                var baseUrl = IsLiveAccount ?  AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
+                var baseUrl = IsLiveAccount ? AppSettings.StreamApiBasePath : StreamApiSettings.DemoUrl;
                 var client = new RestClient(baseUrl); // Fix: Instantiate RestClient with the base URL
                 var request = new RestRequest("/webhooks/webhooks", Method.Post);
                 request.AddJsonBody(JsonConvert.SerializeObject(req));
@@ -420,7 +421,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
             return Tuple.Create(streamOrderResponse, errorMessage);
         }
 
-        public static string  MappingStreamOrderRequest(GenerateLabelRequest generateLabelRequest, CourierService service, string type, string LocationName, string Handsondate)
+        public static string MappingStreamOrderRequest(GenerateLabelRequest generateLabelRequest, CourierService service, string type, string LocationName, string Handsondate)
         {
             if (type == "COLLECTION")
             {
@@ -451,7 +452,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.header.customer.contact.tel1 = generateLabelRequest.Phone;
                 streamOrderRequest.header.customer.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.header.customer.contact.optOutEmail = false;
-                streamOrderRequest.header.customer.contact.optOutSms = false;  
+                streamOrderRequest.header.customer.contact.optOutSms = false;
                 streamOrderRequest.header.customerOrderNo = generateLabelRequest.OrderReference;
                 streamOrderRequest.header.driverNotes = generateLabelRequest.DeliveryNote;
                 streamOrderRequest.header.cutOffTimeMet = true;
@@ -470,7 +471,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.collection.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.collection.contact.optOutEmail = false;
                 streamOrderRequest.collection.contact.optOutSms = false;
-                streamOrderRequest.collection.collectionMethod = generateLabelRequest.deliveryMethod!=null? generateLabelRequest.deliveryMethod: "NORTH";
+                streamOrderRequest.collection.collectionMethod = generateLabelRequest.deliveryMethod != null ? generateLabelRequest.deliveryMethod : "NORTH";
                 streamOrderRequest.collection.bookingRequired = true;
                 int itemCount = 1;
                 streamOrderRequest.collection.items = new List<CollectionOrderRequest.Item>();
@@ -533,7 +534,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.delivery.contact.email = generateLabelRequest.Email;
                 streamOrderRequest.delivery.contact.optOutEmail = false;
                 streamOrderRequest.delivery.contact.optOutSms = false;
-                streamOrderRequest.delivery.deliveryMethod = generateLabelRequest.deliveryMethod!=null ? generateLabelRequest.deliveryMethod : "SGK";
+                streamOrderRequest.delivery.deliveryMethod = generateLabelRequest.deliveryMethod != null ? generateLabelRequest.deliveryMethod : "SGK";
                 streamOrderRequest.delivery.bookingRequired = true;
                 int itemCount = 1;
                 foreach (var packages in generateLabelRequest.Packages)
@@ -548,7 +549,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             quantity = item.Quantity,
                             weight = item.UnitWeight,
                             stockLocation = LocationName,
-                            onHandDate = Handsondate!=""? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd"):null
+                            onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
                         });
                         itemCount++;
                     }

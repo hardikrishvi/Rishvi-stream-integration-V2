@@ -19,21 +19,24 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
     {
         private readonly IRepository<Rishvi.Models.Authorization> _authorization;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<ManageToken> _logger;
 
-        public ManageToken(IUnitOfWork unitOfWork, IRepository<Rishvi.Models.Authorization> authorization)
+        public ManageToken(IUnitOfWork unitOfWork, IRepository<Rishvi.Models.Authorization> authorization, ILogger<ManageToken> logger)
         {
             _unitOfWork = unitOfWork;
             _authorization = authorization;
+            _logger = logger;
         }
 
         public TokenDetails GetToken(Rishvi.Models.Authorization authorizationConfig)
         {
+            _logger.LogInformation("GetToken called with ClientId: {ClientId}", authorizationConfig.ClientId);
             if (!string.IsNullOrEmpty(authorizationConfig.ClientId) && !string.IsNullOrEmpty(authorizationConfig.ClientSecret))
             {
                 // Create an instance of ManageToken to call the non-static method
                 //var manageTokenInstance = new ManageToken(null, null, null); // Pass appropriate arguments for IRepository and UnitOfWork if needed
                 var _Resp = AuthorizeClient(authorizationConfig.ClientId, authorizationConfig.ClientSecret, authorizationConfig.AuthorizationToken);
-
+                _logger.LogInformation("Authorization response received for ClientId: {ClientId}", authorizationConfig.ClientId);
                 return new TokenDetails
                 {
                     AccessToken = _Resp.AccessToken,
@@ -42,6 +45,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     Scope = _Resp.Scope,
                 };
             }
+            _logger.LogWarning("ClientId or ClientSecret is null or empty for authorizationConfig: {AuthorizationConfig}", authorizationConfig);
             return null;
         }
 
