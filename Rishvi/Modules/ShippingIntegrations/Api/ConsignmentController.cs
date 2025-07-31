@@ -139,6 +139,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         }
 
         [HttpPost, Route("GenerateLabel")]
+
         public GenerateLabelResponse GenerateLabel([FromBody] GenerateLabelRequest request)
         {
             _logger.LogInformation("GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
@@ -203,9 +204,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                         int totalItemCount = request.Packages.Sum(s => s.Items.Count());
                         foreach (var package in request.Packages)   // we need to generate a label for each package in the consignment
                         {
-                            // an order may have extended property bound to it, here we can pass any specific parameter we need
-                            // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
-                            string safePlace1 = "";
+                        if (Email== "johnny@max-motorcycles.co.uk" || Email == "info@linnworkscustom.com")
+                        {
+                           // an order may have extended property bound to it, here we can pass any specific parameter we need
+                                            // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
+                                            string safePlace1 = "";
                             if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
                             {
                                 safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
@@ -221,7 +224,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                             {
                                 LabelHeight = 6,                // label height in inches
                                 LabelWidth = 4,                 // label width in inches
-                                PNGLabelDataBase64 = LabelGenerator.GenerateLabelNew(request, package.Items, streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
+                                PNGLabelDataBase64 = LabelGenerator.GenerateLabel_New2(request, package.Items[0], streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
                                 SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
                                 PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
                                 TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
@@ -231,89 +234,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                              * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
                              */
                             itemCount++;
-
                         }
-                        _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
-                        return response;
-                    }
-                    else
-                    {
-                        _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
-                        return new GenerateLabelResponse("Error");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Unhandled error in GenerateLabel for OrderId: {OrderId}", request.OrderId);
-                    SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
-                    EmailHelper.SendEmail("Failed generate lable", ex.ToString());
-                    return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
-                }
-            }
-            else
-            {
-                string Email = "";
-
-                try
-                {
-                    _logger.LogInformation("GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
-                    // lets authenticate the user and make sure we have their config details
-                    Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
-                    if (auth == null)
-                    {
-                        return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
-                    }
-                    Email = auth.Email;
-                    string LocationName = "SGK";
-                    string HandsonDate = "";
-
-                    if (auth.HandsOnDate)
-                    {
-                        HandsonDate = DateTime.Now.ToString();
-                    }
-                    if (auth.UseDefaultLocation && auth.DefaultLocation != "")
-                    {
-                        LocationName = auth.DefaultLocation;
-                    }
-
-                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
-                    // load all the services we have (either for this user specifically or all services)
-                    List<CourierService> services = Services.GetServices;
-
-                    //linnworks will send the serviceId as defined in list of services, we will need to find the service by id 
-                    CourierService selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
-                    if (selectedService == null)
-                    {
-                        _logger.LogError("GenerateLabel Service Id {ServiceId} is not available", request.ServiceId);
-                        throw new Exception("Service Id " + request.ServiceId.ToString() + " is not available");
-                    }
-
-                    // get the service code
-                    string serviceCode = selectedService.ServiceCode;
-                    //and some other information, whatever we need
-                    string VendorCode = selectedService.ServiceGroup;
-
-                    //create response class, we will be adding packages to it
-                    GenerateLabelResponse response = new GenerateLabelResponse();
-                    var streamAuth = _manageToken.GetToken(auth);
-
-                    //var manageToken = new ManageToken(_ClientAuth, _unitOfWork);
-                    //var streamAuth = manageToken.GetToken(auth);
-
-                    StreamGetOrderResponse.Root streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
-
-                    //if (streamOrder!=null)
-                    //{
-                    //    string ord = ;
-                    //}
-
-                    //var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString(),LocationName,HandsonDate);
-                    ///* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
-                    if (streamOrder != null)
-                    {
-                        int itemCount = 1;
-                        int totalItemCount = request.Packages.Sum(s => s.Items.Count());
-                        foreach (var package in request.Packages)   // we need to generate a label for each package in the consignment
+                        else
                         {
                             foreach (var item in package.Items)
                             {
@@ -347,6 +269,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                                  */
                                 itemCount++;
                             }
+                        }
+
+                            
                         }
                         _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
                         return response;

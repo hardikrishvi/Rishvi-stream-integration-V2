@@ -213,7 +213,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
 
                         canvas.DrawText("ITEM COUNT:", 175, (400 + (extraLine * 30)), paint13PXWithBold);
                         canvas.DrawText(itemCount + " of " + totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
-
+                        
                         // Draw a horizontal line
                         float startY = 490;
                         float endX = 360;
@@ -271,9 +271,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
         }
 
 
-        public static string GenerateLabelNew(GenerateLabelRequest request, List<Item> items, string newTrackingNumber, string consignmentNo, string AddressFormatted, int totalItemCount, string labelReference, string companyName)
+        public static string GenerateLabel_New2(GenerateLabelRequest request, Item item, string newTrackingNumber, string consignmentNo, string AddressFormatted, int itemCount, int totalItemCount, string labelReference, string companyName)
         {
-            SqlHelper.SystemLogInsert("GenerateLabelNew", null, request.ToString(), null, "success", "Label generated successfully", false, "Generate Label");
+            SqlHelper.SystemLogInsert("GenerateLabel", null, request.ToString(), null, "success", "Label generated successfully", false, "Generate Lebel New 2");
             try
             {
                 // Specify the width and height of the image
@@ -290,6 +290,38 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                     Typeface = SKTypeface.FromFamilyName(fontName, SKTypefaceStyle.Bold)
                 };
 
+                var paint13PXWithBold = new SKPaint()
+                {
+                    Color = SKColors.Black,
+                    TextSize = 13,
+                    IsAntialias = true,
+                    Typeface = SKTypeface.FromFamilyName(fontName, SKTypefaceStyle.Bold)
+                };
+
+                var paint13PX = new SKPaint()
+                {
+                    Color = SKColors.Black,
+                    TextSize = 13,
+                    IsAntialias = true,
+                    Typeface = SKTypeface.FromFamilyName(fontName, SKTypefaceStyle.Normal)
+                };
+
+                var paint11PX = new SKPaint()
+                {
+                    Color = SKColors.Black,
+                    TextSize = 11,
+                    IsAntialias = true,
+                    Typeface = SKTypeface.FromFamilyName(fontName, SKTypefaceStyle.Normal)
+                };
+
+                var paint25PXWhiteFont = new SKPaint()
+                {
+                    Color = SKColors.White,
+                    TextSize = 25,
+                    IsAntialias = true,
+                    Typeface = SKTypeface.FromFamilyName(fontName, SKTypefaceStyle.Normal)
+                };
+
                 // Convert inches to pixels
                 int width = (int)GetPixels(widthInInches, dpi);
                 int height = (int)GetPixels(heightInInches, dpi);
@@ -302,61 +334,198 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
                         // Set the background color (optional)
                         canvas.Clear(SKColors.White);
 
-                        // Draw the address section
-                        float yOffset = 160; // Initial Y position for address
-                        canvas.DrawText("SHIPPING ADDRESS:", 15, yOffset, paint15PXWithBold);
-                        yOffset += 20;
-                        DrawMultilineText(canvas, paint15PXWithBold, AddressFormatted, 15, yOffset, 180);
-
-                        // Draw the tracking number
-                        yOffset += 40;
-                        canvas.DrawText("TRACKING NO:", 210, yOffset, paint15PXWithBold);
-                        canvas.DrawText(newTrackingNumber ?? "", 210, yOffset + 15, paint15PXWithBold);
-
-                        // Draw the company name
-                        yOffset += 40;
-                        canvas.DrawText("COMPANY:", 210, yOffset, paint15PXWithBold);
-                        canvas.DrawText(companyName, 210, yOffset + 15, paint15PXWithBold);
-
-                        // Loop through each item and add them to the label
-                        float itemYPos = 300; // Starting Y position for item details
-                        int itemCount = 1;
-                        foreach (var item in items)
+                        //Draw postal code
+                        if (!string.IsNullOrEmpty(request.Postalcode))
                         {
-                            canvas.DrawText("ITEM " + itemCount + ":", 15, itemYPos, paint15PXWithBold);
-                            itemYPos += 20;
+                            var splitPostalCode = request.Postalcode.Split(" ");
 
-                            // Draw item name and description
-                            canvas.DrawText("ITEM DESCRIPTION:", 175, itemYPos, paint15PXWithBold);
-                            itemYPos += 20;
-                            DrawMultilineText(canvas, paint15PXWithBold, item.ItemName, 175, itemYPos, 160);
-
-                            // Draw item code
-                            itemYPos += 40;
-                            canvas.DrawText("ITEM CODE:", 175, itemYPos, paint15PXWithBold);
-                            canvas.DrawText(item.ProductCode, 175, itemYPos + 15, paint15PXWithBold);
-
-                            // Generate and draw QR code for each item
-                            SKImage qrCodeImage = GenerateQRCode(consignmentNo + "-0000" + itemCount);
-                            SKPoint destinationPoint = new SKPoint(15, itemYPos + 40);
-                            var paintqrCode = new SKPaint()
+                            if (splitPostalCode.Length >= 2)
                             {
-                                Color = SKColors.Black,
-                                IsAntialias = true
-                            };
-                            canvas.DrawImage(qrCodeImage, destinationPoint, paintqrCode);
+                                using (var paint = new SKPaint())
+                                {
+                                    paint.Color = SKColors.Black;
+                                    paint.TextSize = 80;
+                                    paint.IsAntialias = true;
+                                    paint.Typeface = SKTypeface.FromFamilyName("sans-serif", SKTypefaceStyle.Bold);
 
-                            itemCount++; // Increment item count
-                            itemYPos += 100; // Update Y position for next item
+                                    canvas.DrawText(splitPostalCode[0], 135, 70, paint);
+                                    canvas.DrawText(splitPostalCode[1], 135, 135, paint);
+                                }
+                            }
+                            else
+                            {
+                                using (var paint = new SKPaint())
+                                {
+                                    paint.Color = SKColors.Black;
+                                    paint.TextSize = 70;
+                                    paint.IsAntialias = true;
+                                    paint.Typeface = SKTypeface.FromFamilyName("sans-serif", SKTypefaceStyle.Bold);
+
+                                    canvas.DrawText(splitPostalCode[0], 40, 100, paint);
+                                }
+                            }
                         }
+                        float maxWidth = 180;
+                        canvas.DrawText("SHIPPING ADDRESS:", 15, 160, paint15PXWithBold);
+                        //canvas.DrawText(AddressFormatted, 15, 175, paint6PX);
+                        // Draw text on multiple lines
+                        DrawMultilineText(canvas, paint13PX, AddressFormatted, 15, 175, maxWidth);
+
+                        canvas.DrawText("TRACKING NO:", 210, 160, paint15PXWithBold);
+                        canvas.DrawText(newTrackingNumber == null ? "" : newTrackingNumber, 210, 175, paint13PX);
+
+                        canvas.DrawText("ROUTE NO:", 210, 190, paint15PXWithBold);
+                        canvas.DrawText("", 210, 205, paint13PX);
+
+                        canvas.DrawText("COMPANY:", 210, 220, paint15PXWithBold);
+                        canvas.DrawText(companyName, 210, 235, paint13PX);
+
+                        canvas.DrawText("ORDER NO:", 210, 290, paint15PXWithBold);
+                        if (labelReference == "ChannelReferance")
+                        {
+                            canvas.DrawText(request.OrderReference, 210, 305, paint13PX);
+                        }
+                        else
+                        {
+                            canvas.DrawText((request.OrderId > 0 ? request.OrderId.ToString() : ""), 210, 305, paint13PX);
+                        }
+
+                        canvas.DrawText("SHIP TO NAME:", 15, 300, paint15PXWithBold);
+                        canvas.DrawText(request.Name, 15, 315, paint13PX);
+
+                        ////QR Code Image
+                        SKImage qrCodeImage = GenerateQRCode(consignmentNo + "-0000" + itemCount);
+                        SKPoint destinationPoint = new SKPoint(15, 330);
+                        var paintqrCode = new SKPaint()
+                        {
+                            Color = SKColors.Black,
+                            IsAntialias = true
+                        };
+                        canvas.DrawImage(qrCodeImage, destinationPoint, paintqrCode);
+                        float itemFlotY = 340;
+                        canvas.DrawText("ITEM CODE:", 175, itemFlotY, paint15PXWithBold);
+                        // Desired width of the text
+                        float desiredItemCodeWidth = 160;
+                        // Calculate the width of the text
+                        item.ProductCode = item.ProductCode.Length > 30 ? item.ProductCode.Substring(0, 30) : item.ProductCode;
+                        float textItemCodeWidth = paint13PX.MeasureText(item.ProductCode);
+                        int extraLineItemCode = 0;
+                        // Check if text exceeds the desired width
+                        if (textItemCodeWidth > desiredItemCodeWidth)
+                        {
+                            // Split the text into lines that fit within the desired width
+                            string[] linesItemCode = SplitTextIntoLines(item.ProductCode, paint13PX, desiredItemCodeWidth);
+                            extraLineItemCode = linesItemCode.Length > 1 ? linesItemCode.Length - 1 : 0;
+                            // Draw each line onto the SkiaSharp canvas
+                            float lineHeightItemCode = paint13PX.FontMetrics.Descent - paint13PX.FontMetrics.Ascent;
+                            itemFlotY = itemFlotY + 15; // Starting Y position
+                            foreach (string line in linesItemCode)
+                            {
+                                if (!string.IsNullOrEmpty(line))
+                                {
+                                    canvas.DrawText(line, 175, itemFlotY, paint13PX);
+                                    itemFlotY += lineHeightItemCode; // Move to the next line
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Draw the entire text if it fits within the desired width
+                            itemFlotY += 15;
+                            canvas.DrawText(item.ProductCode, 175, itemFlotY, paint13PX);
+                            itemFlotY += 15;
+                        }
+                        item.ItemName = item.ItemName.Length > 30 ? item.ItemName.Substring(0, 30) : item.ItemName;
+                        //canvas.DrawText(item.ProductCode, 175, 355, paint13PX);
+                        //itemFlotY += 15;
+                        canvas.DrawText("ITEM DESCRIPTION:", 175, itemFlotY, paint15PXWithBold);
+                        // Desired width of the text
+                        float desiredWidth = 160;
+                        // Calculate the width of the text
+                        float textWidth = paint13PX.MeasureText(item.ItemName);
+                        int extraLine = 0;
+                        // Check if text exceeds the desired width
+                        if (textWidth > desiredWidth)
+                        {
+                            // Split the text into lines that fit within the desired width
+                            string[] lines = SplitTextIntoLines(item.ItemName, paint13PX, desiredWidth);
+                            extraLine = lines.Length > 1 ? lines.Length - 1 : 0;
+                            // Draw each line onto the SkiaSharp canvas
+                            float lineHeight = paint13PX.FontMetrics.Descent - paint13PX.FontMetrics.Ascent;
+                            itemFlotY += 15; // Starting Y position
+                            int lincnt = 0;
+                            foreach (string line in lines)
+                            {
+                                lincnt++;
+
+                                if (lincnt>2)
+                                {
+                                    break;
+                                }
+
+                                if (!string.IsNullOrEmpty(line))
+                                {
+                                    canvas.DrawText(line, 175, itemFlotY, paint13PX);
+                                    itemFlotY += lineHeight; // Move to the next line
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Draw the entire text if it fits within the desired width
+                            itemFlotY += 15;
+                            canvas.DrawText(item.ItemName, 175, itemFlotY, paint13PX);
+                        }
+
+
+                        //canvas.DrawText(item.ItemName, 175, 314, paint6PX);
+
+                        canvas.DrawText("ITEM COUNT:", 175, (400 + (extraLine * 30)), paint13PXWithBold);
+                        canvas.DrawText( totalItemCount + " Items", 175, (415 + (extraLine * 30)), paint11PX);
+
+                        // Draw a horizontal line
+                        float startY = 490;
+                        float endX = 360;
+                        float startX = 15;
+
+                        var paintLine = new SKPaint
+                        {
+                            Color = SKColors.Black,
+                            StrokeWidth = 1
+                        };
+
+                        canvas.DrawLine(startX, startY, endX, startY, paintLine);
+
+                        ////Bar code
+                        SKImage barcodeImage = GenerateBarcode(consignmentNo + "-0000" + itemCount);
+                        SKPoint barcodeSKPoint = new SKPoint(15, 505);
+                        var paintBarCode = new SKPaint()
+                        {
+                            Color = SKColors.Black,
+                            IsAntialias = true
+                        };
+                        canvas.DrawImage(barcodeImage, barcodeSKPoint, paintBarCode);
+
+                        canvas.DrawText(consignmentNo + "-0000" + itemCount, 80, 570, paint13PX);
+
+                        //rectangle
+                        var rectanglePaint = new SKPaint()
+                        {
+                            Color = SKColors.Black
+                        };
+                        canvas.DrawRect(290, 495, 65, 65, rectanglePaint);
+                        canvas.DrawText("S", 315, 535, paint25PXWhiteFont);
 
                         // Save the bitmap to a MemoryStream
                         using (var stream = new MemoryStream())
                         {
                             bitmap.Encode(SKEncodedImageFormat.Png, 100)
-                                .SaveTo(stream);
+                                  .SaveTo(stream);
                             stream.Position = 0; // Reset stream position to the beginning
+                            Console.WriteLine("Image generated successfully!");
 
+                            // Now you can return the MemoryStream or use it as needed
+                            // e.g., return stream;
                             return Convert.ToBase64String(stream.ToArray());
                         }
                     }
@@ -364,13 +533,11 @@ namespace Rishvi.Modules.ShippingIntegrations.Models
             }
             catch (Exception ex)
             {
-                SqlHelper.SystemLogInsert("GenerateLabel", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true, "Generate Label");
+                SqlHelper.SystemLogInsert("GenerateLabel", null, JsonConvert.SerializeObject(request).Replace("'", "''"), JsonConvert.SerializeObject(request).Replace("'", "''"), "LabelGenerateError", ex.Message, true, "Generate Lebel");
                 EmailHelper.SendEmail("Failed generate label", ex.Message);
             }
             return string.Empty;
         }
-
-
 
         public static float GetPixels(float inches, float dpi)
         {
