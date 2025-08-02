@@ -473,10 +473,43 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.collection.contact.optOutSms = false;
                 streamOrderRequest.collection.collectionMethod = generateLabelRequest.deliveryMethod != null ? generateLabelRequest.deliveryMethod : "NORTH";
                 streamOrderRequest.collection.bookingRequired = true;
+                //int itemCount = 1;
+                //streamOrderRequest.collection.items = new List<CollectionOrderRequest.Item>();
+                //foreach (var packages in generateLabelRequest.Packages)
+                //{
+                //    foreach (var item in packages.Items)
+                //    {
+                //        streamOrderRequest.collection.items.Add(new CollectionOrderRequest.Item
+                //        {
+                //            sequence = itemCount,
+                //            code = item.ProductCode,
+                //            description = item.ItemName,
+                //            quantity = item.Quantity,
+                //            weight = item.UnitWeight,
+                //            stockLocation = LocationName,
+                //            onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
+                //        });
+                //        itemCount++;
+                //    }
+                //}
+                //Item details
                 int itemCount = 1;
-                streamOrderRequest.collection.items = new List<CollectionOrderRequest.Item>();
+                int parentitemcount = 0;
                 foreach (var packages in generateLabelRequest.Packages)
                 {
+                    streamOrderRequest.collection.items.Add(new CollectionOrderRequest.Item
+                    {
+                        sequence = itemCount,
+                        code = packages.PackageFormat,
+                        description = packages.PackageFormat,
+                        quantity = 1,
+                        weight = Math.Round(packages.PackageWeight, 2) - Math.Round(packages.Items.Sum(item => item.UnitWeight * item.Quantity), 2),
+                        stockLocation = "SGK",
+                    });
+                    parentitemcount = itemCount;
+                    itemCount++;
+
+
                     foreach (var item in packages.Items)
                     {
                         streamOrderRequest.collection.items.Add(new CollectionOrderRequest.Item
@@ -536,9 +569,51 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 streamOrderRequest.delivery.contact.optOutSms = false;
                 streamOrderRequest.delivery.deliveryMethod = generateLabelRequest.deliveryMethod != null ? generateLabelRequest.deliveryMethod : "SGK";
                 streamOrderRequest.delivery.bookingRequired = true;
+                //int itemCount = 1;
+                //foreach (var packages in generateLabelRequest.Packages)
+                //{
+                //    foreach (var item in packages.Items)
+                //    {
+                //        streamOrderRequest.delivery.items.Add(new StreamOrderItem
+                //        {
+                //            sequence = itemCount,
+                //            code = item.ProductCode,
+                //            description = item.ItemName,
+                //            quantity = item.Quantity,
+                //            weight = item.UnitWeight,
+                //            stockLocation = LocationName,
+                //            onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
+                //        });
+                //        itemCount++;
+                //    }
+                //}
+                //Item details
                 int itemCount = 1;
+                int parentitemcount = 0;
                 foreach (var packages in generateLabelRequest.Packages)
                 {
+                    streamOrderRequest.delivery.items.Add(new StreamOrderItem
+                    {
+                        sequence = itemCount,
+                        //parentSequence = itemCount,
+                        //consolidatedLevel = 0,
+                        code = packages.PackageFormat,
+                        description = packages.PackageFormat,
+                        quantity = 1,
+                        //weight = item.UnitWeight,
+                        weight = Math.Round(packages.PackageWeight, 2) - Math.Round(packages.Items.Sum(item => item.UnitWeight * item.Quantity), 2),
+                        //cube = 3.5f,
+                        //assemblyTime = 30,
+                        stockLocation = "SGK",
+                        //onHandDate = "2017-07-30",
+                        //packageId = "ABCD1234567890",
+                        //notes = "Include product manual within packaging.",
+                        //packageType = "PALLET"
+                    });
+                    parentitemcount = itemCount;
+                    itemCount++;
+
+
                     foreach (var item in packages.Items)
                     {
                         streamOrderRequest.delivery.items.Add(new StreamOrderItem
