@@ -143,8 +143,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         public GenerateLabelResponse GenerateLabel([FromBody] GenerateLabelRequest request)
         {
             _logger.LogInformation("GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
-            if (request.OrderId == 100479)
-            {
+            
                 string Email = "";
 
                 try
@@ -289,7 +288,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     EmailHelper.SendEmail("Failed generate lable", ex.ToString());
                     return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
                 }
-            }
+            
 
         }
 
