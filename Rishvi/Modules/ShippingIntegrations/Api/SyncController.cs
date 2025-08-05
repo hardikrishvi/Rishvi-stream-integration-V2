@@ -139,6 +139,47 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
         }
 
+
+        [HttpGet, Route("StartServiceByEmail")]
+        [AllowAnonymous]
+        public async Task<bool> StartServiceByEmail(string Email)
+        {
+            try
+            {
+                _logger.LogInformation("StartService called");
+                //    var getdepots = StreamOrderApi.GetDepots("f8a28932bc88473d0724c44c1d4c1fd90845bebe", "RISHV000000000001", false);
+
+                var listuser = _dbSqlCContext.Authorizations.OrderByDescending(x => x.Id).ToList();
+
+                var uniqueEmailUsers = listuser.Where(x=>x.Email==Email)
+                    .GroupBy(x => x.Email)
+                    .Select(g => g.Last())
+                    .ToList();
+
+                foreach (var res in uniqueEmailUsers)
+                {
+                    if (res.AutoOrderSync)
+                    {
+                        await _linnworksController.GetLinnOrderForStream(res, "");
+                        await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
+                    }
+                    res.UpdatedAt = DateTime.UtcNow;
+                    _dbSqlCContext.Update(res);
+                    _unitOfWork.Commit();
+                }
+                _logger.LogInformation("StartService completed successfully for all users");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in StartService");
+                SqlHelper.SystemLogInsert("sync Method", null, null, null, "Sync", !string.IsNullOrEmpty(ex.ToString()) ? ex.ToString().Replace("'", "''") : null, true, "All");
+                // Log the exception for debugging
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return false; // Indicate failure
+            }
+        }
+
         [HttpPost, Route("PluggableStartService")]
         [AllowAnonymous]
         public async Task<bool> PluggableStartService(string Email, string orderIds)
