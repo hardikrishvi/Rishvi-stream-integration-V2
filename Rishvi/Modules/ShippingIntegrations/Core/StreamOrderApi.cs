@@ -515,6 +515,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     {
                         streamOrderRequest.collection.items.Add(new CollectionOrderRequest.Item
                         {
+                            parentSequence = parentitemcount,
                             sequence = itemCount,
                             code = item.ProductCode,
                             description = item.ItemName,
@@ -621,6 +622,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         streamOrderRequest.delivery.items.Add(new StreamOrderItem
                         {
                             sequence = itemCount,
+                            parentSequence = parentitemcount,
                             code = item.ProductCode,
                             description = item.ItemName,
                             quantity = item.Quantity,
