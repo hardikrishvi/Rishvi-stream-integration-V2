@@ -504,7 +504,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         description = packages.PackageFormat,
                         quantity = 1,
                         weight = Math.Round(packages.PackageWeight, 2) - Math.Round(packages.Items.Sum(item => item.UnitWeight * item.Quantity), 2),
-                        stockLocation = "SGK",
+                        stockLocation = LocationName,
+                        onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
                     });
                     parentitemcount = itemCount;
                     itemCount++;
@@ -514,6 +515,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                     {
                         streamOrderRequest.collection.items.Add(new CollectionOrderRequest.Item
                         {
+                            parentSequence = parentitemcount,
                             sequence = itemCount,
                             parentSequence = parentitemcount,
                             code = item.ProductCode,
@@ -605,7 +607,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         weight = Math.Round(packages.PackageWeight, 2) - Math.Round(packages.Items.Sum(item => item.UnitWeight * item.Quantity), 2),
                         //cube = 3.5f,
                         //assemblyTime = 30,
-                        stockLocation = "SGK",
+                        stockLocation = LocationName,
+                       onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null,
                         //onHandDate = "2017-07-30",
                         //packageId = "ABCD1234567890",
                         //notes = "Include product manual within packaging.",
