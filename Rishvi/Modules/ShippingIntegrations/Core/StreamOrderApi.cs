@@ -517,7 +517,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                         {
                             parentSequence = parentitemcount,
                             sequence = itemCount,
-                            parentSequence = parentitemcount,
+                           
                             code = item.ProductCode,
                             description = item.ItemName,
                             quantity = item.Quantity,
