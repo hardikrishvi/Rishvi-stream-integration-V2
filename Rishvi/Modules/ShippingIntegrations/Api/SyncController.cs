@@ -119,8 +119,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 {
                     if (res.AutoOrderSync)
                     {
-                        await _linnworksController.GetLinnOrderForStream(res, "");
-                        await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
+                        //await _linnworksController.GetLinnOrderForStream(res, "");
+                        //await _linnworksController.CreateLinnworksOrdersToStream(res.AuthorizationToken, "");
                     }
                     res.UpdatedAt = DateTime.UtcNow;
                     _dbSqlCContext.Update(res);
