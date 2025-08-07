@@ -178,7 +178,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                       .Where(x => x.email == user.Email)
                       .ToList();
 
-                    var pendingOrders = reportData.Where(f => !f.IsLinnOrderCreatedInStream && !string.IsNullOrEmpty(f.LinnNumOrderId) && f.LinnNumOrderId== 100532.ToString());
+                    var pendingOrders = reportData.Where(f => !f.IsLinnOrderCreatedInStream && !string.IsNullOrEmpty(f.LinnNumOrderId));
 
                     foreach (var pendingOrder in pendingOrders)
                     {
