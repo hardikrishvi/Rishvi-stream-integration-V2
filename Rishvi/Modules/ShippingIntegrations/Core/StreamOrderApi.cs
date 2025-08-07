@@ -493,23 +493,25 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 //    }
                 //}
                 //Item details
+                int packagecount = 0;
                 int itemCount = 1;
                 int parentitemcount = 0;
                 foreach (var packages in generateLabelRequest.Packages)
                 {
+                    packagecount++;
                     streamOrderRequest.collection.items.Add(new CollectionOrderRequest.Item
                     {
                         sequence = itemCount,
                         code = packages.PackageFormat,
-                        description = packages.PackageFormat,
+                        description = $"Package No:{packagecount} (Total Items : {packages.Items.Count})",
                         quantity = 1,
-                        weight = Math.Round(packages.PackageWeight, 2) - Math.Round(packages.Items.Sum(item => item.UnitWeight * item.Quantity), 2),
+                        weight = Math.Round(packages.PackageWeight, 2),
                         stockLocation = LocationName,
                         onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
                     });
                     parentitemcount = itemCount;
                     itemCount++;
-
+                    
 
                     foreach (var item in packages.Items)
                     {
@@ -591,20 +593,22 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                 //    }
                 //}
                 //Item details
+                int packagecount =0 ;
                 int itemCount = 1;
                 int parentitemcount = 0;
                 foreach (var packages in generateLabelRequest.Packages)
                 {
+                    packagecount++;
                     streamOrderRequest.delivery.items.Add(new StreamOrderItem
                     {
                         sequence = itemCount,
                         //parentSequence = itemCount,
                         //consolidatedLevel = 0,
                         code = packages.PackageFormat??"Default",
-                        description = packages.PackageFormat ?? "Default",
+                        description = $"Package No:{packagecount} (Total Items : {packages.Items.Count})",
                         quantity = 1,
                         //weight = item.UnitWeight,
-                        weight = Math.Round(packages.PackageWeight, 2) - Math.Round(packages.Items.Sum(item => item.UnitWeight * item.Quantity), 2),
+                        weight = Math.Round(packages.PackageWeight, 2) ,
                         //cube = 3.5f,
                         //assemblyTime = 30,
                         stockLocation = LocationName,
@@ -627,7 +631,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                             code = item.ProductCode,
                             description = item.ItemName,
                             quantity = item.Quantity,
-                            weight = item.UnitWeight,
+                            weight = item.UnitWeight ,
                             stockLocation = LocationName,
                             onHandDate = Handsondate != "" ? DateTime.Parse(Handsondate).ToString("yyyy-MM-dd") : null
                         });

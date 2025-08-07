@@ -278,7 +278,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     else
                     {
                         _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
-                        return new GenerateLabelResponse("Error");
+                        return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
                     }
                 }
                 catch (Exception ex)
