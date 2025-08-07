@@ -547,40 +547,65 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                                 var packages = new List<Package>();
                                                 var jsonBins = obj.Api.Orders.GetOrderPackagingSplit(orderRoot.OrderId, true);
 
-                                                
-                                                foreach (var bin in jsonBins)
+                                                if (jsonBins != null && jsonBins.Count > 0)
                                                 {
-                                                    var package = new Package
+                                                    foreach (var bin in jsonBins)
                                                     {
-                                                        
-                                                        PackageWeight = bin.PackagingWeight,
-                                                        PackageWidth = bin.Width,
-                                                        PackageHeight = bin.Height,
-                                                        PackageDepth = bin.Depth,
-                                                        PackageFormat = packagingGroups.SelectMany(pg => pg.PackageTypes).FirstOrDefault(pt => pt.PackageTypeId == bin.fkPackagingTypeId)?.PackageTitle ?? "Default"   , // you can convert to a human-readable format if needed
-                                                        Items = new List<Item>()
-                                                    };
-
-                                                    foreach (var item in bin.Items)
-                                                    {
-                                                        var mappedItem = new Item
+                                                        var package = new Package
                                                         {
-                                                            ProductCode = item.SKU,
-                                                            ItemName = item.Title,
-                                                            Quantity = item.Quantity,
-                                                            UnitWeight = item.Weight,
-                                                            Height = jsopndata.Items.Where(x => x.SKU == item.SKU).FirstOrDefault().Height.ToDecimal(),
-                                                            Width = jsopndata.Items.Where(x => x.SKU == item.SKU).FirstOrDefault().width.ToDecimal(),
-                                                            Length = jsopndata.Items.Where(x => x.SKU == item.SKU).FirstOrDefault().Length.ToDecimal(),
-                                                            stockLocation = "",
-                                                            onHandDate = "",
+
+                                                            PackageWeight = bin.PackagingWeight,
+                                                            PackageWidth = bin.Width,
+                                                            PackageHeight = bin.Height,
+                                                            PackageDepth = bin.Depth,
+                                                            PackageFormat = packagingGroups.SelectMany(pg => pg.PackageTypes).FirstOrDefault(pt => pt.PackageTypeId == bin.fkPackagingTypeId)?.PackageTitle ?? "Default", // you can convert to a human-readable format if needed
+                                                            Items = new List<Item>()
                                                         };
 
-                                                        package.Items.Add(mappedItem);
-                                                    }
+                                                        foreach (var item in bin.Items)
+                                                        {
+                                                            var mappedItem = new Item
+                                                            {
+                                                                ProductCode = item.SKU,
+                                                                ItemName = item.Title,
+                                                                Quantity = item.Quantity,
+                                                                UnitWeight = item.Weight,
+                                                                Height = jsopndata.Items.Where(x => x.SKU == item.SKU).FirstOrDefault().Height.ToDecimal(),
+                                                                Width = jsopndata.Items.Where(x => x.SKU == item.SKU).FirstOrDefault().width.ToDecimal(),
+                                                                Length = jsopndata.Items.Where(x => x.SKU == item.SKU).FirstOrDefault().Length.ToDecimal(),
+                                                                stockLocation = "",
+                                                                onHandDate = "",
+                                                            };
 
-                                                    packages.Add(package);
+                                                            package.Items.Add(mappedItem);
+                                                        }
+
+                                                        packages.Add(package);
+                                                    }
                                                 }
+                                                else
+                                                {
+                                                    packages = new List<Package>() { new Package() {
+                                        PackageDepth = 0,
+                                        PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
+                                        Items = jsopndata.Items.Select(f=> new Item()
+                                        {
+                                            ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
+                                            ItemName =f.Title,
+                                            Quantity = f.Quantity,
+                                            UnitWeight = f.Weight != 0 ? f.Weight.ToDecimal() : 0,
+                                            Height = f.Height != 0 ? f.Height.ToDecimal() : 0,
+                                            Width = f.width != 0 ? f.width.ToDecimal() : 0,
+                                            Length = f.Length != 0 ? f.Length.ToDecimal() : 0,
+
+                                                              //UnitWeight = f.Weight != 0 ? Math.Round(f.Weight.ToDecimal() / 1000, 2) : 0,
+
+                                                          }).ToList()
+                                                    }};
+                                                }
+
+
+
 
 
 
@@ -605,18 +630,18 @@ namespace Rishvi.Modules.ShippingIntegrations.Core
                                                     OrderReference = jsopndata.NumOrderId.ToString(),
                                                     OrderId = 0,
                                                     Packages = packages,
-                                  //                  Packages = new List<Package>() { new Package() {
-                                  //      PackageDepth = 0,
-                                  //      PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
-                                  //      Items = jsopndata.Items.Select(f=> new Item()
-                                  //      {
-                                  //          ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
-                                  //          ItemName =f.Title,
-                                  //          Quantity = f.Quantity,
-                                  //          UnitWeight = f.Weight != 0 ? f.Weight.ToDecimal() : 0,
-                                  //          Height = f.Height != 0 ? f.Height.ToDecimal() : 0,
-                                  //          Width = f.width != 0 ? f.width.ToDecimal() : 0,
-                                  //          Length = f.Length != 0 ? f.Length.ToDecimal() : 0,
+                                                    //                  Packages = new List<Package>() { new Package() {
+                                                    //      PackageDepth = 0,
+                                                    //      PackageHeight  = 0,PackageWeight = 0 ,PackageWidth = 0,
+                                                    //      Items = jsopndata.Items.Select(f=> new Item()
+                                                    //      {
+                                                    //          ProductCode =  f.SKU == null ?f.ChannelSKU : f.SKU,
+                                                    //          ItemName =f.Title,
+                                                    //          Quantity = f.Quantity,
+                                                    //          UnitWeight = f.Weight != 0 ? f.Weight.ToDecimal() : 0,
+                                                    //          Height = f.Height != 0 ? f.Height.ToDecimal() : 0,
+                                                    //          Width = f.width != 0 ? f.width.ToDecimal() : 0,
+                                                    //          Length = f.Length != 0 ? f.Length.ToDecimal() : 0,
 
                                                     //          //UnitWeight = f.Weight != 0 ? Math.Round(f.Weight.ToDecimal() / 1000, 2) : 0,
 
