@@ -596,7 +596,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unhandled error in CancelLabel for OrderReference: {OrderReference}", request.OrderReference);
-                EmailHelper.SendEmail("Failed generate lable in linnworks", ex.Message);
+               // EmailHelper.SendEmail("Failed generate lable in linnworks", ex.Message);
             }
             return new CancelLabelResponse();
         }
