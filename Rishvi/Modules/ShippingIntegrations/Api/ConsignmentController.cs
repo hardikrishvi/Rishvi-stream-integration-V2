@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LinnworksAPI;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Rishvi.Models;
 using Rishvi.Modules.Core.Data;
@@ -6,6 +7,7 @@ using Rishvi.Modules.Core.Helpers;
 using Rishvi.Modules.ShippingIntegrations.Core;
 using Rishvi.Modules.ShippingIntegrations.Models;
 using Rishvi.Modules.ShippingIntegrations.Models.Classes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Rishvi.Modules.ShippingIntegrations.Api
 {
@@ -19,7 +21,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly ILogger<ConsignmentController> _logger;
         private readonly LinnworksController _linnworksController;
 
-        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, LinnworksController linnworksController, ApplicationDbContext context, ManageToken manageToken,  ILogger<ConsignmentController> logger)
+        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, LinnworksController linnworksController, ApplicationDbContext context, ManageToken manageToken, ILogger<ConsignmentController> logger)
         {
             _authorizationToken = authorizationToken;
             _unitOfWork = unitOfWork;
@@ -153,7 +155,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             try
             {
                 // Authenticate and load user config
-                var auth =  _authorizationToken.Load(request.AuthorizationToken);
+                var auth = _authorizationToken.Load(request.AuthorizationToken);
                 if (auth == null)
                 {
                     return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
@@ -168,7 +170,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     LocationName = auth.DefaultLocation;
                 }
 
-                 SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
+                SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
 
                 List<CourierService> services = Services.GetServices;
                 CourierService selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
@@ -182,17 +184,17 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 string VendorCode = selectedService.ServiceGroup;
 
                 GenerateLabelResponse response = new GenerateLabelResponse();
-                var streamAuth =  _manageToken.GetToken(auth);
+                var streamAuth = _manageToken.GetToken(auth);
 
-                var streamOrder =  StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+                var streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
 
                 if (streamOrder == null)
                 {
-                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "Order Not found in Stream"+request.OrderId, "", false, auth.Email);
+                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "Order Not found in Stream" + request.OrderId, "", false, auth.Email);
 
                     await _linnworksController.GetLinnOrderForStream(auth, request.OrderId.ToString());
                     await _linnworksController.CreateLinnworksOrdersToStream(auth.AuthorizationToken, request.OrderId.ToString());
-                    streamOrder =  StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+                    streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
                 }
 
                 if (streamOrder != null)
@@ -250,7 +252,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
                 else
                 {
-                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "Order Not found in Stream" + request.OrderId+" again", "", false, auth.Email);
+                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "Order Not found in Stream" + request.OrderId + " again", "", false, auth.Email);
                     _logger.LogError("GenerateLabel failed for OrderId: {OrderId} Thank you", request.OrderId);
                     return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
                 }
@@ -554,21 +556,42 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 {
                     return new CancelLabelResponse("Authorization failed for token " + request.AuthorizationToken);
                 }
+                var obj = new LinnworksBaseStream(auth.LinnworksToken);
+                CancelOrderShippingLabelRequest canrequest = new CancelOrderShippingLabelRequest();
+
+                var orderdetail = obj.Api.Orders.GetOrderDetailsByNumOrderId(request.OrderReference.ToInt32());
+                if (orderdetail != null)
+                {
+                    canrequest.pkOrderId = orderdetail.OrderId;
+                    var data = obj.Api.ShippingService.CancelOrderShippingLabel(canrequest);
+
+                    _logger.LogInformation("Cancel Label Request Stream Auth Access Token: {AccessToken} and orderid {OrderReference}", auth.LinnworksToken, request.OrderReference);
+                    if (!data.LabelCanceled)
+                    {
+                        _logger.LogError("CancelLabel failed for OrderReference: {OrderReference} with error: {Error}", request.OrderReference, data.ErrorMessage);
+                        return new CancelLabelResponse(data.ErrorMessage);
+                    }
+                    
+                }
+                else
+                {
+                    return new CancelLabelResponse("Order not found");
+                }
 
                 // implement label cancelation routine here 
                 // remember that request will 
 
                 //Call stream delete order api 
-                var streamAuth = _manageToken.GetToken(auth);
+                //var streamAuth = _manageToken.GetToken(auth);
 
-                var streamDeleteOrderResponse = StreamOrderApi.DeleteOrder(streamAuth.AccessToken, request.OrderReference, auth.ClientId, auth.IsLiveAccount);
+                //var streamDeleteOrderResponse = StreamOrderApi.DeleteOrder(streamAuth.AccessToken, request.OrderReference, auth.ClientId, auth.IsLiveAccount);
 
-                _logger.LogInformation("Cancel Label Request Stream Auth Access Token: {AccessToken} and orderid {OrderReference}", streamAuth.AccessToken, request.OrderReference);
-                if (streamDeleteOrderResponse.Item1.response == null && !string.IsNullOrEmpty(streamDeleteOrderResponse.Item2))
-                {
-                    _logger.LogError("CancelLabel failed for OrderReference: {OrderReference} with error: {Error}", request.OrderReference, streamDeleteOrderResponse.Item2);
-                    return new CancelLabelResponse(streamDeleteOrderResponse.Item2);
-                }
+                //_logger.LogInformation("Cancel Label Request Stream Auth Access Token: {AccessToken} and orderid {OrderReference}", streamAuth.AccessToken, request.OrderReference);
+                //if (streamDeleteOrderResponse.Item1.response == null && !string.IsNullOrEmpty(streamDeleteOrderResponse.Item2))
+                //{
+                //    _logger.LogError("CancelLabel failed for OrderReference: {OrderReference} with error: {Error}", request.OrderReference, streamDeleteOrderResponse.Item2);
+                //    return new CancelLabelResponse(streamDeleteOrderResponse.Item2);
+                //}
             }
             catch (Exception ex)
             {
