@@ -17,13 +17,15 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly ApplicationDbContext _context;
         private readonly ManageToken _manageToken;
         private readonly ILogger<ConsignmentController> _logger;
-        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ApplicationDbContext context, ManageToken manageToken, ILogger<ConsignmentController> logger)
+        private readonly SyncController _syncController;
+        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, ApplicationDbContext context, ManageToken manageToken, SyncController syncController, ILogger<ConsignmentController> logger)
         {
             _authorizationToken = authorizationToken;
             _unitOfWork = unitOfWork;
             _context = context;
             _manageToken = manageToken;
             _logger = logger;
+            _syncController = syncController;
         }
 
         [HttpPost(), Route("CreateOrder")]
@@ -277,6 +279,9 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                     }
                     else
                     {
+
+                    _syncController.PluggableStartService(Email, request.OrderId.ToString());
+
                         _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
                         return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
                     }
