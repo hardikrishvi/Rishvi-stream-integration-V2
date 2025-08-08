@@ -5,6 +5,7 @@
         public string OrderReference;
     }
 
+
     public class GenerateLabelRequest : BaseClasses.BaseRequest
     {
         public string Name { get; set; }

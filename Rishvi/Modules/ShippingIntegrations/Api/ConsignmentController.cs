@@ -1,4 +1,5 @@
-﻿using LinnworksAPI;
+﻿using Azure.Core;
+using LinnworksAPI;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Rishvi.Models;
@@ -17,11 +18,12 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         private readonly IAuthorizationToken _authorizationToken;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _context;
+        private readonly SqlContext _dbSqlCContext;
         private readonly ManageToken _manageToken;
         private readonly ILogger<ConsignmentController> _logger;
         private readonly LinnworksController _linnworksController;
 
-        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, LinnworksController linnworksController, ApplicationDbContext context, ManageToken manageToken, ILogger<ConsignmentController> logger)
+        public ConsignmentController(IAuthorizationToken authorizationToken, IUnitOfWork unitOfWork, LinnworksController linnworksController, ApplicationDbContext context, SqlContext dbSqlCContext, ManageToken manageToken, ILogger<ConsignmentController> logger)
         {
             _authorizationToken = authorizationToken;
             _unitOfWork = unitOfWork;
@@ -29,6 +31,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             _manageToken = manageToken;
             _logger = logger;
             _linnworksController = linnworksController;
+            _dbSqlCContext = dbSqlCContext;
 
         }
 
@@ -600,5 +603,68 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
             }
             return new CancelLabelResponse();
         }
+
+        [HttpPost, Route("DeleteOrderFromStream")]
+        public CancelLabelResponse DeleteOrderFromStream(string Email, string orderId)
+        {
+            try
+            {
+                _logger.LogInformation("CancelLabel called with request: {Request}", orderId);
+                SqlHelper.SystemLogInsert("DeleteOrder", null, orderId+" - "+Email, null, "DeleteOrdertart", null, false, "");
+
+                Rishvi.Models.Authorization auth = _dbSqlCContext.Authorizations.Where(x=>x.Email==Email).FirstOrDefault();
+                if (auth == null)
+                {
+                    return new CancelLabelResponse("Authorization failed for token " + auth.AuthorizationToken);
+                }
+
+
+
+                // implement label cancelation routine here 
+                // remember that request will 
+
+                //Call stream delete order api 
+                var streamAuth = _manageToken.GetToken(auth);
+
+                var streamDeleteOrderResponse = StreamOrderApi.DeleteOrder(streamAuth.AccessToken, orderId, auth.ClientId, auth.IsLiveAccount);
+
+                _logger.LogInformation("Cancel Label Request Stream Auth Access Token: {AccessToken} and orderid {OrderReference}", streamAuth.AccessToken, orderId);
+                if (streamDeleteOrderResponse.Item1.response == null && !string.IsNullOrEmpty(streamDeleteOrderResponse.Item2))
+                {
+                    _logger.LogError("CancelLabel failed for OrderReference: {OrderReference} with error: {Error}", orderId, streamDeleteOrderResponse.Item2);
+                    return new CancelLabelResponse(streamDeleteOrderResponse.Item2);
+                }
+                SqlHelper.SystemLogInsert("DeleteOrder", null, orderId + " - " + Email, null, "Order Deleted in stream", null, false, "");
+                var existingReports = _dbSqlCContext.ReportModel
+                    .Where(x => x.email == auth.Email && x.LinnNumOrderId== orderId)
+                    .FirstOrDefault();
+
+                if (existingReports != null)
+                {
+                    existingReports.StreamOrderId = null;
+                    existingReports.StreamOrderId = null;
+                            existingReports.StreamConsignmentId = null;
+                    existingReports.StreamTrackingNumber = null;
+                    existingReports.StreamTrackingURL = null;
+                    existingReports.IsLinnOrderCreatedInStream = false;
+                    existingReports.CreateLinnOrderInStream = null;
+                    existingReports.StreamOrderCreateJson = null;
+                    existingReports.updatedDate = DateTime.Now;
+                    _dbSqlCContext.SaveChanges();
+                }
+                else
+                {
+                    EmailHelper.SendEmail("Failed generate lable", $"Orderno{ orderId} not found in the database");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled error in delete for OrderReference: {OrderReference}", orderId);
+                EmailHelper.SendEmail("Failed generate lable", ex.Message);
+            }
+            return new CancelLabelResponse();
+        }
+
     }
 }
