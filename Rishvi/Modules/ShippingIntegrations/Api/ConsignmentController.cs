@@ -141,161 +141,392 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         }
 
         [HttpPost, Route("GenerateLabel")]
-
         public GenerateLabelResponse GenerateLabel([FromBody] GenerateLabelRequest request)
         {
             _logger.LogInformation("GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
-            
-                string Email = "";
+            string email = "";
 
-                try
+            try
+            {
+                var auth = _authorizationToken.Load(request.AuthorizationToken);
+                if (auth == null)
+                    return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
+
+                email = auth.Email;
+                string locationName = string.IsNullOrWhiteSpace(auth.DefaultLocation) ? "SGK" : auth.DefaultLocation;
+                string handsonDate = auth.HandsOnDate ? DateTime.Now.ToString() : "";
+
+                SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
+
+                var services = Services.GetServices;
+                var selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
+                if (selectedService == null)
+                    throw new Exception("Service Id " + request.ServiceId + " is not available");
+
+                var streamAuth = _manageToken.GetToken(auth);
+                var streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+
+                if (streamOrder == null)
                 {
-                    // lets authenticate the user and make sure we have their config details
-                    Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
-                    if (auth == null)
+                    _syncController.PluggableStartService(email, request.OrderId.ToString());
+                    streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+                }
+
+                if (streamOrder == null)
+                {
+                    _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
+                    return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
+                }
+
+                var response = new GenerateLabelResponse();
+                int itemCount = 1;
+                int totalItemCount = request.Packages.Count;
+
+                foreach (var package in request.Packages)
+                {
+                    if (email == "johnny@max-motorcycles.co.uk" || email == "info@linnworkscustom.com")
                     {
-                        return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
-                    }
-                    Email = auth.Email;
-                    string LocationName = "SGK";
-                    string HandsonDate = "";
-
-                    if (auth.HandsOnDate)
-                    {
-                        HandsonDate = DateTime.Now.ToString();
-                    }
-                    if (auth.UseDefaultLocation && auth.DefaultLocation != "")
-                    {
-                        LocationName = auth.DefaultLocation;
-                    }
-
-                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
-                    // load all the services we have (either for this user specifically or all services)
-                    List<CourierService> services = Services.GetServices;
-
-                    //linnworks will send the serviceId as defined in list of services, we will need to find the service by id 
-                    CourierService selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
-                    if (selectedService == null)
-                    {
-                        _logger.LogError("GenerateLabel Service Id {ServiceId} is not available", request.ServiceId);
-                        throw new Exception("Service Id " + request.ServiceId.ToString() + " is not available");
-                    }
-
-                    // get the service code
-                    string serviceCode = selectedService.ServiceCode;
-                    //and some other information, whatever we need
-                    string VendorCode = selectedService.ServiceGroup;
-
-                    //create response class, we will be adding packages to it
-                    GenerateLabelResponse response = new GenerateLabelResponse();
-                    var streamAuth = _manageToken.GetToken(auth);
-
-                    StreamGetOrderResponse.Root streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
-
-                    //if (streamOrder!=null)
-                    //{
-                    //    string ord = ;
-                    //}
-
-                    //var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString(),LocationName,HandsonDate);
-                    ///* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
-                    if (streamOrder != null)
-                    {
-                        int itemCount = 1;
-                        int totalItemCount = request.Packages.Count;
-                        foreach (var package in request.Packages)   // we need to generate a label for each package in the consignment
-                        {
-                            if (Email == "johnny@max-motorcycles.co.uk" || Email == "info@linnworkscustom.com")
-                            {
-                                // an order may have extended property bound to it, here we can pass any specific parameter we need
-                                // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
-                                string safePlace1 = "";
-                                if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
-                                {
-                                    safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
-                                }
-
-                                //generate new tracking number
-                                //string newTrackingNumber = request.CountryCode + " " + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-
-                                // each consignment must have lead tracking number. In case of multiple packages this will be the main tracking number which allows us to track the whole shipment by one tracking number. When the courier doesn't support this simply allocate the first package tracking number as a lead tracking number
-                                if (response.LeadTrackingNumber == "") { response.LeadTrackingNumber = streamOrder?.response?.order?.trackingId; }
-                                // we now need to add packages back into response, one item per package which contains label and any associated documentation
-                                response.Package.Add(new PackageResponse()
-                                {
-                                    LabelHeight = 6,                // label height in inches
-                                    LabelWidth = 4,                 // label width in inches
-                                    PNGLabelDataBase64 = LabelGenerator.GenerateLabel_New2(request, package.Items[0], streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
-                                    SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
-                                    PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
-                                    TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
-                                });
-
-                                /* Here you can also save the consignment data and associate package/label information in some sort of database
-                                 * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
-                                 */
-                                itemCount++;
-                            }
-                            else
-                            {
-                                foreach (var item in package.Items)
-                                {
-
-                                    // an order may have extended property bound to it, here we can pass any specific parameter we need
-                                    // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
-                                    string safePlace1 = "";
-                                    if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
-                                    {
-                                        safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
-                                    }
-
-                                    //generate new tracking number
-                                    //string newTrackingNumber = request.CountryCode + " " + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-
-                                    // each consignment must have lead tracking number. In case of multiple packages this will be the main tracking number which allows us to track the whole shipment by one tracking number. When the courier doesn't support this simply allocate the first package tracking number as a lead tracking number
-                                    if (response.LeadTrackingNumber == "") { response.LeadTrackingNumber = streamOrder?.response?.order?.trackingId; }
-                                    // we now need to add packages back into response, one item per package which contains label and any associated documentation
-                                    response.Package.Add(new PackageResponse()
-                                    {
-                                        LabelHeight = 6,                // label height in inches
-                                        LabelWidth = 4,                 // label width in inches
-                                        PNGLabelDataBase64 = LabelGenerator.GenerateLabel(request, item, streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
-                                        SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
-                                        PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
-                                        TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
-                                    });
-
-                                    /* Here you can also save the consignment data and associate package/label information in some sort of database
-                                     * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
-                                     */
-                                    itemCount++;
-                                }
-                            }
-
-
-                        }
-                        _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
-                        return response;
+                        // Special label generation for specific users
+                        var label = GeneratePackageLabel_New2(request, package, streamOrder, itemCount, totalItemCount);
+                        response.Package.Add(label);
+                        if (string.IsNullOrEmpty(response.LeadTrackingNumber))
+                            response.LeadTrackingNumber = label.TrackingNumber;
                     }
                     else
                     {
-
-                    _syncController.PluggableStartService(Email, request.OrderId.ToString());
-
-                        _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
-                        return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
+                        foreach (var item in package.Items)
+                        {
+                            var label = GeneratePackageLabel(request, item, streamOrder, package.SequenceNumber, itemCount, totalItemCount);
+                            response.Package.Add(label);
+                            if (string.IsNullOrEmpty(response.LeadTrackingNumber))
+                                response.LeadTrackingNumber = label.TrackingNumber;
+                        }
                     }
+                    itemCount++;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Unhandled error in GenerateLabel for OrderId: {OrderId}", request.OrderId);
-                    SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
-                    EmailHelper.SendEmail("Failed generate lable", ex.ToString());
-                    return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
-                }
-            
 
+                _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled error in GenerateLabel for OrderId: {OrderId}", request.OrderId);
+                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, email);
+                EmailHelper.SendEmail("Failed generate lable", ex.ToString());
+                return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
+            }
         }
+
+
+        private PackageResponse GeneratePackageLabel(
+    GenerateLabelRequest request,
+    Rishvi.Modules.ShippingIntegrations.Models.Item item,
+    StreamGetOrderResponse.Root streamOrder,
+    int sequenceNumber,
+    int itemCount,
+    int totalItemCount)
+        {
+            return new PackageResponse
+            {
+                LabelHeight = 6,
+                LabelWidth = 4,
+                PNGLabelDataBase64 = LabelGenerator.GenerateLabel(
+                    request, item,
+                    streamOrder?.response?.order?.trackingId,
+                    streamOrder?.response?.order?.header?.consignmentNo,
+                    CodeHelper.FormatAddress(request),
+                    itemCount,
+                    totalItemCount,
+                    "", ""),
+                SequenceNumber = sequenceNumber,
+                PDFBytesDocumentationBase64 = new string[] { },
+                TrackingNumber = streamOrder?.response?.order?.trackingId
+            };
+        }
+
+        private PackageResponse GeneratePackageLabel_New2(
+            GenerateLabelRequest request,
+            Package package,
+            StreamGetOrderResponse.Root streamOrder,
+            int itemCount,
+            int totalItemCount)
+        {
+            return new PackageResponse
+            {
+                LabelHeight = 6,
+                LabelWidth = 4,
+                PNGLabelDataBase64 = LabelGenerator.GenerateLabel_New2(
+                    request,
+                    package.Items[0],
+                    streamOrder?.response?.order?.trackingId,
+                    streamOrder?.response?.order?.header?.consignmentNo,
+                    CodeHelper.FormatAddress(request),
+                    itemCount,
+                    totalItemCount,
+                    "", ""),
+                SequenceNumber = package.SequenceNumber,
+                PDFBytesDocumentationBase64 = new string[] { },
+                TrackingNumber = streamOrder?.response?.order?.trackingId
+            };
+        }
+
+
+        //public GenerateLabelResponse GenerateLabel([FromBody] GenerateLabelRequest request)
+        //{
+        //    _logger.LogInformation("GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
+
+        //        string Email = "";
+
+        //        try
+        //        {
+        //            // lets authenticate the user and make sure we have their config details
+        //            Rishvi.Models.Authorization auth = _authorizationToken.Load(request.AuthorizationToken);
+        //            if (auth == null)
+        //            {
+        //                return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
+        //            }
+        //            Email = auth.Email;
+        //            string LocationName = "SGK";
+        //            string HandsonDate = "";
+
+        //            if (auth.HandsOnDate)
+        //            { 
+        //                HandsonDate = DateTime.Now.ToString();
+        //            }
+        //            if (auth.UseDefaultLocation && auth.DefaultLocation != "")
+        //            {
+        //                LocationName = auth.DefaultLocation;
+        //            }
+
+        //            SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
+        //            // load all the services we have (either for this user specifically or all services)
+        //            List<CourierService> services = Services.GetServices;
+
+        //            //linnworks will send the serviceId as defined in list of services, we will need to find the service by id 
+        //            CourierService selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
+        //            if (selectedService == null)
+        //            {
+        //                _logger.LogError("GenerateLabel Service Id {ServiceId} is not available", request.ServiceId);
+        //                throw new Exception("Service Id " + request.ServiceId.ToString() + " is not available");
+        //            }
+
+        //            // get the service code
+        //            string serviceCode = selectedService.ServiceCode;
+        //            //and some other information, whatever we need
+        //            string VendorCode = selectedService.ServiceGroup;
+
+        //            //create response class, we will be adding packages to it
+        //            GenerateLabelResponse response = new GenerateLabelResponse();
+        //            var streamAuth = _manageToken.GetToken(auth);
+
+        //            StreamGetOrderResponse.Root streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+
+        //            //if (streamOrder!=null)
+        //            //{
+        //            //    string ord = ;
+        //            //}
+
+        //            //var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString(),LocationName,HandsonDate);
+        //            ///* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
+        //            if (streamOrder != null)
+        //            {
+        //                int itemCount = 1;
+        //                int totalItemCount = request.Packages.Count;
+        //                foreach (var package in request.Packages)   // we need to generate a label for each package in the consignment
+        //                {
+        //                    if (Email == "johnny@max-motorcycles.co.uk" || Email == "info@linnworkscustom.com")
+        //                    {
+        //                        // an order may have extended property bound to it, here we can pass any specific parameter we need
+        //                        // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
+        //                        string safePlace1 = "";
+        //                        if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
+        //                        {
+        //                            safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
+        //                        }
+
+        //                        //generate new tracking number
+        //                        //string newTrackingNumber = request.CountryCode + " " + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+
+        //                        // each consignment must have lead tracking number. In case of multiple packages this will be the main tracking number which allows us to track the whole shipment by one tracking number. When the courier doesn't support this simply allocate the first package tracking number as a lead tracking number
+        //                        if (response.LeadTrackingNumber == "") { response.LeadTrackingNumber = streamOrder?.response?.order?.trackingId; }
+        //                        // we now need to add packages back into response, one item per package which contains label and any associated documentation
+        //                        response.Package.Add(new PackageResponse()
+        //                        {
+        //                            LabelHeight = 6,                // label height in inches
+        //                            LabelWidth = 4,                 // label width in inches
+        //                            PNGLabelDataBase64 = LabelGenerator.GenerateLabel_New2(request, package.Items[0], streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
+        //                            SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
+        //                            PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
+        //                            TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
+        //                        });
+
+        //                        /* Here you can also save the consignment data and associate package/label information in some sort of database
+        //                         * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
+        //                         */
+        //                        itemCount++;
+        //                    }
+        //                    else
+        //                    {
+        //                        foreach (var item in package.Items)
+        //                        {
+
+        //                            // an order may have extended property bound to it, here we can pass any specific parameter we need
+        //                            // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
+        //                            string safePlace1 = "";
+        //                            if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
+        //                            {
+        //                                safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
+        //                            }
+
+        //                            //generate new tracking number
+        //                            //string newTrackingNumber = request.CountryCode + " " + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+
+        //                            // each consignment must have lead tracking number. In case of multiple packages this will be the main tracking number which allows us to track the whole shipment by one tracking number. When the courier doesn't support this simply allocate the first package tracking number as a lead tracking number
+        //                            if (response.LeadTrackingNumber == "") { response.LeadTrackingNumber = streamOrder?.response?.order?.trackingId; }
+        //                            // we now need to add packages back into response, one item per package which contains label and any associated documentation
+        //                            response.Package.Add(new PackageResponse()
+        //                            {
+        //                                LabelHeight = 6,                // label height in inches
+        //                                LabelWidth = 4,                 // label width in inches
+        //                                PNGLabelDataBase64 = LabelGenerator.GenerateLabel(request, item, streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
+        //                                SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
+        //                                PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
+        //                                TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
+        //                            });
+
+        //                            /* Here you can also save the consignment data and associate package/label information in some sort of database
+        //                             * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
+        //                             */
+        //                            itemCount++;
+        //                        }
+        //                    }
+
+
+        //                }
+        //                _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
+        //                return response;
+        //            }
+        //            else
+        //            {
+
+        //            _syncController.PluggableStartService(Email, request.OrderId.ToString());
+        //            GenerateLabel(request);
+
+
+
+        //             streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+
+        //            //if (streamOrder!=null)
+        //            //{
+        //            //    string ord = ;
+        //            //}
+
+        //            //var streamOrderResponse = StreamOrderApi.CreateOrder(request, auth.ClientId, streamAuth.AccessToken, selectedService, false, "DELIVERY",request.OrderId.ToString(),LocationName,HandsonDate);
+        //            ///* If you need to do any validation of services or consignment data, do it before you generate labels and simply throw an error 
+        //            if (streamOrder != null)
+        //            {
+        //                int itemCount = 1;
+        //                int totalItemCount = request.Packages.Count;
+        //                foreach (var package in request.Packages)   // we need to generate a label for each package in the consignment
+        //                {
+        //                    if (Email == "johnny@max-motorcycles.co.uk" || Email == "info@linnworkscustom.com")
+        //                    {
+        //                        // an order may have extended property bound to it, here we can pass any specific parameter we need
+        //                        // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
+        //                        string safePlace1 = "";
+        //                        if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
+        //                        {
+        //                            safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
+        //                        }
+
+        //                        //generate new tracking number
+        //                        //string newTrackingNumber = request.CountryCode + " " + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+
+        //                        // each consignment must have lead tracking number. In case of multiple packages this will be the main tracking number which allows us to track the whole shipment by one tracking number. When the courier doesn't support this simply allocate the first package tracking number as a lead tracking number
+        //                        if (response.LeadTrackingNumber == "") { response.LeadTrackingNumber = streamOrder?.response?.order?.trackingId; }
+        //                        // we now need to add packages back into response, one item per package which contains label and any associated documentation
+        //                        response.Package.Add(new PackageResponse()
+        //                        {
+        //                            LabelHeight = 6,                // label height in inches
+        //                            LabelWidth = 4,                 // label width in inches
+        //                            PNGLabelDataBase64 = LabelGenerator.GenerateLabel_New2(request, package.Items[0], streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
+        //                            SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
+        //                            PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
+        //                            TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
+        //                        });
+
+        //                        /* Here you can also save the consignment data and associate package/label information in some sort of database
+        //                         * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
+        //                         */
+        //                        itemCount++;
+        //                    }
+        //                    else
+        //                    {
+        //                        foreach (var item in package.Items)
+        //                        {
+
+        //                            // an order may have extended property bound to it, here we can pass any specific parameter we need
+        //                            // in this specific example we will be taking SafePlace extended property of the order and outputting it on the label
+        //                            string safePlace1 = "";
+        //                            if (request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1") != null)
+        //                            {
+        //                                safePlace1 = request.OrderExtendedProperties.Find(s => s.Name == "SafePlace1").Value;
+        //                            }
+
+        //                            //generate new tracking number
+        //                            //string newTrackingNumber = request.CountryCode + " " + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+
+        //                            // each consignment must have lead tracking number. In case of multiple packages this will be the main tracking number which allows us to track the whole shipment by one tracking number. When the courier doesn't support this simply allocate the first package tracking number as a lead tracking number
+        //                            if (response.LeadTrackingNumber == "") { response.LeadTrackingNumber = streamOrder?.response?.order?.trackingId; }
+        //                            // we now need to add packages back into response, one item per package which contains label and any associated documentation
+        //                            response.Package.Add(new PackageResponse()
+        //                            {
+        //                                LabelHeight = 6,                // label height in inches
+        //                                LabelWidth = 4,                 // label width in inches
+        //                                PNGLabelDataBase64 = LabelGenerator.GenerateLabel(request, item, streamOrder?.response?.order?.trackingId, streamOrder?.response?.order?.header?.consignmentNo, CodeHelper.FormatAddress(request), itemCount, totalItemCount, "", ""), // generate the label image, get its bytes and convert bytes to Base64 string
+        //                                SequenceNumber = package.SequenceNumber,    //VERY IMPORTANT TO PRESERVE Sequence number for each package!!!!
+        //                                PDFBytesDocumentationBase64 = new string[] { },         // here we can add any additional documentation, such as customs forms, declarations etc. PDF files converted to Base64 string
+        //                                TrackingNumber = streamOrder?.response?.order?.trackingId // package tracking number
+        //                            });
+
+        //                            /* Here you can also save the consignment data and associate package/label information in some sort of database
+        //                             * if you need to have manifestation or label cancelation reference numbers associated with orderReferences or Order Ids in linnworks
+        //                             */
+        //                            itemCount++;
+        //                        }
+        //                    }
+
+
+        //                }
+        //                _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
+        //                return response;
+        //            }
+        //            else
+        //            {
+        //                _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
+        //                return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
+        //            }
+
+
+
+
+
+
+
+
+
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _logger.LogError(ex, "Unhandled error in GenerateLabel for OrderId: {OrderId}", request.OrderId);
+        //            SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, Email);
+        //            EmailHelper.SendEmail("Failed generate lable", ex.ToString());
+        //            return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
+        //        }
+
+
+        //}
 
         // Converts a System.Drawing.Image to a byte array.
         static byte[] ImageToByteArray(System.Drawing.Image imageIn)
