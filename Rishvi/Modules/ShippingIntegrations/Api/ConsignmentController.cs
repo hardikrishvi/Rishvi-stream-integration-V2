@@ -188,6 +188,8 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
 
                 if (streamOrder == null)
                 {
+                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "Order Not found in Stream"+request.OrderId, "", false, auth.Email);
+
                     await _linnworksController.GetLinnOrderForStream(auth, request.OrderId.ToString());
                     await _linnworksController.CreateLinnworksOrdersToStream(auth.AuthorizationToken, request.OrderId.ToString());
                     streamOrder =  StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
@@ -248,6 +250,7 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
                 }
                 else
                 {
+                    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "Order Not found in Stream" + request.OrderId+" again", "", false, auth.Email);
                     _logger.LogError("GenerateLabel failed for OrderId: {OrderId} Thank you", request.OrderId);
                     return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
                 }
