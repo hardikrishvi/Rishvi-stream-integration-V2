@@ -145,76 +145,77 @@ namespace Rishvi.Modules.ShippingIntegrations.Api
         {
             _logger.LogInformation("GenerateLabel called with request: {Request}", JsonConvert.SerializeObject(request));
             string email = "";
+             var response = new GenerateLabelResponse();
+            return response;
+            //try
+            //{
+            //    var auth = _authorizationToken.Load(request.AuthorizationToken);
+            //    if (auth == null)
+            //        return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
 
-            try
-            {
-                var auth = _authorizationToken.Load(request.AuthorizationToken);
-                if (auth == null)
-                    return new GenerateLabelResponse("Authorization failed for token " + request.AuthorizationToken);
+            //    email = auth.Email;
+            //    string locationName = string.IsNullOrWhiteSpace(auth.DefaultLocation) ? "SGK" : auth.DefaultLocation;
+            //    string handsonDate = auth.HandsOnDate ? DateTime.Now.ToString() : "";
 
-                email = auth.Email;
-                string locationName = string.IsNullOrWhiteSpace(auth.DefaultLocation) ? "SGK" : auth.DefaultLocation;
-                string handsonDate = auth.HandsOnDate ? DateTime.Now.ToString() : "";
+            //    SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
 
-                SqlHelper.SystemLogInsert("GenerateLabel", "", JsonConvert.SerializeObject(request).Replace("'", "''"), "", "GenerateLabel", "", false, auth.Email);
+            //    var services = Services.GetServices;
+            //    var selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
+            //    if (selectedService == null)
+            //        throw new Exception("Service Id " + request.ServiceId + " is not available");
 
-                var services = Services.GetServices;
-                var selectedService = services.Find(s => s.ServiceUniqueId == request.ServiceId);
-                if (selectedService == null)
-                    throw new Exception("Service Id " + request.ServiceId + " is not available");
+            //    var streamAuth = _manageToken.GetToken(auth);
+            //    var streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
 
-                var streamAuth = _manageToken.GetToken(auth);
-                var streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+            //    if (streamOrder == null)
+            //    {
+            //        _syncController.PluggableStartService(email, request.OrderId.ToString());
+            //        streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
+            //    }
 
-                if (streamOrder == null)
-                {
-                    _syncController.PluggableStartService(email, request.OrderId.ToString());
-                    streamOrder = StreamOrderApi.GetOrder(streamAuth.AccessToken, request.OrderId.ToString(), auth.ClientId, auth.IsLiveAccount);
-                }
+            //    if (streamOrder == null)
+            //    {
+            //        _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
+            //        return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
+            //    }
 
-                if (streamOrder == null)
-                {
-                    _logger.LogError("GenerateLabel failed for OrderId: {OrderId}", request.OrderId);
-                    return new GenerateLabelResponse($"GenerateLabel failed for OrderId: {request.OrderId}");
-                }
+            //    var response = new GenerateLabelResponse();
+            //    int itemCount = 1;
+            //    int totalItemCount = request.Packages.Count;
 
-                var response = new GenerateLabelResponse();
-                int itemCount = 1;
-                int totalItemCount = request.Packages.Count;
+            //    foreach (var package in request.Packages)
+            //    {
+            //        if (email == "johnny@max-motorcycles.co.uk" || email == "info@linnworkscustom.com")
+            //        {
+            //            // Special label generation for specific users
+            //            var label = GeneratePackageLabel_New2(request, package, streamOrder, itemCount, totalItemCount);
+            //            response.Package.Add(label);
+            //            if (string.IsNullOrEmpty(response.LeadTrackingNumber))
+            //                response.LeadTrackingNumber = label.TrackingNumber;
+            //        }
+            //        else
+            //        {
+            //            foreach (var item in package.Items)
+            //            {
+            //                var label = GeneratePackageLabel(request, item, streamOrder, package.SequenceNumber, itemCount, totalItemCount);
+            //                response.Package.Add(label);
+            //                if (string.IsNullOrEmpty(response.LeadTrackingNumber))
+            //                    response.LeadTrackingNumber = label.TrackingNumber;
+            //            }
+            //        }
+            //        itemCount++;
+            //    }
 
-                foreach (var package in request.Packages)
-                {
-                    if (email == "johnny@max-motorcycles.co.uk" || email == "info@linnworkscustom.com")
-                    {
-                        // Special label generation for specific users
-                        var label = GeneratePackageLabel_New2(request, package, streamOrder, itemCount, totalItemCount);
-                        response.Package.Add(label);
-                        if (string.IsNullOrEmpty(response.LeadTrackingNumber))
-                            response.LeadTrackingNumber = label.TrackingNumber;
-                    }
-                    else
-                    {
-                        foreach (var item in package.Items)
-                        {
-                            var label = GeneratePackageLabel(request, item, streamOrder, package.SequenceNumber, itemCount, totalItemCount);
-                            response.Package.Add(label);
-                            if (string.IsNullOrEmpty(response.LeadTrackingNumber))
-                                response.LeadTrackingNumber = label.TrackingNumber;
-                        }
-                    }
-                    itemCount++;
-                }
-
-                _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unhandled error in GenerateLabel for OrderId: {OrderId}", request.OrderId);
-                SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, email);
-                EmailHelper.SendEmail("Failed generate lable", ex.ToString());
-                return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
-            }
+            //    _logger.LogInformation("GenerateLabel completed successfully for OrderId: {OrderId}", request.OrderId);
+            //    return response;
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "Unhandled error in GenerateLabel for OrderId: {OrderId}", request.OrderId);
+            //    SqlHelper.SystemLogInsert("CreateOrder", null, JsonConvert.SerializeObject(request).Replace("'", "''"), null, "OrderCatchError", ex.Message, true, email);
+            //    EmailHelper.SendEmail("Failed generate lable", ex.ToString());
+            //    return new GenerateLabelResponse("Unhandled error " + ex.ToString()) { IsError = true };
+            //}
         }
 
 
